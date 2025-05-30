@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Admin - Frequence SUD</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bento-gap: 16px;
+            --bento-border-radius: 18px; /* Un peu moins pour le dashboard */
+            --color-primary: #ed1e79;
+            --color-secondary: #fbb034;
+            --color-text: #202020;
+            --color-background-card: #ffffff;
+            --color-background-page: #e9edf0; /* Fond légèrement différent pour le dash */
+            --color-admin-accent: #2a75bb; /* Une couleur pour les éléments d'admin */
+        }
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            background-color: var(--color-background-page);
+            margin: 0;
+            padding: 0;
+            color: var(--color-text);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 420px;
+            background-color: #3b9fc8; /* Un bleu nuit pour la sidebar */
+            color: #ecf0f1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            overflow-y: auto; /* Permet le scroll si le formulaire est long */
+            flex-shrink: 0; /* Ne pas rétrécir la sidebar */
+        }
+        .sidebar h2 {
+            color: var(--color-secondary);
+            font-size: 1.5em;
+            margin-top: 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #34495e;
+            padding-bottom: 15px;
+        }
+        .sidebar label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+        .sidebar input[type="text"],
+        .sidebar textarea,
+        .sidebar select,
+        .sidebar input[type="color"],
+        .sidebar input[type="email"], /* Pour le login */
+        .sidebar input[type="password"] { /* Pour le login */
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #34495e;
+            background-color: #4a627a;
+            color: #ecf0f1;
+            font-size: 0.9em;
+            box-sizing: border-box;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            height: 40px;
+            padding: 0;
+        }
+        .sidebar input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        .sidebar input[type="color"]::-webkit-color-swatch { border: none; border-radius: 4px; }
+        .sidebar input[type="color"]::-moz-color-swatch { border: none; border-radius: 4px; }
+
+        .sidebar input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        .sidebar .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .sidebar .checkbox-group label {
+            margin-bottom: 0;
+            margin-right: 0;
+        }
+
+        .sidebar button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #34495e;
+            background-color: var(--color-admin-accent);
+            color: #fff;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9em;
+            box-sizing: border-box;
+            transition: background-color 0.2s;
+        }
+        .sidebar button:hover { background-color: #3498db; }
+        .sidebar button#cancelEditBtn {
+            background-color: #7f8c8d;
+        }
+        .sidebar button#cancelEditBtn:hover { background-color: #95a5a6; }
+
+        .sidebar #cardPropertiesForm { display: none; }
+        .sidebar #loggedInContent { display: none; } /* Cache le contenu admin par défaut */
+        .sidebar #authStatus { margin-bottom: 20px; font-size: 0.9em; text-align: center; color: #ecf0f1;}
+        .sidebar #loginForm { background-color: #34495e; padding: 20px; border-radius: 8px; margin-bottom: 20px;}
+        .sidebar #loginError { color: #e74c3c; font-size: 0.85em; margin-bottom: 10px; text-align: center;}
+        .sidebar #logoutBtn { background-color: #e74c3c; margin-top: 20px;}
+        .sidebar #logoutBtn:hover { background-color: #c0392b;}
+
+
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .main-content h1 {
+            margin-top: 0;
+            color: var(--color-primary);
+        }
+
+        .bento-preview-area {
+            border: 2px dashed #bdc3c7;
+            padding: var(--bento-gap);
+            background-color: #f8f9fa;
+            min-height: 400px;
+        }
+        .bento-board-admin {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: minmax(120px, auto);
+            gap: var(--bento-gap);
+        }
+
+        .card-admin {
+            background-color: var(--color-background-card);
+            border-radius: var(--bento-border-radius);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+            padding: 15px;
+            position: relative;
+            border: 2px solid transparent;
+            cursor: grab;
+            display: flex;
+            flex-direction: column;
+            font-size: 0.9em;
+            min-height: 100px;
+            transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s, color 0.2s;
+        }
+        .card-admin.selected {
+            border-color: var(--color-admin-accent);
+            box-shadow: 0 0 0 3px var(--color-admin-accent);
+        }
+        .card-admin.text-light {
+            color: #fff;
+        }
+        .card-admin.text-light .card-title-admin, .card-admin.text-light .card-content-preview {
+            color: #fff;
+        }
+
+        .card-admin .card-title-admin { font-weight: 600; margin-bottom: 5px; }
+        .card-admin .card-content-preview {
+            font-size: 0.85em; color: #555;
+            overflow: hidden; text-overflow: ellipsis; display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            flex-grow: 1;
+        }
+        .card-admin .card-actions-admin {
+            margin-top: 10px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .card-admin .card-actions-admin button {
+            padding: 3px 6px; font-size: 0.75em; margin-left: 5px;
+            background-color: #7f8c8d; color:white; border:none; border-radius:3px; cursor:pointer;
+            transition: background-color 0.2s;
+        }
+        .card-admin .card-actions-admin button.delete { background-color: #c0392b; }
+        .card-admin .card-actions-admin button.delete:hover { background-color: #e74c3c; }
+        .card-admin .card-actions-admin button.edit-card:hover { background-color: #55758a; }
+
+        /* Classes de taille pour les cartes admin */
+        .card-admin.card-col-span-2 { grid-column: span 2; }
+        .card-admin.card-col-span-3 { grid-column: span 3; }
+        .card-admin.card-col-span-4 { grid-column: span 4; }
+        .card-admin.card-row-span-2 { grid-row: span 2; min-height: calc( (120px * 2) + var(--bento-gap) );}
+        .card-admin.card-col-span-2.card-row-span-2 { min-height: calc( (120px * 2) + var(--bento-gap) );}
+
+
+        #jsonOutputContainer, #emailHtmlOutputContainer { margin-top: 30px; }
+        #jsonOutputContainer textarea, #emailHtmlOutputContainer textarea {
+            width: 100%;
+            min-height: 150px;
+            font-family: monospace;
+            font-size: 0.8em;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        #jsonOutputContainer button, #emailHtmlOutputContainer button { margin-bottom: 15px; }
+        #jsonOutputContainer button { background-color: var(--color-primary); }
+        #emailHtmlOutputContainer button { background-color: #e06c75; }
+        #emailHtmlOutputContainer button:hover { background-color: #f38b93; }
+
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar {
+                width: 100%;
+                max-height: 400px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            }
+            .main-content { padding: 15px; }
+            .bento-board-admin {
+                grid-template-columns: repeat(2, 1fr);
+                grid-auto-rows: minmax(100px, auto);
+                gap: calc(var(--bento-gap) * 0.8);
+            }
+            .card-admin.card-col-span-3, .card-admin.card-col-span-4 { grid-column: span 2; }
+            .card-admin.card-row-span-2 { min-height: calc( (100px * 2) + var(--bento-gap) * 0.8 );}
+            .card-admin.card-col-span-2.card-row-span-2 { min-height: calc( (100px * 2) + var(--bento-gap) * 0.8 );}
+        }
+        @media (max-width: 480px) {
+             .bento-board-admin {
+                grid-template-columns: 1fr;
+            }
+            .card-admin.card-col-span-2, .card-admin.card-col-span-3, .card-admin.card-col-span-4 { grid-column: span 1; }
+             .card-admin.card-row-span-2 { min-height: calc( (100px * 2) + var(--bento-gap) * 0.8 );}
+             .card-admin.card-col-span-2.card-row-span-2 { min-height: calc( (100px * 2) + var(--bento-gap) * 0.8 );}
+        }
+        .feedback-message {
+        position: fixed; /* Fixé dans la fenêtre d'affichage (viewport) */
+        top: 50%; /* Aligne le bord supérieur au milieu de la hauteur de la fenêtre */
+        left: 50%; /* Aligne le bord gauche au milieu de la largeur de la fenêtre */
+        transform: translate(-50%, -50%); /* Décale l'élément de la moitié de sa propre largeur/hauteur pour un centrage parfait */
+        z-index: 9999; /* Assure qu'il est au-dessus de tout autre contenu */
+
+        max-width: 600px;
+        width: calc(100% - 40px); /* Pour la réactivité sur mobile (20px de padding de chaque côté) */
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        
+        display: none; /* Caché par défaut, géré par JS */
+        align-items: center; /* Centrage vertical du contenu interne (icône + texte) */
+        gap: 10px; /* Espace entre l'icône et le texte */
+
+        font-size: 0.95em;
+        font-weight: 500;
+        color: #fff;
+        opacity: 0; /* Pour l'animation d'apparition */
+        transition: opacity 0.3s ease-out, transform 0.3s ease-out, background-color 0.2s;
+        box-sizing: border-box;
+    }
+
+    .feedback-message.show {
+        opacity: 1;
+        /* Le transform est déjà géré par l'état initial, mais le répéter peut parfois aider avec les transitions */
+        transform: translate(-50%, -50%); 
+        display: flex; /* Rend l'élément visible en tant que conteneur flex */
+    }
+
+        .feedback-message.success {
+            background-color: #28a745;
+            border: 1px solid #218838;
+        }
+
+        .feedback-message.error {
+            background-color: #dc3545;
+            border: 1px solid #c82333;
+        }
+
+        .feedback-message.loading {
+            background-color: #007bff;
+            border: 1px solid #0069d9;
+        }
+
+        .feedback-icon {
+            font-size: 1.2em;
+            flex-shrink: 0;
+        }
+
+        /* Animation du spinner */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .feedback-icon.spinner::before {
+            content: '🔄';
+            display: inline-block;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Icônes spécifiques */
+        .feedback-icon.check::before { content: '✅'; }
+        .feedback-icon.cross::before { content: '❌'; }
+        .feedback-icon.info::before { content: 'ℹ️'; }
+
+        /* Responsive pour le message de feedback */
+        @media (max-width: 768px) {
+            .feedback-message {
+                margin: 0 auto 15px auto;
+                font-size: 0.9em;
+                padding: 10px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>Admin SUD</h2>
+
+        <!-- Formulaire de Connexion -->
+        <div id="loginForm">
+            <h3>Connexion</h3>
+            <p id="loginError" style="display:none;"></p>
+            <div>
+                <label for="loginEmail">Email :</label>
+                <input type="email" id="loginEmail" placeholder="admin@example.com">
+            </div>
+            <div>
+                <label for="loginPassword">Mot de passe :</label>
+                <input type="password" id="loginPassword" placeholder="********">
+            </div>
+            <button id="signInBtn">Se connecter</button>
+        </div>
+
+        <!-- Contenu affiché après connexion -->
+        <div id="loggedInContent">
+            <p id="authStatus"></p>
+            
+            <hr style="border-color: #34495e; margin: 20px 0;">
+            <h3>Détails du Bulletin</h3>
+            <div>
+                <label for="bulletinPeriod">Période du Bulletin (ex: Janvier 2025) :</label>
+                <input type="text" id="bulletinPeriod" name="bulletinPeriod">
+            </div>
+            <button id="addCardBtn">Ajouter une Nouvelle Carte</button>
+            <hr style="border-color: #34495e; margin: 20px 0;">
+
+            <form id="cardPropertiesForm">
+                <h3>Propriétés de la Carte</h3>
+                <input type="hidden" id="cardId">
+                <div>
+                    <label for="cardTitle">Titre :</label>
+                    <input type="text" id="cardTitle" name="cardTitle">
+                </div>
+                <div>
+                    <label for="cardInitialContent">Contenu Initial (visible sur le web) :</label>
+                    <textarea id="cardInitialContent" name="cardInitialContent" rows="3" placeholder="Texte visible par défaut sur la page web."></textarea>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="hasExpandButton" name="hasExpandButton">
+                    <label for="hasExpandButton">Activer "Voir plus" (pour contenu additionnel sur le web)</label>
+                </div>
+                <div id="extraContentField" style="display: none;">
+                    <label for="cardExtraContent">Contenu Additionnel (caché par "Voir plus" sur le web) :</label>
+                    <textarea id="cardExtraContent" name="cardExtraContent" rows="4" placeholder="Ce texte sera caché et affiché après avoir cliqué sur 'Voir plus' sur la page web."></textarea>
+                </div>
+                <div>
+                    <label for="cardEmailContent">Contenu Email (résumé court) :</label>
+                    <textarea id="cardEmailContent" name="cardEmailContent" rows="2" placeholder="Un court résumé pour l'email, max 2-3 phrases."></textarea>
+                </div>
+                <div>
+                    <label for="cardLinkUrl">Lien URL (vers le bulletin web) :</label>
+                    <input type="text" id="cardLinkUrl" name="cardLinkUrl" placeholder="https://votre-site.com/bulletin.html#section">
+                </div>
+                <div>
+                    <label for="cardEmoji">Emoji/Icône (texte ou SVG) :</label>
+                    <input type="text" id="cardEmoji" name="cardEmoji" placeholder="🤖 ou <svg>...</svg>">
+                </div>
+                <div>
+                    <label for="cardColSpan">Largeur (colonnes) :</label>
+                    <select id="cardColSpan" name="cardColSpan">
+                        <option value="1">1 (Standard)</option>
+                        <option value="2">2 (Large)</option>
+                        <option value="3">3 (Très Large)</option>
+                        <option value="4">4 (Pleine largeur)</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="cardRowSpan">Hauteur (lignes) :</label>
+                    <select id="cardRowSpan" name="cardRowSpan">
+                        <option value="1">1 (Standard)</option>
+                        <option value="2">2 (Haute)</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="cardImage">URL Image de fond (optionnel) :</label>
+                    <input type="text" id="cardImage" name="cardImage" placeholder="https://unsplash.com/your-image.jpg">
+                </div>
+                <div>
+                    <label for="cardBgColor">Couleur de fond (optionnel) :</label>
+                    <input type="color" id="cardBgColor" name="cardBgColor" value="#ffffff">
+                </div>
+                <div>
+                    <label for="cardCustomClasses">Classes CSS additionnelles (ex: text-light) :</label>
+                    <input type="text" id="cardCustomClasses" name="cardCustomClasses" placeholder="ex: text-light">
+                </div>
+                <button type="submit" id="saveCardPropertiesBtn">Sauvegarder Propriétés</button>
+                <button type="button" id="cancelEditBtn">Annuler</button>
+            </form>
+            <button id="logoutBtn">Déconnexion</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div id="feedbackMessage" class="feedback-message" style="display:none;">
+            <span id="feedbackIcon" class="feedback-icon"></span>
+            <span id="feedbackText" class="feedback-text"></span>
+        </div>
+        
+        <h1>Gestion du Bulletin Frequence SUD</h1>
+        <p>Glissez-déposez les cartes pour les réorganiser. Cliquez sur une carte pour éditer ses propriétés.</p>
+
+        <div class="bento-preview-area">
+            <div class="bento-board-admin" id="bentoBoardAdmin">
+                <!-- Les cartes seront ajoutées ici par JavaScript -->
+            </div>
+        </div>
+
+        <div id="jsonOutputContainer">
+            <h3>Configuration JSON du Bulletin Web</h3>
+            <button id="generateJsonBtn">Publier JSON Web sur Firebase</button>
+            <textarea id="jsonOutput" readonly placeholder="Le JSON pour le bulletin web sera affiché ici après publication..."></textarea>
+            <p style="font-size:0.8em; color:#777;">Les données seront sauvegardées sur Firebase.</p>
+        </div>
+
+        <div id="emailHtmlOutputContainer" style="margin-top: 30px;">
+            <h3>Code HTML pour l'Email</h3>
+            <button id="generateEmailHtmlBtn" style="background-color: #e06c75;">Publier HTML Email sur Firebase</button>
+            <textarea id="emailHtmlOutput" readonly style="min-height: 250px;" placeholder="Le code HTML complet pour votre email sera affiché ici après publication."></textarea>
+            <p style="font-size:0.8em; color:#777;">Le code HTML sera sauvegardé sur Firebase. Copiez-le depuis la zone de texte pour l'envoyer.</p>
+            <a href="https://sudcrm59.github.io/Bulletin/bulletin.html" target="_blank">Ouvrir le Frequence SUD</a> | 
+            <a href="https://sudcrm59.github.io/Bulletin/Email.html" target="_blank">Ouvrir le template du mail</a>
+        </div>
+                
+
+    <!-- Firebase SDKs - Doivent être à la fin du <body> -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Votre configuration Firebase (À REMPLACER AVEC LA VÔTRE)
+        const firebaseConfig = {
+          apiKey: "AIzaSyAmu14nCF6x0cblWBFmP44uHJ3tI1McDSA",
+          authDomain: "sudcrm59.firebaseapp.com",
+          projectId: "sudcrm59",
+          storageBucket: "sudcrm59.firebasestorage.app",
+          messagingSenderId: "487748398932",
+          appId: "1:487748398932:web:679ff7f5fcd8b1d6d762c1"
+        };
+
+        // Initialiser Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Variables globales pour les données et le compteur d'ID
+        let cardsData = []; // Contient les données des cartes
+        let bulletinPeriod = "Janvier 2025"; // Nouvelle variable pour la période du bulletin, valeur par défaut
+        let cardIdCounter = 0;
+
+        let feedbackMessageDiv;
+        let feedbackIconSpan;
+        let feedbackTextSpan;
+        let feedbackHideTimeout;
+        
+        // --- Fonctions utilitaires (peuvent rester en dehors de DOMContentLoaded) ---
+
+        function isDarkColor(hexColor) {
+            if (!hexColor || hexColor === '#ffffff') return false;
+            const r = parseInt(hexColor.substring(1, 3), 16);
+            const g = parseInt(hexColor.substring(3, 5), 16);
+            const b = parseInt(hexColor.substring(5, 7), 16);
+            const y = (r * 299 + g * 587 + b * 114) / 1000;
+            return y < 128;
+        }
+
+        // --- Fonctions pour les messages de feedback ---
+        function showFeedback(type, message, duration = 3000) {
+            if (!feedbackMessageDiv || !feedbackIconSpan || !feedbackTextSpan) {
+                console.error("Feedback elements not initialized. Cannot show feedback.");
+                alert(message); // Fallback to alert if elements are missing
+                return;
+            }
+
+            // Effacer les classes précédentes
+            feedbackMessageDiv.className = 'feedback-message';
+            feedbackIconSpan.className = 'feedback-icon';
+
+            // Appliquer le type (success, error, loading) et les icônes
+            feedbackMessageDiv.classList.add(type);
+            feedbackIconSpan.classList.add(type);
+            if (type === 'loading') {
+                feedbackIconSpan.classList.add('spinner');
+            } else if (type === 'success') {
+                feedbackIconSpan.classList.add('check');
+            } else if (type === 'error') {
+                feedbackIconSpan.classList.add('cross');
+            } else {
+                feedbackIconSpan.classList.add('info');
+            }
+
+            feedbackTextSpan.textContent = message;
+            feedbackMessageDiv.style.display = 'flex'; // <--- ASSURE L'AFFICHAGE
+            // Un petit délai pour que le `display` soit pris en compte avant l'animation d'opacité/transform
+            setTimeout(() => {
+                feedbackMessageDiv.classList.add('show'); 
+            }, 10); 
+
+            // Cacher le message après un délai, sauf si c'est un message de chargement
+            clearTimeout(feedbackHideTimeout);
+            if (type !== 'loading') {
+                feedbackHideTimeout = setTimeout(() => {
+                    hideFeedback();
+                }, duration);
+            }
+        }
+
+        function hideFeedback() {
+            if (!feedbackMessageDiv) return;
+            feedbackMessageDiv.classList.remove('show');
+            clearTimeout(feedbackHideTimeout);
+            // Vider le texte et les classes après la transition d'opacité
+            setTimeout(() => {
+                feedbackMessageDiv.style.display = 'none'; // <--- MASQUE L'ÉLÉMENT
+                feedbackTextSpan.textContent = '';
+                feedbackMessageDiv.className = 'feedback-message';
+                feedbackIconSpan.className = 'feedback-icon';
+            }, 300); 
+        }
+        
+        // Convertit "Mois YYYY" en "YYYY-MM" pour l'ID du document Firebase
+        function getBulletinIdFromPeriod(periodString) {
+            const months = {
+                "Janvier": "01", "Février": "02", "Mars": "03", "Avril": "04",
+                "Mai": "05", "Juin": "06", "Juillet": "07", "Août": "08",
+                "Septembre": "09", "Octobre": "10", "Novembre": "11", "Décembre": "12"
+            };
+            const parts = periodString.split(' ');
+            if (parts.length === 2 && months[parts[0]]) {
+                return `${parts[1]}-${months[parts[0]]}`;
+            }
+            // Fallback pour les périodes non standard ou si la conversion échoue
+            console.warn("Format de période inattendu, utilisation d'un ID générique:", periodString);
+            return `bulletin-${Date.now()}`;
+        }
+
+        // Parse le contenu HTML pour les champs initialContent et extraContent
+        // Utilisé lors du chargement d'anciennes données ou de données Firebase
+        function parseContentForDashboard(cardData) {
+            let initialContent = cardData.initialContent || '';
+            let extraContent = cardData.extraContent || '';
+            let hasExpandButton = cardData.hasExpandButton || false;
+            let emailContent = cardData.emailContent || '';
+            let linkUrl = cardData.linkUrl || '';
+
+            // Si l'ancienne structure (un seul 'content' pour le web) est chargée
+            if (cardData.content !== undefined && cardData.initialContent === undefined) {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = cardData.content;
+                const extraContentDiv = tempDiv.querySelector('.extra-content');
+                
+                if (extraContentDiv) {
+                    extraContent = extraContentDiv.innerHTML;
+                    extraContentDiv.remove();
+                    initialContent = tempDiv.innerHTML.trim();
+                    hasExpandButton = true;
+                } else {
+                    initialContent = cardData.content.trim();
+                }
+                // Pour les anciennes cartes sans champs email spécifiques, déduire le contenu email et le lien si non définis
+                if (!emailContent) emailContent = initialContent.substring(0, 150) + (initialContent.length > 150 ? '...' : '');
+                if (!linkUrl) linkUrl = 'https://votre-site.com/bulletin.html'; // Fallback générique
+            }
+
+            return {
+                initialContent,
+                extraContent,
+                hasExpandButton,
+                emailContent,
+                linkUrl
+            };
+        }
+
+        // --- Fonctions de persistance locale (LocalStorage) ---
+
+        function loadCardsFromLocalStorage() {
+            const storedData = localStorage.getItem('bentoDashboardData'); // Changer la clé pour stocker plus de données
+            if (storedData) {
+                const data = JSON.parse(storedData);
+                cardsData = data.cards ? data.cards.map(card => {
+                    const parsedContent = parseContentForDashboard(card);
+                    return {
+                        id: card.id || `card-${++cardIdCounter}`,
+                        title: card.title,
+                        emoji: card.emoji,
+                        colSpan: card.colSpan,
+                        rowSpan: card.rowSpan,
+                        image: card.image,
+                        bgColor: card.bgColor || '#ffffff',
+                        customClasses: card.customClasses,
+                        ...parsedContent
+                    };
+                }) : [];
+                bulletinPeriod = data.period || "Janvier 2025"; // Charger la période
+                cardIdCounter = cardsData.length > 0 ? Math.max(...cardsData.map(c => parseInt(c.id ? c.id.replace('card-', '') : '0') || 0)) + 1 : 0;
+            showFeedback('info', "Données chargées depuis le stockage local (brouillon) !", 4000); // Plus long pour que l'utilisateur lise
+
+            } else {
+                 cardsData = [];
+                 bulletinPeriod = "Janvier 2025"; // Réinitialiser la période par défaut
+                 cardIdCounter = 0;
+            }
+            renderAdminBoard(); // Appelle renderAdminBoard
+            if (bulletinPeriodField) bulletinPeriodField.value = bulletinPeriod; // Mettre à jour le champ après chargement
+        }
+
+        function saveCardsToLocalStorage() {
+            const dataToStore = {
+                cards: cardsData,
+                period: bulletinPeriod // Sauvegarder la période
+            };
+            localStorage.setItem('bentoDashboardData', JSON.stringify(dataToStore));
+        }
+
+        // --- Fonctions de chargement/sauvegarde Firebase (Firestore) ---
+
+        async function loadCardsFromFirestore() {
+            // Vérifier que l'utilisateur est connecté avant de tenter de charger
+            if (!auth.currentUser) {
+                console.log("Non connecté, ne charge pas depuis Firestore.");
+                loadCardsFromLocalStorage(); // Tente de charger un brouillon local si non connecté
+                showFeedback('info', "Connectez-vous pour charger les données depuis Firebase.", 5000);
+
+                return;
+            }
+
+            try {
+                    showFeedback('loading', "Chargement des données depuis Firebase..."); // Message de chargement
+
+                // Pour le dashboard, on charge toujours le dernier bulletin comme point de départ
+                const latestDocSnapshot = await db.collection('bulletins')
+                                                  .orderBy('timestamp', 'desc')
+                                                  .limit(1)
+                                                  .get();
+
+                if (!latestDocSnapshot.empty) {
+                    const doc = latestDocSnapshot.docs[0];
+                    const data = doc.data();
+                    cardsData = data.cards ? data.cards.map(card => {
+                        return {
+                            id: card.id || `card-${++cardIdCounter}`,
+                            title: card.title || '',
+                            initialContent: card.initialContent || '',
+                            extraContent: card.extraContent || '',
+                            hasExpandButton: card.hasExpandButton || false,
+                            emailContent: card.emailContent || '',
+                            linkUrl: card.linkUrl || '',
+                            emoji: card.emoji || '',
+                            colSpan: card.colSpan || 1,
+                            rowSpan: card.rowSpan || 1,
+                            image: card.image || '',
+                            bgColor: card.bgColor || '#ffffff',
+                            customClasses: card.customClasses || '',
+                        };
+                    }) : [];
+                    bulletinPeriod = data.period || "Janvier 2025"; // Charger la période depuis Firestore
+                    cardIdCounter = cardsData.length > 0 ? Math.max(...cardsData.map(c => parseInt(c.id ? c.id.replace('card-', '') : '0') || 0)) + 1 : 0;
+                showFeedback('success', "Données chargées depuis Firebase !", 3000);
+                } else {
+                showFeedback('info', "Aucun bulletin trouvé sur Firebase. Démarrage avec un tableau vide ou tentative de chargement local.", 5000);
+                    loadCardsFromLocalStorage(); // Tente de charger un brouillon local
+                }
+            } catch (error) {
+                console.error("Erreur lors du chargement des données depuis Firebase:", error);
+            showFeedback('error', "Erreur lors du chargement des données depuis Firebase: " + error.message + "\nTentative de chargement local.", 8000);
+                loadCardsFromLocalStorage(); // Fallback sur LocalStorage si Firebase échoue
+            }
+            renderAdminBoard(); // Appelle renderAdminBoard
+            if (bulletinPeriodField) bulletinPeriodField.value = bulletinPeriod; // Mettre à jour le champ après chargement
+        }
+
+
+        // --- Fonctions d'UI (Déclarées dans DOMContentLoaded pour l'accès aux éléments DOM) ---
+        // Définies ici pour que le DOMContentLoaded puisse les appeler une fois que les éléments sont prêts
+
+        let bentoBoardAdmin; // Déclaré ici pour être accessible globalement après DOMContentLoaded
+        let addCardBtn;
+        let cardPropertiesForm;
+        let saveCardPropertiesBtn;
+        let cancelEditBtn;
+        let generateJsonBtn;
+        let jsonOutputTextarea;
+        let generateEmailHtmlBtn;
+        let emailHtmlOutputTextarea;
+        let loginForm;
+        let loginEmailField;
+        let loginPasswordField;
+        let signInBtn;
+        let loginErrorDiv;
+        let loggedInContentDiv;
+        let authStatusP;
+        let logoutBtn;
+        let bulletinPeriodField; // Référence au nouveau champ de période
+        let cardInitialContentField;
+        let cardExtraContentField;
+        let hasExpandButtonCheckbox;
+        let extraContentFieldDiv;
+        let cardEmailContentField;
+        let cardLinkUrlField;
+        let cardBgColorField;
+        let selectedCardId = null; // État de la carte sélectionnée
+
+
+        // Fonction pour créer un élément de carte dans le dashboard (aperçu)
+        function createAdminCardElement(cardData) {
+            const cardEl = document.createElement('div');
+            cardEl.className = 'card-admin';
+            cardEl.id = cardData.id;
+            cardEl.draggable = true;
+
+            if (cardData.colSpan && cardData.colSpan > 1) cardEl.classList.add(`card-col-span-${cardData.colSpan}`);
+            if (cardData.rowSpan && cardData.rowSpan > 1) cardEl.classList.add(`card-row-span-${cardData.rowSpan}`);
+            if (cardData.customClasses) cardData.customClasses.split(' ').forEach(cls => { if(cls) cardEl.classList.add(cls);});
+
+            if (cardData.bgColor && cardData.bgColor !== '#ffffff') {
+                 cardEl.style.backgroundColor = cardData.bgColor;
+                 if (isDarkColor(cardData.bgColor)) { cardEl.classList.add('text-light'); }
+                 else { cardEl.classList.remove('text-light'); }
+            } else {
+                 cardEl.style.backgroundColor = 'var(--color-background-card)';
+                 cardEl.classList.remove('text-light');
+            }
+            
+            const previewContent = (cardData.emailContent || cardData.initialContent || '').substring(0, 100);
+            const truncatedPreview = previewContent + ((cardData.emailContent || cardData.initialContent || '').length > 100 ? '...' : '');
+
+            cardEl.innerHTML = `
+                <div class="card-title-admin">${cardData.emoji || ''} ${cardData.title || 'Nouvelle Carte'}</div>
+                <div class="card-content-preview">${truncatedPreview}</div>
+                <div class="card-actions-admin">
+                    <button class="edit-card">✏️</button>
+                    <button class="delete-card delete">🗑️</button>
+                </div>
+            `;
+
+            // Attacher les écouteurs pour les boutons de la carte (après que les boutons soient dans le DOM)
+            cardEl.addEventListener('click', (e) => { // Empêche la sélection si on clique sur un bouton
+                if (e.target.tagName === 'BUTTON') {
+                    e.stopPropagation();
+                }
+            });
+            cardEl.querySelector('.edit-card').addEventListener('click', () => selectCardForEditing(cardData.id));
+            cardEl.querySelector('.delete-card').addEventListener('click', () => deleteCard(cardData.id));
+            
+            return cardEl;
+        }
+
+        // Fonction pour rendre (afficher) toutes les cartes dans le dashboard
+        function renderAdminBoard() {
+            if (!bentoBoardAdmin) return; // S'assurer que l'élément DOM est prêt
+            bentoBoardAdmin.innerHTML = '';
+            cardsData.forEach(cardData => {
+                const cardEl = createAdminCardElement(cardData);
+                bentoBoardAdmin.appendChild(cardEl);
+            });
+            // Resélectionner la carte si elle était sélectionnée
+            if (selectedCardId) {
+                const stillSelected = document.getElementById(selectedCardId);
+                if (stillSelected) stillSelected.classList.add('selected');
+                else selectedCardId = null;
+            }
+        }
+
+        // Fonction pour sélectionner une carte pour édition
+        function selectCardForEditing(cardId) {
+            // Désélectionner la précédente
+            if (selectedCardId) {
+                const prevSelected = document.getElementById(selectedCardId);
+                if (prevSelected) prevSelected.classList.remove('selected');
+            }
+
+            selectedCardId = cardId;
+            const cardToEdit = cardsData.find(c => c.id === cardId);
+            if (!cardToEdit) {
+                cardPropertiesForm.style.display = 'none';
+                return;
+            }
+
+            document.getElementById(cardId).classList.add('selected');
+
+            // Remplir le formulaire
+            document.getElementById('cardId').value = cardToEdit.id;
+            document.getElementById('cardTitle').value = cardToEdit.title || '';
+            cardInitialContentField.value = cardToEdit.initialContent || '';
+            cardExtraContentField.value = cardToEdit.extraContent || '';
+            hasExpandButtonCheckbox.checked = cardToEdit.hasExpandButton || false;
+            extraContentFieldDiv.style.display = hasExpandButtonCheckbox.checked ? 'block' : 'none';
+            cardEmailContentField.value = cardToEdit.emailContent || '';
+            cardLinkUrlField.value = cardToEdit.linkUrl || '';
+            document.getElementById('cardEmoji').value = cardToEdit.emoji || '';
+            document.getElementById('cardColSpan').value = cardToEdit.colSpan || 1;
+            document.getElementById('cardRowSpan').value = cardToEdit.rowSpan || 1;
+            document.getElementById('cardImage').value = cardToEdit.image || '';
+            cardBgColorField.value = cardToEdit.bgColor || '#ffffff';
+            document.getElementById('cardCustomClasses').value = cardToEdit.customClasses || '';
+
+            cardPropertiesForm.style.display = 'block';
+        }
+
+        // Fonction pour supprimer une carte
+        function deleteCard(cardId) {
+            if (!confirm("Êtes-vous sûr de vouloir supprimer cette carte ?")) return;
+            cardsData = cardsData.filter(c => c.id !== cardId);
+            if (selectedCardId === cardId) {
+                selectedCardId = null;
+                cardPropertiesForm.style.display = 'none';
+            }
+            renderAdminBoard();
+            saveCardsToLocalStorage(); // Sauvegarder après suppression
+        }
+
+        // Fonction pour mettre à jour l'ordre des cartes après un drag & drop
+        function updateCardsDataOrder() {
+            const orderedCardElements = Array.from(bentoBoardAdmin.querySelectorAll('.card-admin'));
+            const newOrderedData = [];
+            orderedCardElements.forEach(el => {
+                const cardData = cardsData.find(c => c.id === el.id);
+                if (cardData) newOrderedData.push(cardData);
+            });
+            cardsData = newOrderedData;
+        }
+
+
+        // --- TOUT LE CODE QUI INTERAGIT AVEC LE DOM DOIT ÊTRE ICI ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Références DOM (maintenant DANS DOMContentLoaded)
+            loginForm = document.getElementById('loginForm');
+            loginEmailField = document.getElementById('loginEmail');
+            loginPasswordField = document.getElementById('loginPassword');
+            signInBtn = document.getElementById('signInBtn');
+            loginErrorDiv = document.getElementById('loginError');
+            loggedInContentDiv = document.getElementById('loggedInContent');
+            authStatusP = document.getElementById('authStatus');
+            logoutBtn = document.getElementById('logoutBtn');
+
+            generateJsonBtn = document.getElementById('generateJsonBtn'); 
+            jsonOutputTextarea = document.getElementById('jsonOutput');
+
+            generateEmailHtmlBtn = document.getElementById('generateEmailHtmlBtn');
+            emailHtmlOutputTextarea = document.getElementById('emailHtmlOutput');
+
+            bentoBoardAdmin = document.getElementById('bentoBoardAdmin');
+            addCardBtn = document.getElementById('addCardBtn');
+            cardPropertiesForm = document.getElementById('cardPropertiesForm');
+            saveCardPropertiesBtn = document.getElementById('saveCardPropertiesBtn');
+            cancelEditBtn = document.getElementById('cancelEditBtn');
+
+            bulletinPeriodField = document.getElementById('bulletinPeriod'); // NOUVEAU
+
+            cardInitialContentField = document.getElementById('cardInitialContent');
+            cardExtraContentField = document.getElementById('cardExtraContent');
+            hasExpandButtonCheckbox = document.getElementById('hasExpandButton');
+            extraContentFieldDiv = document.getElementById('extraContentField');
+            cardEmailContentField = document.getElementById('cardEmailContent');
+            cardLinkUrlField = document.getElementById('cardLinkUrl');
+            cardBgColorField = document.getElementById('cardBgColor');
+
+            feedbackMessageDiv = document.getElementById('feedbackMessage');
+            feedbackIconSpan = document.getElementById('feedbackIcon');
+            feedbackTextSpan = document.getElementById('feedbackText');
+
+            // --- Logique d'authentification ---
+            signInBtn.addEventListener('click', async () => {
+                const email = loginEmailField.value;
+                const password = loginPasswordField.value;
+                loginErrorDiv.style.display = 'none';
+            showFeedback('loading', "Connexion en cours..."); // Avant l'opération
+
+                try {
+                    await auth.signInWithEmailAndPassword(email, password);
+             hideFeedback(); // Cacher le spinner si la connexion est réussie et que onAuthStateChanged prend le relais
+
+                } catch (error) {
+                    console.error("Erreur de connexion:", error);
+                    loginErrorDiv.textContent = `Erreur: ${error.message}`;
+                    loginErrorDiv.style.display = 'block';
+                showFeedback('error', `Erreur de connexion: ${error.message}`, 5000); // Message d'erreur
+
+                }
+            });
+
+            logoutBtn.addEventListener('click', async () => {
+                showFeedback('loading', "Déconnexion en cours...");
+
+                try {
+                    await auth.signOut();
+                hideFeedback();
+
+                } catch (error) {
+                    console.error("Erreur de déconnexion:", error);
+                showFeedback('error', "Erreur lors de la déconnexion: " + error.message, 5000);
+                }
+            });
+
+            // Observateur d'état d'authentification
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    loginForm.style.display = 'none';
+                    loggedInContentDiv.style.display = 'block';
+                    authStatusP.textContent = `Connecté en tant que: ${user.email}`;
+                    showFeedback('success', `Connecté en tant que: ${user.email}`, 3000); // Feedback de connexion réussie
+
+                    loadCardsFromFirestore(); // Charge les données depuis Firebase après connexion
+                } else {
+                    loginForm.style.display = 'block';
+                    loggedInContentDiv.style.display = 'none';
+                    authStatusP.textContent = 'Non connecté';
+                    cardsData = []; // Vider les données si déconnecté
+                    renderAdminBoard(); // Vider l'aperçu
+                    emailHtmlOutputTextarea.value = ''; // Vider les sorties
+                    jsonOutputTextarea.value = '';
+                    showFeedback('info', 'Déconnecté.', 3000); // Feedback de déconnexion
+
+                    if (bulletinPeriodField) bulletinPeriodField.value = ""; // Vider le champ de la période
+                }
+            });
+
+
+            // --- Le reste de votre code JavaScript du dashboard (qui interagit avec le DOM) ---
+
+            // Écouteur pour le nouveau champ bulletinPeriod
+            if (bulletinPeriodField) { // Vérifier si l'élément existe avant d'ajouter l'écouteur
+                 bulletinPeriodField.addEventListener('input', () => {
+                    bulletinPeriod = bulletinPeriodField.value;
+                    saveCardsToLocalStorage(); // Sauvegarder la période localement à chaque changement
+                });
+            }
+
+            hasExpandButtonCheckbox.addEventListener('change', () => {
+                extraContentFieldDiv.style.display = hasExpandButtonCheckbox.checked ? 'block' : 'none';
+            });
+
+            // Drag & Drop
+            let dragSrcAdminEl = null; // Déplacé ici pour être accessible dans ce scope
+            bentoBoardAdmin.addEventListener('dragstart', (e) => {
+                if (e.target.classList.contains('card-admin')) {
+                    dragSrcAdminEl = e.target;
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/plain', e.target.id);
+                    setTimeout(() => dragSrcAdminEl.style.opacity = '0.5', 0);
+                }
+            });
+            bentoBoardAdmin.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+            });
+            bentoBoardAdmin.addEventListener('drop', (e) => {
+                e.preventDefault();
+                if (dragSrcAdminEl && e.target.closest('.bento-board-admin')) {
+                    const targetCard = e.target.closest('.card-admin');
+                    if (targetCard && targetCard !== dragSrcAdminEl) {
+                        const rect = targetCard.getBoundingClientRect();
+                        const nextSibling = (e.clientY - rect.top > rect.height / 2) ? targetCard.nextSibling : targetCard;
+                        bentoBoardAdmin.insertBefore(dragSrcAdminEl, nextSibling);
+                    } else if (!targetCard) {
+                        bentoBoardAdmin.appendChild(dragSrcAdminEl);
+                    }
+                }
+            });
+            bentoBoardAdmin.addEventListener('dragend', (e) => {
+                if (dragSrcAdminEl) {
+                    dragSrcAdminEl.style.opacity = '1';
+                    dragSrcAdminEl = null;
+                    updateCardsDataOrder();
+                    saveCardsToLocalStorage(); // Sauvegarde le brouillon localement
+                }
+            });
+
+            // Boutons d'ajout, sauvegarde, annulation
+            addCardBtn.addEventListener('click', () => {
+                cardIdCounter++;
+                const newCardData = {
+                    id: `card-${cardIdCounter}`,
+                    title: `Nouvelle Carte ${cardIdCounter}`,
+                    initialContent: '', extraContent: '', hasExpandButton: false,
+                    emailContent: '', linkUrl: '', emoji: '',
+                    colSpan: 1, rowSpan: 1, image: '', bgColor: '#ffffff', customClasses: ''
+                };
+                cardsData.push(newCardData);
+                renderAdminBoard();
+                selectCardForEditing(newCardData.id);
+                saveCardsToLocalStorage();
+            });
+
+            cardPropertiesForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const id = document.getElementById('cardId').value;
+                const cardIndex = cardsData.findIndex(c => c.id === id);
+                if (cardIndex === -1) return;
+
+                cardsData[cardIndex] = {
+                    ...cardsData[cardIndex],
+                    title: document.getElementById('cardTitle').value,
+                    initialContent: cardInitialContentField.value,
+                    extraContent: cardExtraContentField.value,
+                    hasExpandButton: hasExpandButtonCheckbox.checked,
+                    emailContent: cardEmailContentField.value,
+                    linkUrl: cardLinkUrlField.value,
+                    emoji: document.getElementById('cardEmoji').value,
+                    colSpan: parseInt(document.getElementById('cardColSpan').value),
+                    rowSpan: parseInt(document.getElementById('cardRowSpan').value),
+                    image: document.getElementById('cardImage').value,
+                    bgColor: cardBgColorField.value,
+                    customClasses: document.getElementById('cardCustomClasses').value,
+                };
+                renderAdminBoard();
+                const currentSelectedEl = document.getElementById(id);
+                if (currentSelectedEl) currentSelectedEl.classList.add('selected');
+                saveCardsToLocalStorage();
+            });
+
+            cancelEditBtn.addEventListener('click', () => {
+                if (selectedCardId) {
+                    const prevSelected = document.getElementById(selectedCardId);
+                    if (prevSelected) prevSelected.classList.remove('selected');
+                }
+                selectedCardId = null;
+                cardPropertiesForm.style.display = 'none';
+                cardPropertiesForm.reset();
+                extraContentFieldDiv.style.display = 'none';
+            });
+
+
+            // --- PUBLIER JSON pour le BULLETIN WEB sur Firebase ---
+            generateJsonBtn.addEventListener('click', async () => { 
+                if (!auth.currentUser) {
+                showFeedback('error', "Vous devez être connecté pour publier le JSON web.", 5000);
+                    return;
+                }
+                updateCardsDataOrder();
+                showFeedback('loading', "Publication JSON web sur Firebase en cours..."); // Avant l'opération
+
+                const publicCardsData = cardsData.map(card => {
+                    let fullContentForWeb = card.initialContent || '';
+                    if (card.hasExpandButton && (card.extraContent || '').trim() !== '') {
+                        fullContentForWeb += `<div class="extra-content">${card.extraContent}</div>`;
+                    }
+                    return {
+                        id: card.id, 
+                        title: card.title,
+                        content: fullContentForWeb, // Ceci est le contenu combiné pour l'affichage principal
+                        emoji: card.emoji,
+                        colSpan: card.colSpan,
+                        rowSpan: card.rowSpan,
+                        image: card.image,
+                        bgColor: card.bgColor,
+                        customClasses: card.customClasses,
+                        // --- CHAMPS AJOUTÉS POUR LA MODALE ET LA COHÉRENCE DES DONNÉES ---
+                        initialContent: card.initialContent,
+                        extraContent: card.extraContent,
+                        hasExpandButton: card.hasExpandButton,
+                        linkUrl: card.linkUrl, 
+                        emailContent: card.emailContent // <--- C'EST LA LIGNE CLÉ QUI ÉTAIT MANQUANTE DANS VOS DONNÉES FIREBASE
+                    };
+                });
+
+                // Récupérer l'ID de document basé sur la période
+                const bulletinId = getBulletinIdFromPeriod(bulletinPeriod);
+console.log("Données envoyées à Firebase:", publicCardsData); // <--- AJOUTEZ CETTE LIGNE
+                try {
+                    // Sauvegarder les cartes ET la période ET le timestamp
+                    await db.collection('bulletins').doc(bulletinId).set({ 
+                        cards: publicCardsData,
+                        period: bulletinPeriod,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp() // Horodatage de publication
+                    });
+                    jsonOutputTextarea.value = JSON.stringify({ cards: publicCardsData, period: bulletinPeriod, id: bulletinId }, null, 2); // Affiche la période et l'ID
+                showFeedback('success', `JSON pour le bulletin web (${bulletinPeriod}, ID: ${bulletinId}) publié sur Firebase avec succès !`, 5000);
+                } catch (error) {
+                    console.error("Erreur lors de la publication JSON web:", error);
+                showFeedback('error', "Échec de la publication du JSON web: " + error.message, 8000);
+                }
+            });
+
+            // --- PUBLIER HTML pour l'EMAIL sur Firebase ---
+            generateEmailHtmlBtn.addEventListener('click', async () => { 
+                if (!auth.currentUser) {
+                showFeedback('error', "Vous devez être connecté pour publier le HTML de l'email.", 5000);
+                    return;
+                }
+                updateCardsDataOrder();
+                showFeedback('loading', "Publication HTML Email sur Firebase en cours..."); // Avant l'opération
+
+                let cardsHtmlContent = '';
+                let currentRowCards = []; 
+                const emailCardColumnWidth = 284; 
+
+                cardsData.forEach(card => {
+                    const cardLink = card.linkUrl || 'https://sudcrm59.github.io/Bulletin/bulletin.html'; // Utiliser une URL mobile si pertinente
+                    const cardBg = card.bgColor && card.bgColor !== '#ffffff' ? card.bgColor : '#ffffff';
+                    const textColor = isDarkColor(cardBg) ? '#FFFFFF' : '#202020';
+                    const btnBgColor = cardBg && cardBg !== '#ffffff' ? (isDarkColor(cardBg) ? '#4a627a' : cardBg) : '#ed1e79';
+                    const btnTextColor = '#FFFFFF';
+
+                    const singleCardTableHtml = `
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${cardBg}; border-radius:18px; box-shadow:0 2px 8px rgba(0,0,0,0.05); font-family:Arial, sans-serif; color:${textColor}; border-collapse: collapse; border-spacing: 0;">
+                            <tr>
+                                <td style="padding:18px 16px;">
+                                    ${card.image ? `<img src="${card.image}" width="100%" style="max-width:${emailCardColumnWidth - (18+16)}px; border-radius:12px; margin-bottom:10px; display:block; height:auto;" alt="${card.title || 'Image de carte'}">` : ''}
+                                    ${card.emoji ? `<span style="font-size:1.8em; display:block; margin-bottom:10px; color:${textColor};">${card.emoji}</span>` : ''}
+                                    <h3 style="margin:0 0 8px 0; font-size:1.1em; font-weight:600; color:${textColor}; font-family:Arial, sans-serif;">${card.title || 'Titre de la carte'}</h3>
+                                    <p style="margin:0 0 10px 0; font-size:0.9em; line-height:1.5; color:${textColor}; font-family:Arial, sans-serif;">${card.emailContent || 'Résumé court pour l\'email.'}</p>
+                                    ${cardLink ? `<a href="${cardLink}" style="display:inline-block; padding:8px 16px; background:${btnBgColor}; color:${btnTextColor}; border-radius:50px; text-decoration:none; font-weight:500; font-size:0.85em; font-family:Arial, sans-serif;">Voir l'article complet</a>` : ''}
+                                </td>
+                            </tr>
+                        </table>
+                    `;
+
+                    currentRowCards.push(`
+                        <td valign="top" width="${emailCardColumnWidth}px" style="padding:8px;">
+                            ${singleCardTableHtml}
+                        </td>
+                    `);
+
+                    if (currentRowCards.length === 2) {
+                        cardsHtmlContent += `<tr>${currentRowCards.join('')}</tr>`;
+                        currentRowCards = [];
+                    }
+                });
+
+                if (currentRowCards.length === 1) {
+                    cardsHtmlContent += `<tr>${currentRowCards[0]}<td valign="top" width="${emailCardColumnWidth}px" style="padding:8px;"> </td></tr>`;
+                }
+                
+                // Récupérer l'ID de document basé sur la période
+                const bulletinId = getBulletinIdFromPeriod(bulletinPeriod);
+
+                const emailHtml = `
+<!DOCTYPE html>
+<html lang="fr" xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="x-apple-disable-message-reformatting">
+    <title>Votre Bulletin Syndical Sud CRM59</title>
+    <!--[if mso]>
+    <noscript>
+        <xml>
+            <o:OfficeDocumentSettings>
+                <o:AllowPNG/>
+                <o:PixelsPerInch>96</o:o:PixelsPerInch>
+            </o:OfficeDocumentSettings>
+        </xml>
+    </noscript>
+    <![endif]-->
+    <style>
+        table, td, div, h1, p, a, ul, li {
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body style="margin:0; padding:0; background:#f0f2f5; text-align:center;">
+
+ <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#f0f2f5;" border="0" style="border-collapse: collapse; border-spacing: 0;">
+  <tr>
+   <td align="center" style="padding:16px 8px;">
+
+    <!-- Nouvelle phrase de disclaimer -->
+    <p style="margin:0 0 16px 0; font-size:0.85em; color:#777777; font-family:Arial, sans-serif; text-align:center;">
+        Chaque salarié a la liberté d'accepter ou de refuser la lecture de ce mail.
+    </p>
+
+    <!-- Container principal de l'email (Largeur fixe 600px, centré) -->
+    <table role="presentation" cellpadding="0" cellspacing="0" width="600" border="0" style="background:#fff; border-radius:24px; box-shadow:0 4px 24px rgba(0,0,0,0.05); overflow:hidden; font-family:Arial, sans-serif; color:#202020; margin:0 auto; display:block; border-collapse: collapse; border-spacing: 0;">
+
+     <!-- Header de la bannière (moins large, coins supérieurs arrondis, fond jaune SUD) -->
+     <tr>
+      <td align="center" style="padding:0;">
+       <table role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0" style="max-width:568px; background:#ff66c4; border-top-left-radius:24px; border-top-right-radius:24px; margin:0 auto; box-shadow:0 4px 15px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.05); border-collapse: collapse; border-spacing: 0;">
+        <tr>
+         <td align="center" style="padding:24px;">
+          <img src="https://raw.githubusercontent.com/SUDCRM59/Bulletin/refs/heads/main/img/logo.gif" width="120" style="border-radius:50%; border:3px solid #ed1e79; background:#fff; box-shadow:0 2px 10px rgba(0,0,0,0.1); display:block; margin-left:auto; margin-right:auto; margin-bottom:10px;" alt="Logo Sud CRM59">
+          <h1 style="margin:0 0 5px 0; font-size:1.8em; font-weight:700; color:#fffe00; text-shadow:none; font-family:Inter, Arial, sans-serif;">FrequenCE SUD</h1>
+          <p style="margin:0; font-size:1em; color:#202020; font-family:Inter, Arial, sans-serif;">Bulletin d'Information Syndical  - ${bulletinPeriod}</p>
+         </td>
+        </tr>
+       </table>
+      </td>
+     </tr>
+
+     <!-- Section du contenu principal (Cartes Bento Dynamiques - toujours 2 colonnes) -->
+     <tr>
+      <td style="padding: 16px;">
+       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:568px; margin:0 auto; display:block; text-align:left; border-collapse: collapse; border-spacing: 0;">
+        ${cardsHtmlContent}
+       </table>
+      </td>
+     </tr>
+
+     <!-- NOUVELLE SECTION POUR L'ÉQUIPE -->
+     <tr>
+      <td align="center" style="padding: 16px;">
+       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:568px; margin:0 auto; display:block; text-align:center; border-collapse: collapse; border-spacing: 0;">
+        <tr>
+         <td style="padding:0 0 15px 0;">
+          <p style="margin:0 0 10px 0; font-size:0.9em; line-height:1.5; color:#202020; font-family:Arial, sans-serif;">
+           Pour toutes questions ou informations complémentaires, rapprochez-vous de vos élus SUD.<br>
+          </p>
+          <p style="margin:0 0 15px 0; font-size:0.9em; line-height:1.5; color:#202020; font-family:Arial, sans-serif;">
+           <strong>Représentant Syndical :</strong> Laurent Martens (Enedis)
+          </p>
+         </td>
+        </tr>
+        <tr>
+         <td style="padding:0;">
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; border-spacing: 0; margin:0 auto;">
+           <tr>
+            <td align="center" style="padding: 5px;">
+             <img src="https://raw.githubusercontent.com/SUDCRM59/Bulletin/refs/heads/main/membres/sb.jpg" width="70" Height="70" style="border-radius:50%; display:block; border: 2px solid #fbb034; object-fit: cover;" alt="Souad Belal">
+             <p>Souad Belal<br>Abeille<br>06.23.91.45.95</p>
+            </td>
+            <td align="center" style="padding: 5px;">
+             <img src="https://raw.githubusercontent.com/SUDCRM59/Bulletin/refs/heads/main/membres/bb.jpg" width="70" Height="70" style="border-radius:50%; display:block; border: 2px solid #fbb034; object-fit: cover;" alt="Bouchra Bensaddik">
+             <p>Bouchra Bensaddik<br>Enedis</p>
+            </td>
+            <td align="center" style="padding: 5px;">
+             <img src="https://raw.githubusercontent.com/SUDCRM59/Bulletin/refs/heads/main/membres/ld.jpg" width="70" Height="70" style="border-radius:50%; display:block; border: 2px solid #fbb034; object-fit: cover;" alt="Latifa Daussy">
+            <p>Latifa Daussy<br>Enedis</p>
+            </td>
+            <td align="center" style="padding: 5px;">
+             <img src="https://raw.githubusercontent.com/SUDCRM59/Bulletin/refs/heads/main/membres/jn.jpg" width="70" Height="70" style="border-radius:50%; display:block; border: 2px solid #fbb034; object-fit: cover;" alt="Julien Nunne">
+            <p>Julien Nunne<br>AG2R<br>06.17.97.31.42</p>
+            </td>
+            <td align="center" style="padding: 5px;">
+             <img src="https://raw.githubusercontent.com/SUDCRM59/Bulletin/refs/heads/main/membres/rb.jpg" width="70" Height="70" style="border-radius:50%; display:block; border: 2px solid #fbb034; object-fit: cover;" alt="Rudy Bodart">
+             <p>Rudy Bodart<br>EHS<br>06.26.15.61.40</p>
+            </td>
+           </tr>
+          </table>
+         </td>
+        </tr>
+       </table>
+      </td>
+     </tr>
+     <!-- FIN NOUVELLE SECTION POUR L'ÉQUIPE -->
+     <tr>
+        <td align="center" style="padding:16px;">
+            <img src="https://raw.githubusercontent.com/SUDCRM59/Bulletin/refs/heads/main/img/SUD-BanApp.png" height="130px"; style="border-radius:24px; padding:12px;">
+        </td>
+     </tr>
+     <!-- QR code + Footer -->
+     <tr>
+      <td align="center" style="padding:16px;">
+       <img src="https://raw.githubusercontent.com/SUDCRM59/Bulletin/refs/heads/main/img/qrcode-SiteSUD.png" width="90" height="90" alt="QR Code Site Web" style="border-radius:12px; border:2px solid #fbb034; display:block; margin:0 auto;">
+      </td>
+     </tr>
+     <tr>
+      <td align="center" style="background:#ff66c4; color:#202020; font-size:1em; padding:16px 8px 8px 8px; border-bottom-left-radius:24px; border-bottom-right-radius:24px;">
+       <p style="margin:0; font-size:0.9em; font-family:Inter, Arial, sans-serif;">
+        Suis-nous : <a href="mailto:syndicatsud59@gmail.com" style="color:#202020; text-decoration:underline;">syndicatsud59@gmail.com</a><br>
+        DS : Souad Belal – 06.23.91.45.95<br>
+        <a href="HTTP://WWW.SYNDICATSUDCRM59.FR" target="_blank">Site Web</a> |
+        <a href="https://www.facebook.com/syndicatsudcrm59" target="_blank">Facebook</a>
+       </p>
+      </td>
+     </tr>
+
+    </table>
+   </td>
+  </tr>
+ </table>
+
+</body>
+</html>
+            `;
+            try {
+                // Sauvegarder le HTML de l'email dans une collection dédiée
+                await db.collection('email_archives').doc(bulletinId).set({ 
+                    htmlContent: emailHtml,
+                    period: bulletinPeriod,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                emailHtmlOutputTextarea.value = emailHtml.trim(); // Afficher le HTML après succès
+                showFeedback('success', `HTML pour l'email (${bulletinPeriod}, ID: ${bulletinId}) généré et PUBLIÉ sur Firebase avec succès !`, 5000);
+                
+                
+            } catch (error) {
+                console.error("Erreur lors de la publication HTML email sur Firebase:", error);
+                showFeedback('error', "Échec de la publication du HTML email: " + error.message, 8000);
+            }
+        });
+            
+        
+    }); // Fin DOMContentLoaded
+    </script>
+</body>
+</html>

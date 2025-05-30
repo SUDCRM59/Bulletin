@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Prévisualisation de votre Bulletin Email - Sud CRM59</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <!-- Pas de CSS complexe ici, car le contenu HTML de l'email a déjà son propre CSS inline -->
+  <style>
+    body {
+      margin: 0;
+      padding: 0; /* L'email généré aura ses propres paddings et centrages */
+      background-color: #f0f2f5; /* Couleur de fond de la page web, pour le contraste */
+      font-family: Arial, sans-serif; /* Fallback si le HTML de l'email ne définit pas tout */
+    }
+    .loading-message, .error-message {
+      text-align: center;
+      margin-top: 50px;
+      padding: 20px;
+      font-size: 1.2em;
+      color: #777;
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .error-message {
+      color: #c0392b;
+    }
+    /* Les styles générés par le dashboard seront injectés ici et doivent être inline */
+    /* Assurez-vous qu'ils s'adaptent bien */
+  </style>
+</head>
+<body>
+
+  <div id="emailContentDisplay">
+    <!-- Le contenu de l'email sera injecté ici par JavaScript -->
+    <p class="loading-message">Chargement du contenu de l'email...</p>
+  </div>
+
+  <!-- Firebase SDKs (nécessaires pour charger depuis Firestore) -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+  <script>
+    // Votre configuration Firebase (DOIT ÊTRE LA MÊME QUE DANS dashboard.html et bulletin.html)
+    const firebaseConfig = {
+      apiKey: "AIzaSyAmu14nCF6x0cblWBFmP44uHJ3tI1McDSA",
+      authDomain: "sudcrm59.firebaseapp.com",
+      projectId: "sudcrm59",
+      storageBucket: "sudcrm59.firebasestorage.app",
+      messagingSenderId: "487748398932",
+      appId: "1:487748398932:web:679ff7f5fcd8b1d6d762c1"
+    };
+
+    // Initialiser Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const emailContentDisplay = document.getElementById('emailContentDisplay');
+      const params = new URLSearchParams(window.location.search);
+      const requestedEmailId = params.get('id'); // Tente de récupérer l'ID depuis l'URL
+
+      let emailDoc;
+
+      try {
+        if (requestedEmailId) {
+          // Si un ID est demandé dans l'URL, charge cet email spécifique
+          emailDoc = await db.collection('email_archives').doc(requestedEmailId).get();
+        } else {
+          // Sinon, charge le dernier email publié (par défaut)
+          const latestDocSnapshot = await db.collection('email_archives')
+                                            .orderBy('timestamp', 'desc')
+                                            .limit(1)
+                                            .get();
+          if (!latestDocSnapshot.empty) {
+            emailDoc = latestDocSnapshot.docs[0];
+          }
+        }
+
+        if (emailDoc && emailDoc.exists && emailDoc.data() && emailDoc.data().htmlContent) {
+          // Si le document existe et contient la propriété htmlContent
+          emailContentDisplay.innerHTML = emailDoc.data().htmlContent;
+        } else {
+          // Si aucun email n'est trouvé ou l'ID est invalide
+          emailContentDisplay.innerHTML = `<p class="error-message">Aucun contenu d'email trouvé ou l'ID spécifié n'existe pas. Publiez-en un depuis le dashboard.</p>`;
+        }
+      } catch (error) {
+        // Gérer les erreurs (par exemple, problème de connexion à Firebase, règles de sécurité)
+        console.error("Erreur lors du chargement du contenu de l'email:", error);
+        emailContentDisplay.innerHTML = `<p class="error-message">Erreur lors du chargement du contenu de l'email : ${error.message}. Vérifiez votre connexion et les règles Firebase.</p>`;
+      }
+    });
+  </script>
+</body>
+</html>
