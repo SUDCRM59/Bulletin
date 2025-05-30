@@ -1035,6 +1035,7 @@
                 const currentSelectedEl = document.getElementById(id);
                 if (currentSelectedEl) currentSelectedEl.classList.add('selected');
                 saveCardsToLocalStorage();
+                showFeedback('success', "Propriétés de la carte sauvegardées localement !", 3000); 
             });
 
             cancelEditBtn.addEventListener('click', () => {
