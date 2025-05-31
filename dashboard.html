@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Dashboard Admin - Frequence SUD</title>
-      <link rel="icon" href="img/logo.gif" sizes="any">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Quill.js CSS -->
@@ -352,6 +351,19 @@
                 <label for="bulletinPeriod">Période du Bulletin (ex: Janvier 2025) :</label>
                 <input type="text" id="bulletinPeriod" name="bulletinPeriod">
             </div>
+            
+            <hr style="border-color: #34495e; margin: 20px 0;">
+            <h3>Archives des Bulletins</h3>
+            <div>
+                <label for="archiveSelect">Charger un ancien bulletin :</label>
+                <select id="archiveSelect" name="archiveSelect" style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #34495e; background-color: #4a627a; color: #ecf0f1;">
+                    <option value="">Chargement des archives...</option>
+                </select>
+                <button id="loadArchiveBtn" style="background-color: #2a75bb; margin-bottom: 15px;">Charger l'Archive</button>
+            </div>
+            
+            <button id="newProjectBtn" style="background-color: #7f8c8d; margin-bottom: 10px;">Commencer un Nouveau Projet</button>
+            
             <button id="addCardBtn">Ajouter une Nouvelle Carte</button>
             <hr style="border-color: #34495e; margin: 20px 0;">
 
@@ -535,6 +547,9 @@
         let initialContentQuill;
         let extraContentQuill;
 
+        let newProjectBtn;
+        let archiveSelect;
+        let loadArchiveBtn;
 
         // --- Fonctions utilitaires (peuvent rester en dehors de DOMContentLoaded) ---
 
@@ -694,7 +709,8 @@
 
         // --- Fonctions de chargement/sauvegarde Firebase (Firestore) ---
 
-        async function loadCardsFromFirestore() {
+        // Ajout d'un paramètre optionnel bulletinIdToLoad
+        async function loadCardsFromFirestore(bulletinIdToLoad = null) {
             if (!auth.currentUser) {
                 console.log("Non connecté, ne charge pas depuis Firestore.");
                 loadCardsFromLocalStorage();
@@ -703,15 +719,25 @@
             }
 
             try {
-                showFeedback('loading', "Chargement des données depuis Firebase...");
-                const latestDocSnapshot = await db.collection('bulletins')
-                                                  .orderBy('timestamp', 'desc')
+                showFeedback('loading', `Chargement des données depuis Firebase${bulletinIdToLoad ? ' (archive)' : ' (dernier bulletin)'}...`);
+                
+                let docSnapshot;
+                if (bulletinIdToLoad) {
+                    // Chargement d'un bulletin spécifique
+                    docSnapshot = await db.collection('bulletins').doc(bulletinIdToLoad).get();
+                } else {
+                    // Chargement du dernier bulletin (comportement par défaut)
+                    const latestDocQuery = await db.collection('bulletins')
+                                                  .orderBy('timestamp', 'desc') // Ou orderBy(firebase.firestore.FieldPath.documentId(), 'desc')
                                                   .limit(1)
                                                   .get();
+                    if (!latestDocQuery.empty) {
+                        docSnapshot = latestDocQuery.docs[0];
+                    }
+                }
 
-                if (!latestDocSnapshot.empty) {
-                    const doc = latestDocSnapshot.docs[0];
-                    const data = doc.data();
+                if (docSnapshot && docSnapshot.exists) { // Vérifier que le document existe
+                    const data = docSnapshot.data();
                     cardsData = data.cards ? data.cards.map(card => {
                         return {
                             id: card.id || `card-${++cardIdCounter}`,
@@ -729,11 +755,11 @@
                             customClasses: card.customClasses || '',
                         };
                     }) : [];
-                    bulletinPeriod = data.period || "Janvier 2025";
+                    bulletinPeriod = data.period || (bulletinIdToLoad || "Janvier 2025"); // Utilise la période du doc, ou l'ID si pas de période, ou défaut
                     cardIdCounter = cardsData.length > 0 ? Math.max(...cardsData.map(c => parseInt(c.id ? c.id.replace('card-', '') : '0') || 0)) + 1 : 0;
-                    showFeedback('success', "Données chargées depuis Firebase !", 3000);
+                    showFeedback('success', `Bulletin "${bulletinPeriod}" chargé depuis Firebase !`, 3000);
                 } else {
-                    showFeedback('info', "Aucun bulletin trouvé sur Firebase. Démarrage avec un tableau vide ou tentative de chargement local.", 5000);
+                    showFeedback('info', `Le bulletin ${bulletinIdToLoad || "le plus récent"} n'a pas été trouvé sur Firebase. Démarrage avec un tableau vide ou tentative de chargement local.`, 5000);
                     loadCardsFromLocalStorage();
                 }
             } catch (error) {
@@ -743,8 +769,9 @@
             }
             renderAdminBoard();
             if (bulletinPeriodField) bulletinPeriodField.value = bulletinPeriod;
+            // Après le chargement d'un bulletin, rafraîchir les options des archives
+            loadArchiveOptions(); 
         }
-
 
         // --- Fonctions d'UI ---
         function createAdminCardElement(cardData) {
@@ -859,7 +886,43 @@
             });
             cardsData = newOrderedData;
         }
+// --- Fonction pour charger les options d'archives dans le sélecteur ---
+        async function loadArchiveOptions() {
+            if (!archiveSelect) return; // S'assurer que l'élément est là
+            archiveSelect.innerHTML = '<option value="">Chargement des archives...</option>'; // Message de chargement
+            archiveSelect.disabled = true; // Désactiver pendant le chargement
+            loadArchiveBtn.disabled = true; // Désactiver le bouton aussi
 
+            try {
+                // Récupère tous les bulletins, triés par ID pour la chronologie (YYYY-MM)
+                const querySnapshot = await db.collection('bulletins')
+                                              .orderBy(firebase.firestore.FieldPath.documentId(), 'desc')
+                                              .get();
+
+                archiveSelect.innerHTML = '<option value="">-- Sélectionner un bulletin --</option>'; // Option par défaut
+                
+                if (querySnapshot.empty) {
+                    archiveSelect.innerHTML = '<option value="">Aucune archive disponible</option>';
+                } else {
+                    querySnapshot.forEach(doc => {
+                        const data = doc.data();
+                        const bulletinId = doc.id;
+                        const period = data.period || bulletinId; // Utilise la période stockée, sinon l'ID
+                        const option = document.createElement('option');
+                        option.value = bulletinId;
+                        option.textContent = period;
+                        archiveSelect.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error("Erreur lors du chargement des archives:", error);
+                archiveSelect.innerHTML = '<option value="">Erreur de chargement des archives</option>';
+                showFeedback('error', "Erreur lors du chargement des archives: " + error.message, 5000);
+            } finally {
+                archiveSelect.disabled = false; // Réactiver
+                loadArchiveBtn.disabled = false; // Réactiver
+            }
+        }
 
         // --- TOUT LE CODE QUI INTERAGIT AVEC LE DOM DOIT ÊTRE ICI ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -893,6 +956,9 @@
 
             bulletinPeriodField = document.getElementById('bulletinPeriod');
 
+            archiveSelect = document.getElementById('archiveSelect');
+            loadArchiveBtn = document.getElementById('loadArchiveBtn');
+
             // Noter que ces IDs sont maintenant des DIV pour Quill
             // cardInitialContentField = document.getElementById('cardInitialContent'); // Plus nécessaire de récupérer le DIV directement
             // cardExtraContentField = document.getElementById('cardExtraContent'); // Plus nécessaire de récupérer le DIV directement
@@ -903,6 +969,7 @@
             cardLinkUrlField = document.getElementById('cardLinkUrl');
             cardBgColorField = document.getElementById('cardBgColor');
             
+            newProjectBtn = document.getElementById('newProjectBtn');
 
             // --- Initialisation de Quill.js ---
             const toolbarOptions = [
@@ -928,8 +995,61 @@
                 },
                 placeholder: 'Ce texte sera caché et affiché après avoir cliqué sur "Voir plus", avec mise en forme...'
             });
+            if (loadArchiveBtn) {
+                loadArchiveBtn.addEventListener('click', () => {
+                    const selectedId = archiveSelect.value;
+                    if (selectedId) {
+                        // On propose de sauvegarder le brouillon actuel avant de charger l'archive
+                        if (cardsData.length > 0 && confirm("Voulez-vous sauvegarder votre brouillon actuel avant de charger l'archive ?")) {
+                            saveCardsToLocalStorage(); // Sauvegarde le brouillon actuel
+                        }
+                        loadCardsFromFirestore(selectedId); // Charge le bulletin sélectionné
+                    } else {
+                        showFeedback('info', "Veuillez sélectionner un bulletin dans la liste déroulante.", 3000);
+                    }
+                });
+            }
+            // --- Écouteur d'événement pour le bouton "Commencer un Nouveau Projet" ---
+            if (newProjectBtn) {
+                newProjectBtn.addEventListener('click', () => {
+                    if (confirm("Êtes-vous sûr de vouloir commencer un nouveau projet ? Toutes les cartes non publiées actuellement en édition seront perdues.")) {
+                        cardsData = []; // Efface toutes les cartes en mémoire
+                        cardIdCounter = 0; // Réinitialise le compteur d'ID
+                        selectedCardId = null; // Désélectionne toute carte éditée
 
+                        // Définir la période du bulletin par défaut (par exemple, le mois et l'année actuels)
+                        const now = new Date();
+                        const currentMonth = now.toLocaleString('fr-FR', { month: 'long' });
+                        const currentYear = now.getFullYear();
+                        bulletinPeriod = `${currentMonth} ${currentYear}`;
+                        bulletinPeriodField.value = bulletinPeriod;
 
+                        // Réinitialiser l'affichage
+                        renderAdminBoard(); // Vide la zone de prévisualisation
+                        cardPropertiesForm.style.display = 'none'; // Masque le formulaire d'édition
+                        cardPropertiesForm.reset(); // Réinitialise le formulaire d'édition
+                        initialContentQuill.setContents([]); // Vide les éditeurs Quill
+                        extraContentQuill.setContents([]);
+                        cardEmailContentField.value = ''; // Vide le champ emailContent
+                        document.getElementById('cardLinkUrl').value = ''; // Vide le champ linkUrl
+                        document.getElementById('cardEmoji').value = ''; // Vide le champ emoji
+                        document.getElementById('cardColSpan').value = '1'; // Réinitialise la largeur
+                        document.getElementById('cardRowSpan').value = '1'; // Réinitialise la hauteur
+                        document.getElementById('cardImage').value = ''; // Vide l'URL d'image
+                        document.getElementById('cardBgColor').value = '#ffffff'; // Remet le blanc
+                        document.getElementById('cardCustomClasses').value = ''; // Vide les classes CSS
+
+                        jsonOutputTextarea.value = ''; // Vide le JSON de sortie
+                        emailHtmlOutputTextarea.value = ''; // Vide le HTML Email de sortie
+                        openEmailPreviewBtn.style.display = 'none'; // Cache le bouton d'aperçu email
+                        lastPublishedEmailId = null;
+
+                        // Supprime le brouillon du stockage local
+                        localStorage.removeItem('bentoDashboardData');
+                        showFeedback('success', "Nouveau projet démarré ! Le brouillon local a été effacé.", 4000);
+                    }
+                });
+            }
             // --- Logique d'authentification ---
             signInBtn.addEventListener('click', async () => {
                 const email = loginEmailField.value;
@@ -968,6 +1088,9 @@
                     showFeedback('success', `Connecté en tant que: ${user.email}`, 3000);
 
                     loadCardsFromFirestore();
+                    showFeedback('success', `Connecté en tant que: ${user.email}`, 3000);
+                   loadCardsFromFirestore(); // Appelle sans paramètre pour charger le dernier
+                    loadArchiveOptions(); // Charge les options dès la connexion
                 } else {
                     loginForm.style.display = 'block';
                     loggedInContentDiv.style.display = 'none';
@@ -977,7 +1100,13 @@
                     emailHtmlOutputTextarea.value = '';
                     jsonOutputTextarea.value = '';
                     showFeedback('info', 'Déconnecté.', 3000);
-
+                 
+                    if (archiveSelect) {
+                        archiveSelect.innerHTML = '<option value="">-- Non connecté --</option>';
+                        archiveSelect.disabled = true;
+                        loadArchiveBtn.disabled = true;
+                    }
+                    
                     if (bulletinPeriodField) bulletinPeriodField.value = "";
                     if (openEmailPreviewBtn) {
                         openEmailPreviewBtn.style.display = 'none';
