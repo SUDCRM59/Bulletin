@@ -618,17 +618,20 @@
         // Convertit "Mois YYYY" en "YYYY-MM" pour l'ID du document Firebase
         function getBulletinIdFromPeriod(periodString) {
             const months = {
-                "Janvier": "01", "Février": "02", "Mars": "03", "Avril": "04",
-                "Mai": "05", "Juin": "06", "Juillet": "07", "Août": "08",
-                "Septembre": "09", "Octobre": "10", "Novembre": "11", "Décembre": "12"
+                "janvier": "01", "février": "02", "fevrier": "02", "mars": "03", "avril": "04",
+                "mai": "05", "juin": "06", "juillet": "07", "août": "08", "aout": "08",
+                "septembre": "09", "octobre": "10", "novembre": "11", "décembre": "12", "decembre": "12"
             };
+            if (!periodString) return `bulletin-${Date.now()}`;
+            // Nettoie et normalise la saisie
+            periodString = periodString.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").trim().toLowerCase();
             const parts = periodString.split(' ');
             if (parts.length === 2 && months[parts[0]]) {
                 return `${parts[1]}-${months[parts[0]]}`;
             }
-            console.warn("Format de période inattendu, utilisation d'un ID générique:", periodString);
             return `bulletin-${Date.now()}`;
         }
+
 
         // Parse le contenu HTML pour les champs initialContent et extraContent
         // Utilisé lors du chargement d'anciennes données ou de données Firebase
