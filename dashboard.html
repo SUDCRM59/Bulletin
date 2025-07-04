@@ -1338,56 +1338,58 @@
 
                 const emailHtml = `
 <!DOCTYPE html>
-<html lang="fr" xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<html lang="fr">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="x-apple-disable-message-reformatting">
-    <title>Votre Bulletin Syndical Sud CRM59</title>
-    <!--[if mso]>
-    <noscript>
-        <xml>
-            <o:OfficeDocumentSettings>
-                <o:AllowPNG/>
-                <o:PixelsPerInch>96</o:o:PixelsPerInch>
-            </o:OfficeDocumentSettings>
-        </xml>
-    </noscript>
-    <![endif]-->
-    <style>
-        table, td, div, h1, p, a, ul, li {
-            font-family: Arial, sans-serif;
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Votre Bulletin Syndical Sud CRM59</title>
+  <style>
+    @media only screen and (max-width:600px) {
+      .container-main { width:100%!important; min-width:0!important; max-width:100%!important; }
+      .responsive-img { width:100%!important; max-width:100%!important; height:auto!important; }
+      .stack-cols td { display:block!important; width:100%!important; }
+      .p16 { padding-left:8px!important; padding-right:8px!important; }
+      .no-radius { border-radius:0!important; }
+    }
+  </style>
 </head>
-<body style="margin:0; padding:0; background:#f0f2f5; text-align:center;">
+<body style="margin:0; padding:0; background:#f0f2f5;">
 
- <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#f0f2f5;" border="0" style="border-collapse: collapse; border-spacing: 0;">
-  <tr>
-   <td align="center" style="padding:16px 8px;">
-
-    <!-- Nouvelle phrase de disclaimer -->
-    <p style="margin:0 0 16px 0; font-size:0.85em; color:#777777; font-family:Arial, sans-serif; text-align:center;">
-        Chaque salarié a la liberté d'accepter ou de refuser la lecture de ce mail.
-    </p>
-
-    <!-- Container principal de l'email (Largeur fixe 600px, centré) -->
-    <table role="presentation" cellpadding="0" cellspacing="0" width="600" border="0" style="background:#fff; border-radius:24px; box-shadow:0 4px 24px rgba(0,0,0,0.05); overflow:hidden; font-family:Arial, sans-serif; color:#202020; margin:0 auto; display:block; border-collapse: collapse; border-spacing: 0;">
-
-     <!-- Header de la bannière (moins large, coins supérieurs arrondis, fond jaune SUD) -->
-     <tr>
-      <td align="center" style="padding:0;">
-       <table role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0" style="max-width:568px; background:#ff66c4; border-top-left-radius:24px; border-top-right-radius:24px; margin:0 auto; box-shadow:0 4px 15px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.05); border-collapse: collapse; border-spacing: 0;">
-        <tr>
-         <td align="center" style="padding:24px;">
-          <img src="https://raw.githubusercontent.com/SUDCRM59/Bulletin/refs/heads/main/img/logo.gif" width="120" style="border-radius:50%; border:3px solid #ed1e79; background:#fff; box-shadow:0 2px 10px rgba(0,0,0,0.1); display:block; margin-left:auto; margin-right:auto; margin-bottom:10px;" alt="Logo Sud CRM59">
-          <h1 style="margin:0 0 5px 0; font-size:1.8em; font-weight:700; color:#fffe00; text-shadow:none; font-family:Inter, Arial, sans-serif;">FrequenCE SUD</h1>
-          <p style="margin:0; font-size:1em; color:#202020; font-family:Inter, Arial, sans-serif;">Bulletin d'Information Syndical  - ${bulletinPeriod}</p>
-         </td>
-        </tr>
-       </table>
+  <!-- Disclaimer -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f0f2f5" style="background:#f0f2f5;">
+    <tr>
+      <td align="center" style="padding:16px 8px 0 8px;">
+        <p style="margin:0 0 16px 0; font-size:0.85em; color:#777; font-family:Arial,sans-serif; text-align:center;">
+          Chaque salarié a la liberté d'accepter ou de refuser la lecture de ce mail.
+        </p>
       </td>
-     </tr>
+    </tr>
+  </table>
+
+  <!-- Conteneur principal -->
+  <table role="presentation" width="100%" bgcolor="#f0f2f5" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td align="center" style="padding:0 0 32px 0;">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" class="container-main" style="width:600px; max-width:600px; background:#fff; border-radius:24px; box-shadow:0 4px 24px rgba(0,0,0,0.06); margin:0 auto;">
+          <!-- HEADER -->
+          <tr>
+            <td align="center" style="padding:0;">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#ff66c4; border-top-left-radius:24px; border-top-right-radius:24px;">
+                <tr>
+                  <td align="center" style="padding:24px 10px 16px 10px;">
+                    <img src="https://raw.githubusercontent.com/SUDCRM59/Bulletin/refs/heads/main/img/logo.gif"
+                      width="120" class="responsive-img"
+                      style="max-width:120px; width:100%; height:auto; border-radius:50%; border:3px solid #ed1e79; background:#fff; box-shadow:0 2px 10px rgba(0,0,0,0.1); display:block; margin:0 auto 10px auto;"
+                      alt="Logo Sud CRM59">
+                    <h1 style="margin:0 0 5px 0; font-size:1.7em; font-weight:700; color:#fffe00; font-family:Arial, sans-serif;">FrequenCE SUD</h1>
+                    <p style="margin:0; font-size:1em; color:#202020; font-family:Arial,sans-serif;">
+                      Bulletin d'Information Syndical  - ${bulletinPeriod}</strong>
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
      <!-- Section du contenu principal (Cartes Bento Dynamiques - toujours 2 colonnes) -->
      <tr>
