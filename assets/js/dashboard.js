@@ -387,7 +387,14 @@ async function saveDraftToFirestore() {
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   };
 
-  await db.collection(DRAFT_COLLECTION).doc(currentDraftId).set(payload, { merge: true });
+  try {
+    await db.collection(DRAFT_COLLECTION).doc(currentDraftId).set(payload, { merge: true });
+    console.log("Brouillon enregistré :", currentDraftId, payload);
+  } catch (error) {
+    console.error("Erreur Firestore saveDraftToFirestore :", error);
+    alert("Impossible d'enregistrer le brouillon : " + error.message);
+    throw error;
+  }
 }
 
 async function loadPublishedArchivesList() {
