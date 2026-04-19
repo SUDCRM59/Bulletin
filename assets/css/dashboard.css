@@ -614,7 +614,23 @@ button:active{
     border-radius: 22px;
   }
 }
+.admin-card{
+  cursor: grab;
+}
 
+.admin-card:active{
+  cursor: grabbing;
+}
+
+.admin-card.is-dragging{
+  opacity: 0.45;
+  transform: scale(0.98);
+}
+
+.admin-card.drag-over{
+  outline: 3px dashed rgba(237, 30, 121, 0.6);
+  outline-offset: -6px;
+}
 @media (max-width: 560px){
   .dashboard-main{
     padding: 14px;
