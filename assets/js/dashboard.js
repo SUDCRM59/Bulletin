@@ -143,11 +143,7 @@ function bindEvents() {
 
 function initAuthObserver() {
   auth.onAuthStateChanged(async (user) => {
-    if (!user) {
-      console.warn("Aucun utilisateur connecté.");
-      return;
-    }
-
+    console.log("Utilisateur Firebase :", user ? user.email : "non connecté");
     await loadLatestProject();
   });
 }
@@ -325,10 +321,10 @@ function closeModal(modal) {
 async function loadLatestProject() {
   try {
     const snapshot = await db
-      .collection("bulletin_archives")
-      .orderBy("timestamp", "desc")
-      .limit(1)
-      .get();
+  .collection("bulletins")
+  .orderBy("timestamp", "desc")
+  .limit(1)
+  .get();
 
     if (snapshot.empty) {
       cardsData = [];
@@ -354,9 +350,9 @@ async function loadLatestProject() {
 async function loadArchivesList() {
   try {
     const snapshot = await db
-      .collection("bulletin_archives")
-      .orderBy("timestamp", "desc")
-      .get();
+  .collection("bulletins")
+  .orderBy("timestamp", "desc")
+  .get();
 
     archiveList = snapshot.docs.map((doc) => ({
       id: doc.id,
@@ -390,7 +386,7 @@ async function loadSelectedArchive() {
   if (!archiveId) return;
 
   try {
-    const doc = await db.collection("bulletin_archives").doc(archiveId).get();
+    const doc = await db.collection("bulletins").doc(archiveId).get();
 
     if (!doc.exists) {
       alert("Archive introuvable.");
@@ -413,16 +409,11 @@ async function loadSelectedArchive() {
 async function publishWebBulletin() {
   try {
     const payload = buildPublishPayload();
+    const bulletinId = payload.period || `bulletin_${Date.now()}`;
 
-    await db.collection("bulletin_archives").add({
+    await db.collection("bulletins").doc(bulletinId).set({
       ...payload,
-      publishedTo: "web",
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    await db.collection("bulletin_current").doc("live").set({
-      ...payload,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
     alert("Bulletin web publié.");
