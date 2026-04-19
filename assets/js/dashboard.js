@@ -24,6 +24,9 @@ let longTextQuill = null;
 let archiveList = [];
 let currentDraftId = DEFAULT_DRAFT_ID;
 
+let draggedCardId = null;
+let dragOverCardId = null;
+
 const DOM = {};
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -217,6 +220,7 @@ function createCardElement(card) {
   }
 
   article.dataset.id = card.id;
+  article.draggable = true;
 
   const typeLabel = getTypeLabel(card.type);
   const shortTextPlain = stripHtml(card.shortText || "");
@@ -245,7 +249,13 @@ function createCardElement(card) {
   article.addEventListener("click", (event) => {
     if (event.target.closest(".js-edit-card")) {
       event.stopPropagation();
+      return;
     }
+
+    if (article.classList.contains("is-dragging")) {
+      return;
+    }
+
     openCardEditor(card.id);
   });
 
@@ -255,9 +265,74 @@ function createCardElement(card) {
     openCardEditor(card.id);
   });
 
+  article.addEventListener("dragstart", (event) => {
+    draggedCardId = card.id;
+    article.classList.add("is-dragging");
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", card.id);
+  });
+
+  article.addEventListener("dragend", () => {
+    article.classList.remove("is-dragging");
+    clearDragStates();
+    draggedCardId = null;
+    dragOverCardId = null;
+  });
+
+  article.addEventListener("dragover", (event) => {
+    event.preventDefault();
+    if (!draggedCardId || draggedCardId === card.id) return;
+
+    dragOverCardId = card.id;
+    clearDragStates();
+    article.classList.add("drag-over");
+  });
+
+  article.addEventListener("dragleave", () => {
+    article.classList.remove("drag-over");
+  });
+
+  article.addEventListener("drop", async (event) => {
+    event.preventDefault();
+
+    const sourceId = draggedCardId;
+    const targetId = card.id;
+
+    clearDragStates();
+
+    if (!sourceId || !targetId || sourceId === targetId) return;
+
+    reorderCards(sourceId, targetId);
+    renderBoard();
+
+    try {
+      await saveDraftToFirestore();
+    } catch (error) {
+      console.error("Erreur sauvegarde après réorganisation :", error);
+      alert("L'ordre a changé à l'écran, mais pas dans le brouillon.");
+    }
+  });
+
   return article;
 }
+function reorderCards(sourceId, targetId) {
+  const sourceIndex = cardsData.findIndex((card) => card.id === sourceId);
+  const targetIndex = cardsData.findIndex((card) => card.id === targetId);
 
+  if (sourceIndex === -1 || targetIndex === -1 || sourceIndex === targetIndex) {
+    return;
+  }
+
+  const [movedCard] = cardsData.splice(sourceIndex, 1);
+  cardsData.splice(targetIndex, 0, movedCard);
+}
+
+function clearDragStates() {
+  document.querySelectorAll(".admin-card").forEach((card) => {
+    card.classList.remove("drag-over");
+    card.classList.remove("is-dragging");
+  });
+}
 function openCardEditor(cardId) {
   const card = cardsData.find((item) => item.id === cardId);
   if (!card) return;
