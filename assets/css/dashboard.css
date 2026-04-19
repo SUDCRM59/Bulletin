@@ -737,3 +737,15 @@ button:active{
     max-width: none;
   }
 }
+.drop-slot{
+  min-height: 18px;
+  border-radius: 14px;
+  background: transparent;
+  transition: background-color .18s ease, border-color .18s ease, min-height .18s ease;
+}
+
+.drop-slot.drag-over{
+  min-height: 56px;
+  background: rgba(237, 30, 121, 0.08);
+  border: 2px dashed rgba(237, 30, 121, 0.45);
+}
