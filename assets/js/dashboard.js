@@ -267,7 +267,7 @@ function fillModal(card) {
   longTextQuill.root.innerHTML = card.longText || "";
 }
 
-function saveCurrentCard() {
+async function saveCurrentCard() {
   if (!selectedCardId) return;
 
   const cardIndex = cardsData.findIndex((item) => item.id === selectedCardId);
@@ -290,9 +290,30 @@ function saveCurrentCard() {
 
   cardsData[cardIndex] = updatedCard;
   renderBoard();
-  closeModal(DOM.cardModal);
-}
 
+  try {
+    await saveDraftToFirestore();
+    closeModal(DOM.cardModal);
+  } catch (error) {
+    console.error("Erreur sauvegarde brouillon :", error);
+    alert("La carte a été mise à jour à l'écran, mais pas enregistrée en base.");
+  }
+}
+async function saveDraftToFirestore() {
+  const period = DOM.bulletinPeriod.value.trim() || "Brouillon";
+  const docId = currentArchiveId || "draft_live";
+
+  const payload = {
+    period,
+    cards: cardsData.map((card) => ({ ...card })),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    isDraft: true
+  };
+
+  await db.collection("bulletins").doc(docId).set(payload, { merge: true });
+
+  currentArchiveId = docId;
+}
 function deleteCurrentCard() {
   if (!selectedCardId) return;
 
