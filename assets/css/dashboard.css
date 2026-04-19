@@ -704,3 +704,36 @@ button:active{
   align-items: center;
   gap: 8px;
 }
+.toast{
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 500;
+  min-width: 220px;
+  max-width: 320px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(30, 36, 48, 0.96);
+  color: #fff;
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.24);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(12px);
+  transition: opacity .22s ease, transform .22s ease;
+  font-size: .92rem;
+  line-height: 1.4;
+}
+
+.toast.show{
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (max-width: 560px){
+  .toast{
+    left: 14px;
+    right: 14px;
+    bottom: 14px;
+    max-width: none;
+  }
+}
