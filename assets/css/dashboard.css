@@ -674,3 +674,33 @@ button:active{
     width: 100%;
   }
 }
+.admin-card{
+  cursor: default;
+}
+
+.drag-handle{
+  cursor: grab;
+  font-weight: 700;
+  letter-spacing: -1px;
+  user-select: none;
+}
+
+.drag-handle:active{
+  cursor: grabbing;
+}
+
+.admin-card.is-dragging{
+  opacity: 0.45;
+  transform: scale(0.98);
+}
+
+.admin-card.drag-over{
+  outline: 3px dashed rgba(237, 30, 121, 0.55);
+  outline-offset: -6px;
+}
+
+.admin-card-menu{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
