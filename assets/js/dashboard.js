@@ -33,7 +33,7 @@ function bindDom() {
   DOM.bulletinPeriod = document.getElementById("bulletinPeriod");
   DOM.bentoBoard = document.getElementById("bentoBoard");
   DOM.addCardBtn = document.getElementById("addCardBtn");
-  DOM.addCardTile = document.getElementById("addCardTile");
+
 
   DOM.publishWebBtn = document.getElementById("publishWebBtn");
   DOM.publishEmailBtn = document.getElementById("publishEmailBtn");
@@ -91,7 +91,7 @@ function initEditors() {
 
 function bindEvents() {
   DOM.addCardBtn?.addEventListener("click", handleAddCard);
-  DOM.addCardTile?.addEventListener("click", handleAddCard);
+
 
   DOM.closeModal?.addEventListener("click", () => closeModal(DOM.cardModal));
   DOM.saveCardBtn?.addEventListener("click", saveCurrentCard);
