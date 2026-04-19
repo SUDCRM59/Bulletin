@@ -26,6 +26,7 @@ let currentDraftId = DEFAULT_DRAFT_ID;
 
 let draggedCardId = null;
 let dragOverCardId = null;
+let isDraggingCard = false;
 
 const DOM = {};
 
@@ -220,7 +221,6 @@ function createCardElement(card) {
   }
 
   article.dataset.id = card.id;
-  article.draggable = true;
 
   const typeLabel = getTypeLabel(card.type);
   const shortTextPlain = stripHtml(card.shortText || "");
@@ -230,6 +230,7 @@ function createCardElement(card) {
     <div class="admin-card-toolbar">
       <span class="admin-card-badge">${escapeHtml(typeLabel)}</span>
       <div class="admin-card-menu">
+        <button class="admin-card-icon-btn drag-handle" type="button" title="Déplacer" draggable="true">⋮⋮</button>
         <button class="admin-card-icon-btn js-edit-card" type="button" title="Modifier">✏️</button>
       </div>
     </div>
@@ -246,42 +247,51 @@ function createCardElement(card) {
     </div>
   `;
 
-  article.addEventListener("click", (event) => {
-    if (event.target.closest(".js-edit-card")) {
-      event.stopPropagation();
-      return;
-    }
+  const editButton = article.querySelector(".js-edit-card");
+  const dragHandle = article.querySelector(".drag-handle");
 
-    if (article.classList.contains("is-dragging")) {
+  article.addEventListener("click", (event) => {
+    if (
+      event.target.closest(".js-edit-card") ||
+      event.target.closest(".drag-handle") ||
+      isDraggingCard
+    ) {
       return;
     }
 
     openCardEditor(card.id);
   });
 
-  const editButton = article.querySelector(".js-edit-card");
   editButton?.addEventListener("click", (event) => {
     event.stopPropagation();
     openCardEditor(card.id);
   });
 
-  article.addEventListener("dragstart", (event) => {
+  dragHandle?.addEventListener("dragstart", (event) => {
     draggedCardId = card.id;
+    isDraggingCard = true;
     article.classList.add("is-dragging");
     event.dataTransfer.effectAllowed = "move";
     event.dataTransfer.setData("text/plain", card.id);
   });
 
-  article.addEventListener("dragend", () => {
+  dragHandle?.addEventListener("dragend", () => {
     article.classList.remove("is-dragging");
     clearDragStates();
     draggedCardId = null;
     dragOverCardId = null;
+
+    setTimeout(() => {
+      isDraggingCard = false;
+    }, 50);
   });
 
   article.addEventListener("dragover", (event) => {
     event.preventDefault();
-    if (!draggedCardId || draggedCardId === card.id) return;
+
+    if (!draggedCardId || draggedCardId === card.id) {
+      return;
+    }
 
     dragOverCardId = card.id;
     clearDragStates();
@@ -300,7 +310,9 @@ function createCardElement(card) {
 
     clearDragStates();
 
-    if (!sourceId || !targetId || sourceId === targetId) return;
+    if (!sourceId || !targetId || sourceId === targetId) {
+      return;
+    }
 
     reorderCards(sourceId, targetId);
     renderBoard();
@@ -315,6 +327,7 @@ function createCardElement(card) {
 
   return article;
 }
+
 function reorderCards(sourceId, targetId) {
   const sourceIndex = cardsData.findIndex((card) => card.id === sourceId);
   const targetIndex = cardsData.findIndex((card) => card.id === targetId);
