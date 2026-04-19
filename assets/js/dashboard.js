@@ -196,14 +196,72 @@ async function handleAddCard() {
 function renderBoard() {
   if (!DOM.bentoBoard) return;
 
-  DOM.bentoBoard.querySelectorAll(".admin-card").forEach((card) => card.remove());
+  DOM.bentoBoard.innerHTML = "";
 
-  cardsData.forEach((card) => {
+  DOM.bentoBoard.appendChild(createDropSlot(0));
+
+  cardsData.forEach((card, index) => {
     const cardElement = createCardElement(card);
     DOM.bentoBoard.appendChild(cardElement);
+    DOM.bentoBoard.appendChild(createDropSlot(index + 1));
   });
 }
+function createDropSlot(index) {
+  const slot = document.createElement("div");
+  slot.className = "drop-slot";
+  slot.dataset.index = String(index);
 
+  slot.addEventListener("dragover", (event) => {
+    event.preventDefault();
+    if (!draggedCardId) return;
+    clearDragStates();
+    slot.classList.add("drag-over");
+  });
+
+  slot.addEventListener("dragleave", () => {
+    slot.classList.remove("drag-over");
+  });
+
+  slot.addEventListener("drop", async (event) => {
+    event.preventDefault();
+
+    const sourceId = draggedCardId;
+    const targetIndex = Number(slot.dataset.index);
+
+    clearDragStates();
+
+    if (!sourceId || Number.isNaN(targetIndex)) {
+      return;
+    }
+
+    moveCardToIndex(sourceId, targetIndex);
+    renderBoard();
+
+    try {
+      await saveDraftToFirestore();
+      showToast("Ordre mis à jour");
+    } catch (error) {
+      console.error("Erreur sauvegarde après déplacement :", error);
+      alert("Le déplacement a fonctionné à l'écran, mais pas dans le brouillon.");
+    }
+  });
+
+  return slot;
+}
+function moveCardToIndex(cardId, targetIndex) {
+  const sourceIndex = cardsData.findIndex((card) => card.id === cardId);
+  if (sourceIndex === -1) return;
+
+  const [movedCard] = cardsData.splice(sourceIndex, 1);
+
+  let adjustedIndex = targetIndex;
+  if (sourceIndex < targetIndex) {
+    adjustedIndex -= 1;
+  }
+
+  adjustedIndex = Math.max(0, Math.min(adjustedIndex, cardsData.length));
+  cardsData.splice(adjustedIndex, 0, movedCard);
+}
 function createCardElement(card) {
   const article = document.createElement("article");
   article.className = buildCardClassName(card);
@@ -380,6 +438,10 @@ function clearDragStates() {
   document.querySelectorAll(".admin-card").forEach((card) => {
     card.classList.remove("drag-over");
     card.classList.remove("is-dragging");
+  });
+
+  document.querySelectorAll(".drop-slot").forEach((slot) => {
+    slot.classList.remove("drag-over");
   });
 }
 function openCardEditor(cardId) {
