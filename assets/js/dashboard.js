@@ -228,9 +228,7 @@ function createCardElement(card) {
   const typeLabel = getTypeLabel(card.type);
   const shortTextPlain = stripHtml(card.shortText || "");
   const shortTextPreview = truncateText(shortTextPlain, 160);
-  
-  const duplicateButton = article.querySelector(".js-duplicate-card");
-  
+
   article.innerHTML = `
     <div class="admin-card-toolbar">
       <span class="admin-card-badge">${escapeHtml(typeLabel)}</span>
@@ -254,24 +252,31 @@ function createCardElement(card) {
   `;
 
   const editButton = article.querySelector(".js-edit-card");
+  const duplicateButton = article.querySelector(".js-duplicate-card");
   const dragHandle = article.querySelector(".drag-handle");
 
   article.addEventListener("click", (event) => {
-  if (
-    event.target.closest(".js-edit-card") ||
-    event.target.closest(".js-duplicate-card") ||
-    event.target.closest(".drag-handle") ||
-    isDraggingCard
-  ) {
-    return;
-  }
+    if (
+      event.target.closest(".js-edit-card") ||
+      event.target.closest(".js-duplicate-card") ||
+      event.target.closest(".drag-handle") ||
+      isDraggingCard
+    ) {
+      return;
+    }
 
-  openCardEditor(card.id);
-});
-duplicateButton?.addEventListener("click", async (event) => {
-  event.stopPropagation();
-  await duplicateCard(card.id);
-});
+    openCardEditor(card.id);
+  });
+
+  editButton?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    openCardEditor(card.id);
+  });
+
+  duplicateButton?.addEventListener("click", async (event) => {
+    event.stopPropagation();
+    await duplicateCard(card.id);
+  });
 
   dragHandle?.addEventListener("dragstart", (event) => {
     draggedCardId = card.id;
@@ -333,6 +338,7 @@ duplicateButton?.addEventListener("click", async (event) => {
 
   return article;
 }
+
 async function duplicateCard(cardId) {
   const sourceCard = cardsData.find((item) => item.id === cardId);
   if (!sourceCard) return;
