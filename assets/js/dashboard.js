@@ -66,6 +66,9 @@ function bindDom() {
   DOM.cardColSpan = document.getElementById("cardColSpan");
   DOM.cardRowSpan = document.getElementById("cardRowSpan");
   DOM.cardEmailText = document.getElementById("cardEmailText");
+
+  DOM.toast = document.getElementById("toast");
+  DOM.toastText = document.getElementById("toastText");
 }
 
 function initEditors() {
@@ -225,12 +228,15 @@ function createCardElement(card) {
   const typeLabel = getTypeLabel(card.type);
   const shortTextPlain = stripHtml(card.shortText || "");
   const shortTextPreview = truncateText(shortTextPlain, 160);
-
+  
+  const duplicateButton = article.querySelector(".js-duplicate-card");
+  
   article.innerHTML = `
     <div class="admin-card-toolbar">
       <span class="admin-card-badge">${escapeHtml(typeLabel)}</span>
       <div class="admin-card-menu">
         <button class="admin-card-icon-btn drag-handle" type="button" title="Déplacer" draggable="true">⋮⋮</button>
+        <button class="admin-card-icon-btn js-duplicate-card" type="button" title="Dupliquer">⧉</button>
         <button class="admin-card-icon-btn js-edit-card" type="button" title="Modifier">✏️</button>
       </div>
     </div>
@@ -251,21 +257,21 @@ function createCardElement(card) {
   const dragHandle = article.querySelector(".drag-handle");
 
   article.addEventListener("click", (event) => {
-    if (
-      event.target.closest(".js-edit-card") ||
-      event.target.closest(".drag-handle") ||
-      isDraggingCard
-    ) {
-      return;
-    }
+  if (
+    event.target.closest(".js-edit-card") ||
+    event.target.closest(".js-duplicate-card") ||
+    event.target.closest(".drag-handle") ||
+    isDraggingCard
+  ) {
+    return;
+  }
 
-    openCardEditor(card.id);
-  });
-
-  editButton?.addEventListener("click", (event) => {
-    event.stopPropagation();
-    openCardEditor(card.id);
-  });
+  openCardEditor(card.id);
+});
+duplicateButton?.addEventListener("click", async (event) => {
+  event.stopPropagation();
+  await duplicateCard(card.id);
+});
 
   dragHandle?.addEventListener("dragstart", (event) => {
     draggedCardId = card.id;
@@ -327,7 +333,31 @@ function createCardElement(card) {
 
   return article;
 }
+async function duplicateCard(cardId) {
+  const sourceCard = cardsData.find((item) => item.id === cardId);
+  if (!sourceCard) return;
 
+  const duplicatedCard = {
+    ...sourceCard,
+    id: generateId(),
+    title: sourceCard.title ? `${sourceCard.title} (copie)` : "Copie de carte"
+  };
+
+  const sourceIndex = cardsData.findIndex((item) => item.id === cardId);
+
+  if (sourceIndex === -1) return;
+
+  cardsData.splice(sourceIndex + 1, 0, duplicatedCard);
+  renderBoard();
+
+  try {
+    await saveDraftToFirestore();
+    showToast("Carte dupliquée");
+  } catch (error) {
+    console.error("Erreur duplication carte :", error);
+    alert("La carte a été dupliquée à l'écran, mais pas enregistrée dans le brouillon.");
+  }
+}
 function reorderCards(sourceId, targetId) {
   const sourceIndex = cardsData.findIndex((card) => card.id === sourceId);
   const targetIndex = cardsData.findIndex((card) => card.id === targetId);
@@ -435,6 +465,20 @@ function closeModal(modal) {
   modal.classList.remove("open");
 }
 
+let toastTimer = null;
+
+function showToast(message) {
+  if (!DOM.toast || !DOM.toastText) return;
+
+  DOM.toastText.textContent = message;
+  DOM.toast.classList.add("show");
+
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    DOM.toast.classList.remove("show");
+  }, 2200);
+}
+
 async function loadLatestDraft() {
   try {
     const doc = await db.collection(DRAFT_COLLECTION).doc(DEFAULT_DRAFT_ID).get();
@@ -475,16 +519,9 @@ async function saveDraftToFirestore() {
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   };
 
-  try {
-    await db.collection(DRAFT_COLLECTION).doc(currentDraftId).set(payload, { merge: true });
-    console.log("Brouillon enregistré :", currentDraftId, payload);
-  } catch (error) {
-    console.error("Erreur Firestore saveDraftToFirestore :", error);
-    alert("Impossible d'enregistrer le brouillon : " + error.message);
-    throw error;
-  }
+  await db.collection(DRAFT_COLLECTION).doc(currentDraftId).set(payload, { merge: true });
+  showToast("Brouillon enregistré");
 }
-
 async function loadPublishedArchivesList() {
   try {
     const snapshot = await db
