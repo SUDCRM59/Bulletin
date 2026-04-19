@@ -12,12 +12,17 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+const DRAFT_COLLECTION = "bulletins_drafts";
+const PUBLIC_COLLECTION = "bulletins";
+const EMAIL_COLLECTION = "email_archives";
+const DEFAULT_DRAFT_ID = "draft_live";
+
 let cardsData = [];
 let selectedCardId = null;
 let shortTextQuill = null;
 let longTextQuill = null;
 let archiveList = [];
-let currentArchiveId = null;
+let currentDraftId = DEFAULT_DRAFT_ID;
 
 const DOM = {};
 
@@ -33,7 +38,6 @@ function bindDom() {
   DOM.bulletinPeriod = document.getElementById("bulletinPeriod");
   DOM.bentoBoard = document.getElementById("bentoBoard");
   DOM.addCardBtn = document.getElementById("addCardBtn");
-
 
   DOM.publishWebBtn = document.getElementById("publishWebBtn");
   DOM.publishEmailBtn = document.getElementById("publishEmailBtn");
@@ -92,17 +96,16 @@ function initEditors() {
 function bindEvents() {
   DOM.addCardBtn?.addEventListener("click", handleAddCard);
 
-
   DOM.closeModal?.addEventListener("click", () => closeModal(DOM.cardModal));
   DOM.saveCardBtn?.addEventListener("click", saveCurrentCard);
   DOM.deleteCardBtn?.addEventListener("click", deleteCurrentCard);
 
   DOM.openArchivesBtn?.addEventListener("click", async () => {
-    await loadArchivesList();
+    await loadPublishedArchivesList();
     openModal(DOM.archiveModal);
   });
 
-  DOM.loadArchiveBtn?.addEventListener("click", loadSelectedArchive);
+  DOM.loadArchiveBtn?.addEventListener("click", loadSelectedPublishedArchive);
 
   DOM.publishWebBtn?.addEventListener("click", publishWebBulletin);
   DOM.publishEmailBtn?.addEventListener("click", publishEmailBulletin);
@@ -116,6 +119,9 @@ function bindEvents() {
       alert("Erreur lors de la déconnexion.");
     }
   });
+
+  DOM.bulletinPeriod?.addEventListener("change", saveDraftMeta);
+  DOM.bulletinPeriod?.addEventListener("blur", saveDraftMeta);
 
   document.querySelectorAll("[data-close]").forEach((button) => {
     button.addEventListener("click", () => {
@@ -144,7 +150,7 @@ function bindEvents() {
 function initAuthObserver() {
   auth.onAuthStateChanged(async (user) => {
     console.log("Utilisateur Firebase :", user ? user.email : "non connecté");
-    await loadLatestProject();
+    await loadLatestDraft();
   });
 }
 
@@ -165,13 +171,19 @@ function createEmptyCard() {
   };
 }
 
-function handleAddCard() {
+async function handleAddCard() {
   const newCard = createEmptyCard();
   cardsData.push(newCard);
   selectedCardId = newCard.id;
   renderBoard();
   fillModal(newCard);
   openModal(DOM.cardModal);
+
+  try {
+    await saveDraftToFirestore();
+  } catch (error) {
+    console.error("Erreur sauvegarde brouillon après ajout :", error);
+  }
 }
 
 function renderBoard() {
@@ -188,6 +200,9 @@ function renderBoard() {
 function createCardElement(card) {
   const article = document.createElement("article");
   article.className = buildCardClassName(card);
+
+  article.style.background = "";
+  article.style.backgroundImage = "";
 
   if (card.bgColor && !card.image) {
     article.style.background = card.bgColor;
@@ -296,25 +311,11 @@ async function saveCurrentCard() {
     closeModal(DOM.cardModal);
   } catch (error) {
     console.error("Erreur sauvegarde brouillon :", error);
-    alert("La carte a été mise à jour à l'écran, mais pas enregistrée en base.");
+    alert("La carte a été mise à jour à l'écran, mais pas enregistrée dans le brouillon.");
   }
 }
-async function saveDraftToFirestore() {
-  const period = DOM.bulletinPeriod.value.trim() || "Brouillon";
-  const docId = currentArchiveId || "draft_live";
 
-  const payload = {
-    period,
-    cards: cardsData.map((card) => ({ ...card })),
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-    isDraft: true
-  };
-
-  await db.collection("bulletins").doc(docId).set(payload, { merge: true });
-
-  currentArchiveId = docId;
-}
-function deleteCurrentCard() {
+async function deleteCurrentCard() {
   if (!selectedCardId) return;
 
   const card = cardsData.find((item) => item.id === selectedCardId);
@@ -326,7 +327,14 @@ function deleteCurrentCard() {
   cardsData = cardsData.filter((item) => item.id !== selectedCardId);
   selectedCardId = null;
   renderBoard();
-  closeModal(DOM.cardModal);
+
+  try {
+    await saveDraftToFirestore();
+    closeModal(DOM.cardModal);
+  } catch (error) {
+    console.error("Erreur suppression brouillon :", error);
+    alert("La carte a été supprimée à l'écran, mais pas enregistrée en base.");
+  }
 }
 
 function openModal(modal) {
@@ -339,41 +347,55 @@ function closeModal(modal) {
   modal.classList.remove("open");
 }
 
-async function loadLatestProject() {
+async function loadLatestDraft() {
   try {
-    const snapshot = await db
-  .collection("bulletins")
-  .orderBy("timestamp", "desc")
-  .limit(1)
-  .get();
+    const doc = await db.collection(DRAFT_COLLECTION).doc(DEFAULT_DRAFT_ID).get();
 
-    if (snapshot.empty) {
+    if (!doc.exists) {
       cardsData = [];
       DOM.bulletinPeriod.value = "";
+      currentDraftId = DEFAULT_DRAFT_ID;
       renderBoard();
+      await saveDraftToFirestore();
       return;
     }
 
-    const doc = snapshot.docs[0];
     const data = doc.data();
-
-    currentArchiveId = doc.id;
+    currentDraftId = doc.id;
     cardsData = Array.isArray(data.cards) ? data.cards : [];
     DOM.bulletinPeriod.value = data.period || "";
-
     renderBoard();
   } catch (error) {
-    console.error("Erreur chargement dernier projet :", error);
-    alert("Impossible de charger le dernier projet.");
+    console.error("Erreur chargement brouillon :", error);
+    alert("Impossible de charger le brouillon.");
   }
 }
 
-async function loadArchivesList() {
+async function saveDraftMeta() {
+  try {
+    await saveDraftToFirestore();
+  } catch (error) {
+    console.error("Erreur sauvegarde meta brouillon :", error);
+  }
+}
+
+async function saveDraftToFirestore() {
+  const payload = {
+    period: DOM.bulletinPeriod.value.trim(),
+    cards: cardsData.map((card) => ({ ...card })),
+    isDraft: true,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+
+  await db.collection(DRAFT_COLLECTION).doc(currentDraftId).set(payload, { merge: true });
+}
+
+async function loadPublishedArchivesList() {
   try {
     const snapshot = await db
-  .collection("bulletins")
-  .orderBy("timestamp", "desc")
-  .get();
+      .collection(PUBLIC_COLLECTION)
+      .orderBy("timestamp", "desc")
+      .get();
 
     archiveList = snapshot.docs.map((doc) => ({
       id: doc.id,
@@ -397,17 +419,17 @@ async function loadArchivesList() {
       DOM.archiveSelect.appendChild(option);
     });
   } catch (error) {
-    console.error("Erreur chargement archives :", error);
-    alert("Impossible de charger les archives.");
+    console.error("Erreur chargement archives publiées :", error);
+    alert("Impossible de charger les archives publiées.");
   }
 }
 
-async function loadSelectedArchive() {
+async function loadSelectedPublishedArchive() {
   const archiveId = DOM.archiveSelect.value;
   if (!archiveId) return;
 
   try {
-    const doc = await db.collection("bulletins").doc(archiveId).get();
+    const doc = await db.collection(PUBLIC_COLLECTION).doc(archiveId).get();
 
     if (!doc.exists) {
       alert("Archive introuvable.");
@@ -415,14 +437,14 @@ async function loadSelectedArchive() {
     }
 
     const data = doc.data();
-    currentArchiveId = doc.id;
     cardsData = Array.isArray(data.cards) ? data.cards : [];
     DOM.bulletinPeriod.value = data.period || "";
-
     renderBoard();
+
+    await saveDraftToFirestore();
     closeModal(DOM.archiveModal);
   } catch (error) {
-    console.error("Erreur chargement archive :", error);
+    console.error("Erreur chargement archive publiée :", error);
     alert("Impossible de charger cette archive.");
   }
 }
@@ -430,11 +452,12 @@ async function loadSelectedArchive() {
 async function publishWebBulletin() {
   try {
     const payload = buildPublishPayload();
-    const bulletinId = payload.period || `bulletin_${Date.now()}`;
+    const publishedId = buildPublishedDocId(payload.period);
 
-    await db.collection("bulletins").doc(bulletinId).set({
+    await db.collection(PUBLIC_COLLECTION).doc(publishedId).set({
       ...payload,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      sourceDraftId: currentDraftId
     });
 
     alert("Bulletin web publié.");
@@ -449,14 +472,15 @@ async function publishEmailBulletin() {
     const payload = buildPublishPayload();
     const emailHtml = generateEmailHtml(payload);
 
-    const docRef = await db.collection("email_archives").add({
+    await db.collection(EMAIL_COLLECTION).add({
       period: payload.period,
       cards: payload.cards,
       htmlContent: emailHtml,
+      sourceDraftId: currentDraftId,
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
 
-    alert(`Email publié. ID : ${docRef.id}`);
+    alert("Email publié.");
   } catch (error) {
     console.error("Erreur publication email :", error);
     alert("Erreur lors de la publication email.");
@@ -466,10 +490,19 @@ async function publishEmailBulletin() {
 function buildPublishPayload() {
   return {
     period: DOM.bulletinPeriod.value.trim(),
-    cards: cardsData.map((card) => ({
-      ...card
-    }))
+    cards: cardsData.map((card) => ({ ...card }))
   };
+}
+
+function buildPublishedDocId(period) {
+  const base = (period || `bulletin_${Date.now()}`)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\w\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "_");
+
+  return base || `bulletin_${Date.now()}`;
 }
 
 function generateEmailHtml(payload) {
