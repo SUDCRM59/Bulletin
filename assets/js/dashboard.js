@@ -7,51 +7,87 @@ const firebaseConfig = {
   appId: "1:487748398932:web:679ff7f5fcd8b1d6d762c1"
 };
 
-firebase.initializeApp(firebaseConfig);
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-const DRAFT_COLLECTION = "bulletins_drafts";
-const PUBLIC_COLLECTION = "bulletins";
-const EMAIL_COLLECTION = "email_archives";
+const DRAFT_COLLECTION = "bulletin_v3_drafts";
+const PUBLIC_COLLECTION = "bulletin_v3_public";
+const EMAIL_COLLECTION = "bulletin_v3_emails";
 const DEFAULT_DRAFT_ID = "draft_live";
+
+const DEFAULT_GRID = {
+  columns: 4,
+  rowHeight: 180,
+  gap: 16
+};
 
 let cardsData = [];
 let selectedCardId = null;
+let currentDraftId = DEFAULT_DRAFT_ID;
+let archiveList = [];
 let shortTextQuill = null;
 let longTextQuill = null;
-let archiveList = [];
-let currentDraftId = DEFAULT_DRAFT_ID;
+let toastTimer = null;
 
-let draggedCardId = null;
-let dragOverCardId = null;
-let isDraggingCard = false;
+let dragState = {
+  active: false,
+  cardId: null,
+  startX: 0,
+  startY: 0,
+  offsetX: 0,
+  offsetY: 0,
+  originX: 1,
+  originY: 1
+};
 
 const DOM = {};
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   bindDom();
   initEditors();
   bindEvents();
+  applyBoardSettings(DEFAULT_GRID);
   initAuthObserver();
   renderBoard();
 });
 
 function bindDom() {
   DOM.bulletinPeriod = document.getElementById("bulletinPeriod");
-  DOM.bentoBoard = document.getElementById("bentoBoard");
-  DOM.addCardBtn = document.getElementById("addCardBtn");
+  DOM.bulletinTitle = document.getElementById("bulletinTitle");
 
+  DOM.gridColumns = document.getElementById("gridColumns");
+  DOM.gridRowHeight = document.getElementById("gridRowHeight");
+  DOM.gridGap = document.getElementById("gridGap");
+
+  DOM.addCardBtn = document.getElementById("addCardBtn");
+  DOM.saveDraftBtn = document.getElementById("saveDraftBtn");
   DOM.publishWebBtn = document.getElementById("publishWebBtn");
   DOM.publishEmailBtn = document.getElementById("publishEmailBtn");
   DOM.openArchivesBtn = document.getElementById("openArchivesBtn");
   DOM.logoutBtn = document.getElementById("logoutBtn");
 
+  DOM.toggleGridBtn = document.getElementById("toggleGridBtn");
+  DOM.fitBoardBtn = document.getElementById("fitBoardBtn");
+
+  DOM.boardCanvas = document.getElementById("boardCanvas");
+  DOM.boardGrid = document.getElementById("boardGrid");
+  DOM.cardsLayer = document.getElementById("cardsLayer");
+
+  DOM.selectedCardInfo = document.getElementById("selectedCardInfo");
+  DOM.quickCardActions = document.getElementById("quickCardActions");
+  DOM.editSelectedCardBtn = document.getElementById("editSelectedCardBtn");
+  DOM.duplicateSelectedCardBtn = document.getElementById("duplicateSelectedCardBtn");
+  DOM.deleteSelectedCardBtn = document.getElementById("deleteSelectedCardBtn");
+
   DOM.cardModal = document.getElementById("cardModal");
   DOM.closeModal = document.getElementById("closeModal");
   DOM.saveCardBtn = document.getElementById("saveCardBtn");
   DOM.deleteCardBtn = document.getElementById("deleteCardBtn");
+  DOM.duplicateCardBtn = document.getElementById("duplicateCardBtn");
 
   DOM.archiveModal = document.getElementById("archiveModal");
   DOM.archiveSelect = document.getElementById("archiveSelect");
@@ -63,9 +99,12 @@ function bindDom() {
   DOM.cardLink = document.getElementById("cardLink");
   DOM.cardImage = document.getElementById("cardImage");
   DOM.cardBgColor = document.getElementById("cardBgColor");
-  DOM.cardColSpan = document.getElementById("cardColSpan");
-  DOM.cardRowSpan = document.getElementById("cardRowSpan");
+  DOM.cardTextColorMode = document.getElementById("cardTextColorMode");
   DOM.cardEmailText = document.getElementById("cardEmailText");
+  DOM.cardX = document.getElementById("cardX");
+  DOM.cardY = document.getElementById("cardY");
+  DOM.cardW = document.getElementById("cardW");
+  DOM.cardH = document.getElementById("cardH");
 
   DOM.toast = document.getElementById("toast");
   DOM.toastText = document.getElementById("toastText");
@@ -102,33 +141,69 @@ function initEditors() {
 
 function bindEvents() {
   DOM.addCardBtn?.addEventListener("click", handleAddCard);
-
-  DOM.closeModal?.addEventListener("click", () => closeModal(DOM.cardModal));
-  DOM.saveCardBtn?.addEventListener("click", saveCurrentCard);
-  DOM.deleteCardBtn?.addEventListener("click", deleteCurrentCard);
-
-  DOM.openArchivesBtn?.addEventListener("click", async () => {
-    await loadPublishedArchivesList();
-    openModal(DOM.archiveModal);
+  DOM.saveDraftBtn?.addEventListener("click", async () => {
+    try {
+      await saveDraftToFirestore();
+      showToast("Brouillon enregistré");
+    } catch (error) {
+      console.error(error);
+      alert("Impossible d'enregistrer le brouillon.");
+    }
   });
-
-  DOM.loadArchiveBtn?.addEventListener("click", loadSelectedPublishedArchive);
 
   DOM.publishWebBtn?.addEventListener("click", publishWebBulletin);
   DOM.publishEmailBtn?.addEventListener("click", publishEmailBulletin);
+  DOM.openArchivesBtn?.addEventListener("click", openArchivesModal);
 
   DOM.logoutBtn?.addEventListener("click", async () => {
     try {
       await auth.signOut();
-      alert("Déconnecté.");
+      showToast("Déconnecté");
     } catch (error) {
       console.error(error);
       alert("Erreur lors de la déconnexion.");
     }
   });
 
+  DOM.toggleGridBtn?.addEventListener("click", () => {
+    DOM.boardCanvas.classList.toggle("show-grid");
+  });
+
+  DOM.fitBoardBtn?.addEventListener("click", () => {
+    DOM.boardCanvas?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  DOM.gridColumns?.addEventListener("change", handleBoardSettingsChange);
+  DOM.gridRowHeight?.addEventListener("change", handleBoardSettingsChange);
+  DOM.gridGap?.addEventListener("change", handleBoardSettingsChange);
+
   DOM.bulletinPeriod?.addEventListener("change", saveDraftMeta);
   DOM.bulletinPeriod?.addEventListener("blur", saveDraftMeta);
+  DOM.bulletinTitle?.addEventListener("change", saveDraftMeta);
+  DOM.bulletinTitle?.addEventListener("blur", saveDraftMeta);
+
+  DOM.editSelectedCardBtn?.addEventListener("click", () => {
+    if (selectedCardId) openCardEditor(selectedCardId);
+  });
+
+  DOM.duplicateSelectedCardBtn?.addEventListener("click", async () => {
+    if (selectedCardId) await duplicateCard(selectedCardId);
+  });
+
+  DOM.deleteSelectedCardBtn?.addEventListener("click", async () => {
+    if (selectedCardId) await deleteCardById(selectedCardId);
+  });
+
+  DOM.closeModal?.addEventListener("click", () => closeModal(DOM.cardModal));
+  DOM.saveCardBtn?.addEventListener("click", saveCurrentCard);
+  DOM.deleteCardBtn?.addEventListener("click", async () => {
+    if (selectedCardId) await deleteCardById(selectedCardId, true);
+  });
+  DOM.duplicateCardBtn?.addEventListener("click", async () => {
+    if (selectedCardId) await duplicateCard(selectedCardId, true);
+  });
+
+  DOM.loadArchiveBtn?.addEventListener("click", loadSelectedPublishedArchive);
 
   document.querySelectorAll("[data-close]").forEach((button) => {
     button.addEventListener("click", () => {
@@ -152,6 +227,9 @@ function bindEvents() {
       closeModal(DOM.archiveModal);
     }
   });
+
+  document.addEventListener("pointermove", handlePointerMove);
+  document.addEventListener("pointerup", handlePointerUp);
 }
 
 function initAuthObserver() {
@@ -161,7 +239,50 @@ function initAuthObserver() {
   });
 }
 
+/* =========================
+   BOARD SETTINGS
+========================= */
+
+function getBoardSettings() {
+  return {
+    columns: clampNumber(Number(DOM.gridColumns?.value || DEFAULT_GRID.columns), 4, 6),
+    rowHeight: clampNumber(Number(DOM.gridRowHeight?.value || DEFAULT_GRID.rowHeight), 120, 260),
+    gap: clampNumber(Number(DOM.gridGap?.value || DEFAULT_GRID.gap), 8, 32)
+  };
+}
+
+function applyBoardSettings(settings) {
+  if (!DOM.boardCanvas) return;
+
+  DOM.boardCanvas.style.setProperty("--board-columns", settings.columns);
+  DOM.boardCanvas.style.setProperty("--board-row-height", `${settings.rowHeight}px`);
+  DOM.boardCanvas.style.setProperty("--board-gap", `${settings.gap}px`);
+
+  if (DOM.gridColumns) DOM.gridColumns.value = String(settings.columns);
+  if (DOM.gridRowHeight) DOM.gridRowHeight.value = String(settings.rowHeight);
+  if (DOM.gridGap) DOM.gridGap.value = String(settings.gap);
+}
+
+async function handleBoardSettingsChange() {
+  applyBoardSettings(getBoardSettings());
+  renderBoard();
+
+  try {
+    await saveDraftToFirestore();
+    showToast("Grille mise à jour");
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+/* =========================
+   DATA MODEL
+========================= */
+
 function createEmptyCard() {
+  const settings = getBoardSettings();
+  const position = findFirstAvailablePosition(1, 1, settings.columns);
+
   return {
     id: generateId(),
     type: "news",
@@ -173,139 +294,120 @@ function createEmptyCard() {
     link: "",
     image: "",
     bgColor: "#ffffff",
-    colSpan: 1,
-    rowSpan: 1
+    textColorMode: "auto",
+    x: position.x,
+    y: position.y,
+    w: 1,
+    h: 1
   };
 }
 
-async function handleAddCard() {
-  const newCard = createEmptyCard();
-  cardsData.push(newCard);
-  selectedCardId = newCard.id;
-  renderBoard();
-  fillModal(newCard);
-  openModal(DOM.cardModal);
-
-  try {
-    await saveDraftToFirestore();
-  } catch (error) {
-    console.error("Erreur sauvegarde brouillon après ajout :", error);
-  }
+function getCardById(cardId) {
+  return cardsData.find((item) => item.id === cardId);
 }
+
+function getCardIndexById(cardId) {
+  return cardsData.findIndex((item) => item.id === cardId);
+}
+
+function getMaxRows() {
+  if (!cardsData.length) return 8;
+  return Math.max(
+    8,
+    ...cardsData.map((card) => Number(card.y || 1) + Number(card.h || 1) - 1)
+  );
+}
+
+/* =========================
+   RENDER
+========================= */
 
 function renderBoard() {
-  if (!DOM.bentoBoard) return;
-
-  DOM.bentoBoard.innerHTML = "";
-
-  DOM.bentoBoard.appendChild(createDropSlot(0));
-
-  cardsData.forEach((card, index) => {
-    const cardElement = createCardElement(card);
-    DOM.bentoBoard.appendChild(cardElement);
-    DOM.bentoBoard.appendChild(createDropSlot(index + 1));
-  });
+  renderGridBackground();
+  renderCards();
+  updateSelectedCardPanel();
 }
-function createDropSlot(index) {
-  const slot = document.createElement("div");
-  slot.className = "drop-slot";
-  slot.dataset.index = String(index);
 
-  slot.addEventListener("dragover", (event) => {
-    event.preventDefault();
-    if (!draggedCardId) return;
-    clearDragStates();
-    slot.classList.add("drag-over");
-  });
+function renderGridBackground() {
+  if (!DOM.boardGrid) return;
 
-  slot.addEventListener("dragleave", () => {
-    slot.classList.remove("drag-over");
-  });
+  const settings = getBoardSettings();
+  const rows = getMaxRows() + 2;
 
-  slot.addEventListener("drop", async (event) => {
-    event.preventDefault();
+  DOM.boardGrid.innerHTML = "";
 
-    const sourceId = draggedCardId;
-    const targetIndex = Number(slot.dataset.index);
-
-    clearDragStates();
-
-    if (!sourceId || Number.isNaN(targetIndex)) {
-      return;
-    }
-
-    moveCardToIndex(sourceId, targetIndex);
-    renderBoard();
-
-    try {
-      await saveDraftToFirestore();
-      showToast("Ordre mis à jour");
-    } catch (error) {
-      console.error("Erreur sauvegarde après déplacement :", error);
-      alert("Le déplacement a fonctionné à l'écran, mais pas dans le brouillon.");
-    }
-  });
-
-  return slot;
-}
-function moveCardToIndex(cardId, targetIndex) {
-  const sourceIndex = cardsData.findIndex((card) => card.id === cardId);
-  if (sourceIndex === -1) return;
-
-  const [movedCard] = cardsData.splice(sourceIndex, 1);
-
-  let adjustedIndex = targetIndex;
-  if (sourceIndex < targetIndex) {
-    adjustedIndex -= 1;
+  for (let i = 0; i < settings.columns * rows; i += 1) {
+    const cell = document.createElement("div");
+    cell.className = "grid-cell";
+    DOM.boardGrid.appendChild(cell);
   }
 
-  adjustedIndex = Math.max(0, Math.min(adjustedIndex, cardsData.length));
-  cardsData.splice(adjustedIndex, 0, movedCard);
+  if (DOM.cardsLayer) {
+    DOM.cardsLayer.style.gridTemplateColumns = `repeat(${settings.columns}, minmax(0, 1fr))`;
+    DOM.cardsLayer.style.gridAutoRows = `${settings.rowHeight}px`;
+    DOM.cardsLayer.style.gap = `${settings.gap}px`;
+  }
+
+  DOM.boardGrid.style.gridTemplateColumns = `repeat(${settings.columns}, minmax(0, 1fr))`;
+  DOM.boardGrid.style.gridAutoRows = `${settings.rowHeight}px`;
+  DOM.boardGrid.style.gap = `${settings.gap}px`;
 }
+
+function renderCards() {
+  if (!DOM.cardsLayer) return;
+
+  DOM.cardsLayer.innerHTML = "";
+
+  cardsData.forEach((card) => {
+    const cardElement = createCardElement(card);
+    DOM.cardsLayer.appendChild(cardElement);
+  });
+}
+
 function createCardElement(card) {
   const article = document.createElement("article");
-  article.className = buildCardClassName(card);
-
-  article.style.background = "";
-  article.style.backgroundImage = "";
-
-  if (card.bgColor && !card.image) {
-    article.style.background = card.bgColor;
-  }
+  article.className = "v3-card";
+  article.dataset.id = card.id;
+  article.style.gridColumn = `${card.x} / span ${card.w}`;
+  article.style.gridRow = `${card.y} / span ${card.h}`;
 
   if (card.image) {
+    article.classList.add("has-image");
     article.style.backgroundImage = `url("${escapeHtmlAttribute(card.image)}")`;
+  } else {
+    article.style.background = normalizeColor(card.bgColor || "#ffffff");
   }
 
   if (shouldUseLightText(card)) {
     article.classList.add("text-light");
   }
 
-  article.dataset.id = card.id;
+  if (selectedCardId === card.id) {
+    article.classList.add("selected");
+  }
 
-  const typeLabel = getTypeLabel(card.type);
   const shortTextPlain = stripHtml(card.shortText || "");
-  const shortTextPreview = truncateText(shortTextPlain, 160);
+  const shortTextPreview = truncateText(shortTextPlain, 180);
 
   article.innerHTML = `
-    <div class="admin-card-toolbar">
-      <span class="admin-card-badge">${escapeHtml(typeLabel)}</span>
-      <div class="admin-card-menu">
-        <button class="admin-card-icon-btn drag-handle" type="button" title="Déplacer" draggable="true">⋮⋮</button>
-        <button class="admin-card-icon-btn js-duplicate-card" type="button" title="Dupliquer">⧉</button>
-        <button class="admin-card-icon-btn js-edit-card" type="button" title="Modifier">✏️</button>
+    <div class="v3-card-toolbar">
+      <span class="v3-card-badge">${escapeHtml(getTypeLabel(card.type))}</span>
+      <div class="v3-card-menu">
+        <button class="v3-card-icon-btn drag-handle" type="button" title="Déplacer">⋮⋮</button>
+        <button class="v3-card-icon-btn js-duplicate-card" type="button" title="Dupliquer">⧉</button>
+        <button class="v3-card-icon-btn js-edit-card" type="button" title="Modifier">✏️</button>
       </div>
     </div>
 
-    <div class="admin-card-icon">${escapeHtml(card.icon || "📄")}</div>
+    <div class="v3-card-body">
+      <div class="v3-card-icon">${escapeHtml(card.icon || "📄")}</div>
+      <h3 class="v3-card-title">${escapeHtml(card.title || "Sans titre")}</h3>
+      <p class="v3-card-short">${escapeHtml(shortTextPreview || "Aucun texte court")}</p>
 
-    <h3 class="admin-card-title">${escapeHtml(card.title || "Sans titre")}</h3>
-
-    <p class="admin-card-short">${escapeHtml(shortTextPreview || "Aucun texte court")}</p>
-
-    <div class="admin-card-footer">
-      <span class="admin-card-meta">${card.colSpan} col · ${card.rowSpan} ligne</span>
-      ${card.link ? `<a class="admin-card-link" href="${escapeHtmlAttribute(card.link)}" target="_blank" rel="noopener noreferrer">Voir lien</a>` : `<span class="admin-card-link"></span>`}
+      <div class="v3-card-footer">
+        <span class="v3-card-meta">x:${card.x} y:${card.y} · ${card.w}×${card.h}</span>
+        ${card.link ? `<a class="v3-card-link" href="${escapeHtmlAttribute(card.link)}" target="_blank" rel="noopener noreferrer">Voir</a>` : `<span class="v3-card-link"></span>`}
+      </div>
     </div>
   `;
 
@@ -317,17 +419,17 @@ function createCardElement(card) {
     if (
       event.target.closest(".js-edit-card") ||
       event.target.closest(".js-duplicate-card") ||
-      event.target.closest(".drag-handle") ||
-      isDraggingCard
+      event.target.closest(".drag-handle")
     ) {
       return;
     }
 
-    openCardEditor(card.id);
+    selectCard(card.id);
   });
 
   editButton?.addEventListener("click", (event) => {
     event.stopPropagation();
+    selectCard(card.id);
     openCardEditor(card.id);
   });
 
@@ -336,190 +438,183 @@ function createCardElement(card) {
     await duplicateCard(card.id);
   });
 
-  dragHandle?.addEventListener("dragstart", (event) => {
-    draggedCardId = card.id;
-    isDraggingCard = true;
-    article.classList.add("is-dragging");
-    event.dataTransfer.effectAllowed = "move";
-    event.dataTransfer.setData("text/plain", card.id);
-  });
-
-  dragHandle?.addEventListener("dragend", () => {
-    article.classList.remove("is-dragging");
-    clearDragStates();
-    draggedCardId = null;
-    dragOverCardId = null;
-
-    setTimeout(() => {
-      isDraggingCard = false;
-    }, 50);
-  });
-
-  article.addEventListener("dragover", (event) => {
+  dragHandle?.addEventListener("pointerdown", (event) => {
     event.preventDefault();
-
-    if (!draggedCardId || draggedCardId === card.id) {
-      return;
-    }
-
-    dragOverCardId = card.id;
-    clearDragStates();
-    article.classList.add("drag-over");
-  });
-
-  article.addEventListener("dragleave", () => {
-    article.classList.remove("drag-over");
-  });
-
-  article.addEventListener("drop", async (event) => {
-    event.preventDefault();
-
-    const sourceId = draggedCardId;
-    const targetId = card.id;
-
-    clearDragStates();
-
-    if (!sourceId || !targetId || sourceId === targetId) {
-      return;
-    }
-
-    reorderCards(sourceId, targetId);
-    renderBoard();
-
-    try {
-      await saveDraftToFirestore();
-    } catch (error) {
-      console.error("Erreur sauvegarde après réorganisation :", error);
-      alert("L'ordre a changé à l'écran, mais pas dans le brouillon.");
-    }
+    event.stopPropagation();
+    startDraggingCard(event, card, article);
   });
 
   return article;
 }
 
-async function duplicateCard(cardId) {
-  const sourceCard = cardsData.find((item) => item.id === cardId);
-  if (!sourceCard) return;
-
-  const duplicatedCard = {
-    ...sourceCard,
-    id: generateId(),
-    title: sourceCard.title ? `${sourceCard.title} (copie)` : "Copie de carte"
-  };
-
-  const sourceIndex = cardsData.findIndex((item) => item.id === cardId);
-
-  if (sourceIndex === -1) return;
-
-  cardsData.splice(sourceIndex + 1, 0, duplicatedCard);
-  renderBoard();
-
-  try {
-    await saveDraftToFirestore();
-    showToast("Carte dupliquée");
-  } catch (error) {
-    console.error("Erreur duplication carte :", error);
-    alert("La carte a été dupliquée à l'écran, mais pas enregistrée dans le brouillon.");
-  }
+function selectCard(cardId) {
+  selectedCardId = cardId;
+  renderCards();
+  updateSelectedCardPanel();
 }
-function reorderCards(sourceId, targetId) {
-  const sourceIndex = cardsData.findIndex((card) => card.id === sourceId);
-  const targetIndex = cardsData.findIndex((card) => card.id === targetId);
 
-  if (sourceIndex === -1 || targetIndex === -1 || sourceIndex === targetIndex) {
+function updateSelectedCardPanel() {
+  if (!DOM.selectedCardInfo || !DOM.quickCardActions) return;
+
+  const card = getCardById(selectedCardId);
+
+  if (!card) {
+    DOM.selectedCardInfo.textContent = "Aucune carte sélectionnée";
+    DOM.quickCardActions.classList.add("hidden");
     return;
   }
 
-  const [movedCard] = cardsData.splice(sourceIndex, 1);
-  cardsData.splice(targetIndex, 0, movedCard);
+  DOM.selectedCardInfo.innerHTML = `
+    <strong>${escapeHtml(card.title || "Sans titre")}</strong><br>
+    Type : ${escapeHtml(getTypeLabel(card.type))}<br>
+    Position : colonne ${card.x}, ligne ${card.y}<br>
+    Taille : ${card.w} × ${card.h}
+  `;
+
+  DOM.quickCardActions.classList.remove("hidden");
 }
 
-function clearDragStates() {
-  document.querySelectorAll(".admin-card").forEach((card) => {
-    card.classList.remove("drag-over");
-    card.classList.remove("is-dragging");
-  });
+/* =========================
+   MODAL
+========================= */
 
-  document.querySelectorAll(".drop-slot").forEach((slot) => {
-    slot.classList.remove("drag-over");
-  });
-}
 function openCardEditor(cardId) {
-  const card = cardsData.find((item) => item.id === cardId);
+  const card = getCardById(cardId);
   if (!card) return;
 
   selectedCardId = cardId;
-  fillModal(card);
-  openModal(DOM.cardModal);
-}
 
-function fillModal(card) {
   DOM.cardTitle.value = card.title || "";
   DOM.cardType.value = card.type || "news";
   DOM.cardIcon.value = card.icon || "";
   DOM.cardLink.value = card.link || "";
   DOM.cardImage.value = card.image || "";
   DOM.cardBgColor.value = normalizeColor(card.bgColor || "#ffffff");
-  DOM.cardColSpan.value = String(card.colSpan || 1);
-  DOM.cardRowSpan.value = String(card.rowSpan || 1);
+  DOM.cardTextColorMode.value = card.textColorMode || "auto";
   DOM.cardEmailText.value = card.emailText || "";
+
+  DOM.cardX.value = String(card.x || 1);
+  DOM.cardY.value = String(card.y || 1);
+  DOM.cardW.value = String(card.w || 1);
+  DOM.cardH.value = String(card.h || 1);
 
   shortTextQuill.root.innerHTML = card.shortText || "";
   longTextQuill.root.innerHTML = card.longText || "";
+
+  openModal(DOM.cardModal);
 }
 
 async function saveCurrentCard() {
   if (!selectedCardId) return;
 
-  const cardIndex = cardsData.findIndex((item) => item.id === selectedCardId);
-  if (cardIndex === -1) return;
+  const card = getCardById(selectedCardId);
+  if (!card) return;
+
+  const settings = getBoardSettings();
 
   const updatedCard = {
-    ...cardsData[cardIndex],
+    ...card,
     title: DOM.cardTitle.value.trim(),
     type: DOM.cardType.value,
     icon: DOM.cardIcon.value.trim(),
     link: DOM.cardLink.value.trim(),
     image: DOM.cardImage.value.trim(),
     bgColor: DOM.cardBgColor.value,
-    colSpan: clampSpan(Number(DOM.cardColSpan.value), 1, 4),
-    rowSpan: clampSpan(Number(DOM.cardRowSpan.value), 1, 2),
+    textColorMode: DOM.cardTextColorMode.value || "auto",
+    emailText: DOM.cardEmailText.value.trim(),
     shortText: shortTextQuill.root.innerHTML,
     longText: longTextQuill.root.innerHTML,
-    emailText: DOM.cardEmailText.value.trim()
+    x: clampNumber(Number(DOM.cardX.value), 1, settings.columns),
+    y: Math.max(1, Number(DOM.cardY.value) || 1),
+    w: clampNumber(Number(DOM.cardW.value), 1, settings.columns),
+    h: clampNumber(Number(DOM.cardH.value), 1, 4)
   };
 
-  cardsData[cardIndex] = updatedCard;
-  renderBoard();
+  if (updatedCard.x + updatedCard.w - 1 > settings.columns) {
+    updatedCard.x = Math.max(1, settings.columns - updatedCard.w + 1);
+  }
+
+  if (!isPositionFreeForCard(updatedCard.id, updatedCard.x, updatedCard.y, updatedCard.w, updatedCard.h)) {
+    alert("Cette position est déjà occupée par une autre carte.");
+    return;
+  }
+
+  const index = getCardIndexById(updatedCard.id);
+  if (index === -1) return;
+
+  cardsData[index] = updatedCard;
 
   try {
     await saveDraftToFirestore();
+    renderBoard();
     closeModal(DOM.cardModal);
+    showToast("Carte enregistrée");
   } catch (error) {
-    console.error("Erreur sauvegarde brouillon :", error);
-    alert("La carte a été mise à jour à l'écran, mais pas enregistrée dans le brouillon.");
+    console.error(error);
+    alert("Impossible d'enregistrer la carte.");
   }
 }
 
-async function deleteCurrentCard() {
-  if (!selectedCardId) return;
+async function duplicateCard(cardId, closeAfter = false) {
+  const sourceCard = getCardById(cardId);
+  if (!sourceCard) return;
 
-  const card = cardsData.find((item) => item.id === selectedCardId);
-  if (!card) return;
+  const settings = getBoardSettings();
+  const duplicatedCard = {
+    ...sourceCard,
+    id: generateId(),
+    title: sourceCard.title ? `${sourceCard.title} (copie)` : "Copie de carte"
+  };
 
-  const confirmDelete = window.confirm(`Supprimer la carte "${card.title || "Sans titre"}" ?`);
-  if (!confirmDelete) return;
+  const newPosition = findAvailablePositionNearCard(sourceCard, settings.columns);
+  duplicatedCard.x = newPosition.x;
+  duplicatedCard.y = newPosition.y;
 
-  cardsData = cardsData.filter((item) => item.id !== selectedCardId);
-  selectedCardId = null;
-  renderBoard();
+  cardsData.push(duplicatedCard);
+  selectedCardId = duplicatedCard.id;
 
   try {
     await saveDraftToFirestore();
-    closeModal(DOM.cardModal);
+    renderBoard();
+    updateSelectedCardPanel();
+
+    if (closeAfter) {
+      closeModal(DOM.cardModal);
+    }
+
+    showToast("Carte dupliquée");
   } catch (error) {
-    console.error("Erreur suppression brouillon :", error);
-    alert("La carte a été supprimée à l'écran, mais pas enregistrée en base.");
+    console.error(error);
+    alert("Impossible de dupliquer la carte.");
+  }
+}
+
+async function deleteCardById(cardId, closeAfter = false) {
+  const card = getCardById(cardId);
+  if (!card) return;
+
+  const ok = window.confirm(`Supprimer la carte "${card.title || "Sans titre"}" ?`);
+  if (!ok) return;
+
+  cardsData = cardsData.filter((item) => item.id !== cardId);
+
+  if (selectedCardId === cardId) {
+    selectedCardId = null;
+  }
+
+  try {
+    await saveDraftToFirestore();
+    renderBoard();
+    updateSelectedCardPanel();
+
+    if (closeAfter) {
+      closeModal(DOM.cardModal);
+    }
+
+    showToast("Carte supprimée");
+  } catch (error) {
+    console.error(error);
+    alert("Impossible de supprimer la carte.");
   }
 }
 
@@ -533,19 +628,253 @@ function closeModal(modal) {
   modal.classList.remove("open");
 }
 
-let toastTimer = null;
+/* =========================
+   DRAG & DROP V3
+========================= */
 
-function showToast(message) {
-  if (!DOM.toast || !DOM.toastText) return;
+function startDraggingCard(event, card, article) {
+  selectCard(card.id);
 
-  DOM.toastText.textContent = message;
-  DOM.toast.classList.add("show");
+  const rect = article.getBoundingClientRect();
 
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => {
-    DOM.toast.classList.remove("show");
-  }, 2200);
+  dragState = {
+    active: true,
+    cardId: card.id,
+    startX: event.clientX,
+    startY: event.clientY,
+    offsetX: event.clientX - rect.left,
+    offsetY: event.clientY - rect.top,
+    originX: card.x,
+    originY: card.y
+  };
+
+  article.classList.add("is-dragging");
 }
+
+function handlePointerMove(event) {
+  if (!dragState.active || !dragState.cardId) return;
+
+  const draggedCard = getCardById(dragState.cardId);
+  if (!draggedCard || !DOM.cardsLayer) return;
+
+  const metrics = getBoardMetrics();
+  if (!metrics) return;
+
+  const nextX = clampNumber(
+    Math.floor((event.clientX - metrics.left) / metrics.colWidth) + 1,
+    1,
+    metrics.columns
+  );
+
+  const nextY = Math.max(
+    1,
+    Math.floor((event.clientY - metrics.top) / metrics.rowHeightStep) + 1
+  );
+
+  let finalX = nextX;
+  if (finalX + draggedCard.w - 1 > metrics.columns) {
+    finalX = Math.max(1, metrics.columns - draggedCard.w + 1);
+  }
+
+  const canPlace = isPositionFreeForCard(draggedCard.id, finalX, nextY, draggedCard.w, draggedCard.h);
+
+  previewDraggedCard(draggedCard.id, finalX, nextY, canPlace);
+}
+
+async function handlePointerUp(event) {
+  if (!dragState.active || !dragState.cardId) return;
+
+  const draggedCard = getCardById(dragState.cardId);
+  const cardId = dragState.cardId;
+
+  clearDragPreview();
+
+  if (!draggedCard) {
+    resetDragState();
+    return;
+  }
+
+  const metrics = getBoardMetrics();
+  if (!metrics) {
+    resetDragState();
+    return;
+  }
+
+  let targetX = clampNumber(
+    Math.floor((event.clientX - metrics.left) / metrics.colWidth) + 1,
+    1,
+    metrics.columns
+  );
+
+  const targetY = Math.max(
+    1,
+    Math.floor((event.clientY - metrics.top) / metrics.rowHeightStep) + 1
+  );
+
+  if (targetX + draggedCard.w - 1 > metrics.columns) {
+    targetX = Math.max(1, metrics.columns - draggedCard.w + 1);
+  }
+
+  if (isPositionFreeForCard(cardId, targetX, targetY, draggedCard.w, draggedCard.h)) {
+    const index = getCardIndexById(cardId);
+    if (index !== -1) {
+      cardsData[index] = {
+        ...cardsData[index],
+        x: targetX,
+        y: targetY
+      };
+
+      try {
+        await saveDraftToFirestore();
+        showToast("Carte déplacée");
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }
+
+  resetDragState();
+  renderBoard();
+}
+
+function resetDragState() {
+  dragState = {
+    active: false,
+    cardId: null,
+    startX: 0,
+    startY: 0,
+    offsetX: 0,
+    offsetY: 0,
+    originX: 1,
+    originY: 1
+  };
+}
+
+function previewDraggedCard(cardId, x, y, valid) {
+  const element = DOM.cardsLayer?.querySelector(`.v3-card[data-id="${cardId}"]`);
+  const card = getCardById(cardId);
+
+  if (!element || !card) return;
+
+  element.style.gridColumn = `${x} / span ${card.w}`;
+  element.style.gridRow = `${y} / span ${card.h}`;
+  element.classList.add("is-dragging");
+  element.classList.toggle("drag-preview", !!valid);
+  element.classList.toggle("invalid-drop", !valid);
+}
+
+function clearDragPreview() {
+  DOM.cardsLayer?.querySelectorAll(".v3-card").forEach((element) => {
+    element.classList.remove("drag-preview");
+    element.classList.remove("invalid-drop");
+    element.classList.remove("is-dragging");
+  });
+}
+
+function getBoardMetrics() {
+  if (!DOM.cardsLayer) return null;
+
+  const rect = DOM.cardsLayer.getBoundingClientRect();
+  const settings = getBoardSettings();
+  const columns = settings.columns;
+  const gap = settings.gap;
+  const totalGap = gap * (columns - 1);
+  const colWidth = (rect.width - totalGap) / columns;
+
+  return {
+    left: rect.left,
+    top: rect.top,
+    width: rect.width,
+    columns,
+    gap,
+    colWidth: colWidth + gap,
+    rowHeightStep: settings.rowHeight + gap
+  };
+}
+
+/* =========================
+   POSITION / COLLISION
+========================= */
+
+function isPositionFreeForCard(cardId, x, y, w, h) {
+  const settings = getBoardSettings();
+
+  if (x < 1 || y < 1 || w < 1 || h < 1) return false;
+  if (x + w - 1 > settings.columns) return false;
+
+  const candidate = {
+    x,
+    y,
+    w,
+    h
+  };
+
+  return !cardsData.some((card) => {
+    if (card.id === cardId) return false;
+    return rectanglesOverlap(candidate, card);
+  });
+}
+
+function rectanglesOverlap(a, b) {
+  const aLeft = a.x;
+  const aRight = a.x + a.w - 1;
+  const aTop = a.y;
+  const aBottom = a.y + a.h - 1;
+
+  const bLeft = b.x;
+  const bRight = b.x + b.w - 1;
+  const bTop = b.y;
+  const bBottom = b.y + b.h - 1;
+
+  return !(
+    aRight < bLeft ||
+    aLeft > bRight ||
+    aBottom < bTop ||
+    aTop > bBottom
+  );
+}
+
+function findFirstAvailablePosition(w, h, columns) {
+  for (let y = 1; y <= 50; y += 1) {
+    for (let x = 1; x <= columns; x += 1) {
+      if (x + w - 1 > columns) continue;
+      if (isPositionFreeForCard(null, x, y, w, h)) {
+        return { x, y };
+      }
+    }
+  }
+
+  return { x: 1, y: getMaxRows() + 1 };
+}
+
+function findAvailablePositionNearCard(sourceCard, columns) {
+  const candidates = [
+    { x: sourceCard.x + sourceCard.w, y: sourceCard.y },
+    { x: sourceCard.x, y: sourceCard.y + sourceCard.h },
+    { x: sourceCard.x + 1, y: sourceCard.y + 1 },
+    { x: sourceCard.x, y: sourceCard.y }
+  ];
+
+  for (const pos of candidates) {
+    const safeX = Math.max(1, Math.min(pos.x, columns));
+    const safeY = Math.max(1, pos.y);
+
+    let finalX = safeX;
+    if (finalX + sourceCard.w - 1 > columns) {
+      finalX = Math.max(1, columns - sourceCard.w + 1);
+    }
+
+    if (isPositionFreeForCard(null, finalX, safeY, sourceCard.w, sourceCard.h)) {
+      return { x: finalX, y: safeY };
+    }
+  }
+
+  return findFirstAvailablePosition(sourceCard.w, sourceCard.h, columns);
+}
+
+/* =========================
+   FIRESTORE
+========================= */
 
 async function loadLatestDraft() {
   try {
@@ -553,17 +882,28 @@ async function loadLatestDraft() {
 
     if (!doc.exists) {
       cardsData = [];
-      DOM.bulletinPeriod.value = "";
       currentDraftId = DEFAULT_DRAFT_ID;
+      DOM.bulletinPeriod.value = "";
+      DOM.bulletinTitle.value = "Frequence SUD";
+      applyBoardSettings(DEFAULT_GRID);
       renderBoard();
       await saveDraftToFirestore();
       return;
     }
 
     const data = doc.data();
+
     currentDraftId = doc.id;
-    cardsData = Array.isArray(data.cards) ? data.cards : [];
+    cardsData = Array.isArray(data.cards) ? sanitizeCards(data.cards) : [];
     DOM.bulletinPeriod.value = data.period || "";
+    DOM.bulletinTitle.value = data.title || "Frequence SUD";
+
+    applyBoardSettings({
+      columns: Number(data.columns || DEFAULT_GRID.columns),
+      rowHeight: Number(data.rowHeight || DEFAULT_GRID.rowHeight),
+      gap: Number(data.gap || DEFAULT_GRID.gap)
+    });
+
     renderBoard();
   } catch (error) {
     console.error("Erreur chargement brouillon :", error);
@@ -580,22 +920,25 @@ async function saveDraftMeta() {
 }
 
 async function saveDraftToFirestore() {
+  const settings = getBoardSettings();
+
   const payload = {
     period: DOM.bulletinPeriod.value.trim(),
+    title: DOM.bulletinTitle.value.trim() || "Frequence SUD",
+    columns: settings.columns,
+    rowHeight: settings.rowHeight,
+    gap: settings.gap,
     cards: cardsData.map((card) => ({ ...card })),
     isDraft: true,
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   };
 
   await db.collection(DRAFT_COLLECTION).doc(currentDraftId).set(payload, { merge: true });
-  showToast("Brouillon enregistré");
 }
-async function loadPublishedArchivesList() {
+
+async function openArchivesModal() {
   try {
-    const snapshot = await db
-      .collection(PUBLIC_COLLECTION)
-      .orderBy("timestamp", "desc")
-      .get();
+    const snapshot = await db.collection(PUBLIC_COLLECTION).orderBy("timestamp", "desc").get();
 
     archiveList = snapshot.docs.map((doc) => ({
       id: doc.id,
@@ -604,23 +947,24 @@ async function loadPublishedArchivesList() {
 
     DOM.archiveSelect.innerHTML = "";
 
-    if (archiveList.length === 0) {
+    if (!archiveList.length) {
       const option = document.createElement("option");
       option.value = "";
       option.textContent = "Aucune archive disponible";
       DOM.archiveSelect.appendChild(option);
-      return;
+    } else {
+      archiveList.forEach((archive) => {
+        const option = document.createElement("option");
+        option.value = archive.id;
+        option.textContent = archive.period || archive.id;
+        DOM.archiveSelect.appendChild(option);
+      });
     }
 
-    archiveList.forEach((archive) => {
-      const option = document.createElement("option");
-      option.value = archive.id;
-      option.textContent = archive.period || archive.id;
-      DOM.archiveSelect.appendChild(option);
-    });
+    openModal(DOM.archiveModal);
   } catch (error) {
-    console.error("Erreur chargement archives publiées :", error);
-    alert("Impossible de charger les archives publiées.");
+    console.error(error);
+    alert("Impossible de charger les archives.");
   }
 }
 
@@ -630,21 +974,29 @@ async function loadSelectedPublishedArchive() {
 
   try {
     const doc = await db.collection(PUBLIC_COLLECTION).doc(archiveId).get();
-
     if (!doc.exists) {
       alert("Archive introuvable.");
       return;
     }
 
     const data = doc.data();
-    cardsData = Array.isArray(data.cards) ? data.cards : [];
+
+    cardsData = Array.isArray(data.cards) ? sanitizeCards(data.cards) : [];
     DOM.bulletinPeriod.value = data.period || "";
-    renderBoard();
+    DOM.bulletinTitle.value = data.title || "Frequence SUD";
+
+    applyBoardSettings({
+      columns: Number(data.columns || DEFAULT_GRID.columns),
+      rowHeight: Number(data.rowHeight || DEFAULT_GRID.rowHeight),
+      gap: Number(data.gap || DEFAULT_GRID.gap)
+    });
 
     await saveDraftToFirestore();
+    renderBoard();
     closeModal(DOM.archiveModal);
+    showToast("Archive chargée dans le brouillon");
   } catch (error) {
-    console.error("Erreur chargement archive publiée :", error);
+    console.error(error);
     alert("Impossible de charger cette archive.");
   }
 }
@@ -656,13 +1008,13 @@ async function publishWebBulletin() {
 
     await db.collection(PUBLIC_COLLECTION).doc(publishedId).set({
       ...payload,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-      sourceDraftId: currentDraftId
+      sourceDraftId: currentDraftId,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
 
-    alert("Bulletin web publié.");
+    showToast("Bulletin web publié");
   } catch (error) {
-    console.error("Erreur publication web :", error);
+    console.error(error);
     alert("Erreur lors de la publication web.");
   }
 }
@@ -673,66 +1025,67 @@ async function publishEmailBulletin() {
     const emailHtml = generateEmailHtml(payload);
 
     await db.collection(EMAIL_COLLECTION).add({
-      period: payload.period,
-      cards: payload.cards,
+      ...payload,
       htmlContent: emailHtml,
       sourceDraftId: currentDraftId,
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     });
 
-    alert("Email publié.");
+    showToast("Email publié");
   } catch (error) {
-    console.error("Erreur publication email :", error);
+    console.error(error);
     alert("Erreur lors de la publication email.");
   }
 }
 
 function buildPublishPayload() {
+  const settings = getBoardSettings();
+
   return {
     period: DOM.bulletinPeriod.value.trim(),
+    title: DOM.bulletinTitle.value.trim() || "Frequence SUD",
+    columns: settings.columns,
+    rowHeight: settings.rowHeight,
+    gap: settings.gap,
     cards: cardsData.map((card) => ({ ...card }))
   };
 }
 
-function buildPublishedDocId(period) {
-  const base = (period || `bulletin_${Date.now()}`)
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^\w\s-]/g, "")
-    .trim()
-    .replace(/\s+/g, "_");
-
-  return base || `bulletin_${Date.now()}`;
-}
+/* =========================
+   EMAIL HTML
+========================= */
 
 function generateEmailHtml(payload) {
-  const cardsHtml = payload.cards
-    .map((card) => {
-      const title = escapeHtml(card.title || "");
-      const icon = escapeHtml(card.icon || "📄");
-      const emailText = escapeHtml(card.emailText || stripHtml(card.shortText || ""));
-      const link = card.link
-        ? `<p style="margin:12px 0 0;"><a href="${escapeHtmlAttribute(card.link)}" style="color:#ed1e79;text-decoration:none;font-weight:600;">Lire la suite</a></p>`
-        : "";
+  const cardsSorted = [...payload.cards].sort((a, b) => {
+    if (a.y !== b.y) return a.y - b.y;
+    return a.x - b.x;
+  });
 
-      return `
-        <tr>
-          <td style="padding:0 0 18px;">
-            <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background:#ffffff;border-radius:18px;border:1px solid #e6eaf2;">
-              <tr>
-                <td style="padding:20px;font-family:Arial,sans-serif;color:#1e2430;">
-                  <div style="font-size:24px;line-height:1;margin-bottom:10px;">${icon}</div>
-                  <div style="font-size:20px;font-weight:700;margin-bottom:8px;">${title}</div>
-                  <div style="font-size:14px;line-height:1.6;color:#475569;">${emailText}</div>
-                  ${link}
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-      `;
-    })
-    .join("");
+  const cardsHtml = cardsSorted.map((card) => {
+    const title = escapeHtml(card.title || "");
+    const icon = escapeHtml(card.icon || "📄");
+    const emailText = escapeHtml(card.emailText || stripHtml(card.shortText || ""));
+    const link = card.link
+      ? `<p style="margin:12px 0 0;"><a href="${escapeHtmlAttribute(card.link)}" style="color:#ed1e79;text-decoration:none;font-weight:600;">Lire la suite</a></p>`
+      : "";
+
+    return `
+      <tr>
+        <td style="padding:0 0 18px;">
+          <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background:#ffffff;border-radius:18px;border:1px solid #e6eaf2;">
+            <tr>
+              <td style="padding:20px;font-family:Arial,sans-serif;color:#1e2430;">
+                <div style="font-size:24px;line-height:1;margin-bottom:10px;">${icon}</div>
+                <div style="font-size:20px;font-weight:700;margin-bottom:8px;">${title}</div>
+                <div style="font-size:14px;line-height:1.6;color:#475569;">${emailText}</div>
+                ${link}
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    `;
+  }).join("");
 
   return `
 <!DOCTYPE html>
@@ -749,7 +1102,7 @@ function generateEmailHtml(payload) {
         <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;max-width:700px;">
           <tr>
             <td style="background:#ed1e79;color:#ffffff;padding:28px 24px;border-radius:22px 22px 0 0;text-align:center;">
-              <div style="font-size:28px;font-weight:700;">Frequence SUD</div>
+              <div style="font-size:28px;font-weight:700;">${escapeHtml(payload.title || "Frequence SUD")}</div>
               <div style="font-size:15px;margin-top:8px;opacity:.95;">${escapeHtml(payload.period || "")}</div>
             </td>
           </tr>
@@ -774,6 +1127,30 @@ function generateEmailHtml(payload) {
   `.trim();
 }
 
+/* =========================
+   HELPERS
+========================= */
+
+function sanitizeCards(cards) {
+  return cards.map((card) => ({
+    id: card.id || generateId(),
+    type: card.type || "news",
+    title: card.title || "Sans titre",
+    icon: card.icon || "📄",
+    shortText: card.shortText || "",
+    longText: card.longText || "",
+    emailText: card.emailText || "",
+    link: card.link || "",
+    image: card.image || "",
+    bgColor: normalizeColor(card.bgColor || "#ffffff"),
+    textColorMode: card.textColorMode || "auto",
+    x: Math.max(1, Number(card.x || 1)),
+    y: Math.max(1, Number(card.y || 1)),
+    w: Math.max(1, Number(card.w || 1)),
+    h: Math.max(1, Number(card.h || 1))
+  }));
+}
+
 function getTypeLabel(type) {
   const labels = {
     news: "Actu",
@@ -781,36 +1158,45 @@ function getTypeLabel(type) {
     info: "Info",
     link: "Lien",
     app: "Application",
+    image: "Image",
     custom: "Personnalisée"
   };
 
   return labels[type] || "Carte";
 }
 
-function buildCardClassName(card) {
-  const classes = [
-    "admin-card",
-    `col-span-${clampSpan(Number(card.colSpan), 1, 4)}`,
-    `row-span-${clampSpan(Number(card.rowSpan), 1, 2)}`
-  ];
-
-  if (card.image) {
-    classes.push("has-image");
-  }
-
-  return classes.join(" ");
-}
-
 function shouldUseLightText(card) {
+  if (card.textColorMode === "light") return true;
+  if (card.textColorMode === "dark") return false;
   if (card.image) return true;
   return isDarkColor(card.bgColor || "#ffffff");
 }
 
-function generateId() {
-  return `card_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+function buildPublishedDocId(period) {
+  const base = (period || `bulletin_${Date.now()}`)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\w\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "_")
+    .toLowerCase();
+
+  return base || `bulletin_${Date.now()}`;
 }
 
-function clampSpan(value, min, max) {
+function showToast(message) {
+  if (!DOM.toast || !DOM.toastText) return;
+
+  DOM.toastText.textContent = message;
+  DOM.toast.classList.add("show");
+
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    DOM.toast.classList.remove("show");
+  }, 2200);
+}
+
+function clampNumber(value, min, max) {
   if (Number.isNaN(value)) return min;
   return Math.max(min, Math.min(max, value));
 }
@@ -855,4 +1241,8 @@ function isDarkColor(hexColor) {
 
   const brightness = (r * 299 + g * 587 + b * 114) / 1000;
   return brightness < 150;
+}
+
+function generateId() {
+  return `card_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 }
