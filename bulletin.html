@@ -662,22 +662,27 @@
 <body>
 
   <header class="top-banner">
-    <div class="top-banner-inner">
-      <div class="top-line">
-        <div>
-          <h1 class="site-title glitch" id="siteTitle" data-text="FréquenCE SUD">
-            FréquenCE SUD
-          </h1>
-          <p class="top-subtitle" id="siteSubtitle">Bulletin syndical de chargement…</p>
-        </div>
+  <div class="top-banner-inner">
+    <div class="journal-kicker">BULLETIN SYNDICAL</div>
 
-        <div class="top-actions">
-          <button class="top-btn" id="scrollCardsBtn">Lire le bulletin</button>
-          <button class="top-btn" id="reloadBtn">Actualiser</button>
-        </div>
+    <h1 class="site-title glitch" id="siteTitle" data-text="FréquenCE SUD">
+      FréquenCE SUD
+    </h1>
+
+    <div class="journal-meta-row">
+      <div class="journal-meta-left">
+        <span class="journal-meta-item">Édition publique salariés</span>
+        <span class="journal-sep"></span>
+        <span class="journal-meta-item" id="siteSubtitle">Bulletin syndical de chargement…</span>
+      </div>
+
+      <div class="top-actions">
+        <button class="top-btn" id="scrollCardsBtn">Lire le bulletin</button>
+        <button class="top-btn" id="reloadBtn">Actualiser</button>
       </div>
     </div>
-  </header>
+  </div>
+</header>
 
   <main class="page-wrap">
     <section class="intro-block">
@@ -819,7 +824,11 @@
         }
       });
     }
+triggerGlitch();
 
+setInterval(() => {
+  triggerGlitch();
+}, 7000 + Math.random() * 5000);
     async function loadInitialBulletin() {
       const params = new URLSearchParams(window.location.search);
       const requestedPeriod = params.get("period");
@@ -1139,18 +1148,13 @@
       const brightness = (r * 299 + g * 587 + b * 114) / 1000;
       return brightness < 150;
     }
-    function triggerGlitch(){
-  const el = document.getElementById("siteTitle");
+function triggerGlitch() {
+  const el = DOM.siteTitle;
+  if (!el) return;
 
   el.classList.remove("active");
   void el.offsetWidth;
   el.classList.add("active");
-}
-
-/* glitch léger toutes les 6 à 12 secondes */
-setInterval(()=>{
-  triggerGlitch();
-}, 6000 + Math.random()*6000);
-  </script>
+}  </script>
 </body>
 </html>
