@@ -424,17 +424,21 @@ function createCardElement(card) {
         ${card.link ? `<a class="v3-card-link" href="${escapeHtmlAttribute(card.link)}" target="_blank" rel="noopener noreferrer">Voir</a>` : `<span class="v3-card-link"></span>`}
       </div>
     </div>
+
+    <button class="resize-handle" type="button" title="Redimensionner">↘</button>
   `;
 
   const editButton = article.querySelector(".js-edit-card");
   const duplicateButton = article.querySelector(".js-duplicate-card");
   const dragHandle = article.querySelector(".drag-handle");
+  const resizeHandle = article.querySelector(".resize-handle");
 
   article.addEventListener("click", (event) => {
     if (
       event.target.closest(".js-edit-card") ||
       event.target.closest(".js-duplicate-card") ||
-      event.target.closest(".drag-handle")
+      event.target.closest(".drag-handle") ||
+      event.target.closest(".resize-handle")
     ) {
       return;
     }
@@ -457,6 +461,12 @@ function createCardElement(card) {
     event.preventDefault();
     event.stopPropagation();
     startDraggingCard(event, card, article);
+  });
+
+  resizeHandle?.addEventListener("pointerdown", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    startResizingCard(event, card, article);
   });
 
   return article;
