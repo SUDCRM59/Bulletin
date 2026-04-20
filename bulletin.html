@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Fréquence SUD</title>
+  <title>FréquenCE SUD</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <link rel="icon" href="assets/img/logo.gif" sizes="any">
@@ -12,21 +12,18 @@
 
   <style>
     :root{
-      --bg:#0f1220;
-      --bg-2:#161a2e;
-      --panel:rgba(255,255,255,.08);
-      --panel-strong:rgba(255,255,255,.14);
-      --line:rgba(255,255,255,.10);
-      --text:#f5f7ff;
-      --muted:#c3c9de;
-      --primary:#ed1e79;
-      --primary-2:#ff5fb1;
-      --secondary:#fbb034;
-      --shadow:0 20px 60px rgba(0,0,0,.28);
-      --radius:28px;
-      --radius-sm:18px;
-      --maxw:1280px;
-      --grid-gap:18px;
+      --pink:#ed1e79;
+      --pink-dark:#c71563;
+      --yellow:#fbb034;
+      --white:#ffffff;
+      --bg:#f5f5f7;
+      --text:#202020;
+      --muted:#666;
+      --line:#ececf1;
+      --shadow:0 14px 34px rgba(0,0,0,.08);
+      --radius:24px;
+      --radius-sm:16px;
+      --maxw:1200px;
     }
 
     *{
@@ -40,13 +37,8 @@
     body{
       margin:0;
       font-family:'Inter', Arial, sans-serif;
+      background:var(--bg);
       color:var(--text);
-      background:
-        radial-gradient(circle at top left, rgba(237,30,121,.22), transparent 28%),
-        radial-gradient(circle at top right, rgba(251,176,52,.16), transparent 24%),
-        linear-gradient(180deg, #12152a 0%, #0f1220 100%);
-      min-height:100vh;
-      overflow-x:hidden;
     }
 
     a{
@@ -54,306 +46,179 @@
       text-decoration:none;
     }
 
-    .page-noise{
-      position:fixed;
-      inset:0;
+    .top-banner{
+      background:linear-gradient(135deg, var(--pink) 0%, #ff5fb1 100%);
+      color:#fff;
+      padding:28px 16px 24px;
+      box-shadow:0 8px 24px rgba(237,30,121,.18);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .top-banner::before{
+      content:"";
+      position:absolute;
+      inset:auto -60px -80px auto;
+      width:260px;
+      height:260px;
+      border-radius:50%;
+      background:rgba(255,255,255,.08);
       pointer-events:none;
-      opacity:.06;
-      background-image:
-        radial-gradient(circle at 20% 20%, #fff 0 1px, transparent 1px),
-        radial-gradient(circle at 80% 30%, #fff 0 1px, transparent 1px),
-        radial-gradient(circle at 40% 80%, #fff 0 1px, transparent 1px);
-      background-size: 180px 180px, 240px 240px, 300px 300px;
-      z-index:0;
     }
 
-    .topbar{
-      position:sticky;
-      top:0;
-      z-index:50;
-      backdrop-filter:blur(16px);
-      background:rgba(10,12,22,.52);
-      border-bottom:1px solid rgba(255,255,255,.06);
+    .top-banner::after{
+      content:"";
+      position:absolute;
+      left:-70px;
+      top:-70px;
+      width:200px;
+      height:200px;
+      border-radius:50%;
+      background:rgba(255,255,255,.08);
+      pointer-events:none;
     }
 
-    .topbar-inner{
+    .top-banner-inner{
       max-width:var(--maxw);
       margin:0 auto;
-      padding:14px 20px;
+      position:relative;
+      z-index:1;
+    }
+
+    .top-line{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:16px;
+      gap:12px;
+      flex-wrap:wrap;
     }
 
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:14px;
-      min-width:0;
-    }
-
-    .brand-mark{
-      width:48px;
-      height:48px;
-      border-radius:16px;
-      display:grid;
-      place-items:center;
-      background:linear-gradient(135deg,var(--primary),var(--secondary));
-      color:#fff;
-      font-weight:900;
-      box-shadow:0 10px 30px rgba(237,30,121,.28);
-      flex-shrink:0;
-    }
-
-    .brand-text{
-      min-width:0;
-    }
-
-    .brand-text h1{
+    .site-title{
       margin:0;
-      font-size:1rem;
+      font-size:clamp(2rem, 5vw, 3.5rem);
+      line-height:.95;
       font-weight:900;
-      letter-spacing:.02em;
+      letter-spacing:-.05em;
+      text-transform:none;
+      text-shadow:
+        0 1px 0 rgba(255,255,255,.12),
+        0 0 18px rgba(255,255,255,.10);
     }
 
-    .brand-text p{
-      margin:3px 0 0;
-      color:var(--muted);
-      font-size:.84rem;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
+    .site-title .glish{
+      display:inline-block;
+      position:relative;
+    }
+
+    .site-title .glish::before,
+    .site-title .glish::after{
+      content:attr(data-text);
+      position:absolute;
+      left:0;
+      top:0;
+      opacity:.18;
+      pointer-events:none;
+    }
+
+    .site-title .glish::before{
+      transform:translate(1px,-1px);
+      color:#fff8c9;
+    }
+
+    .site-title .glish::after{
+      transform:translate(-1px,1px);
+      color:#ffd1e7;
+    }
+
+    .top-subtitle{
+      margin:10px 0 0;
+      font-size:1rem;
+      font-weight:700;
+      opacity:.96;
     }
 
     .top-actions{
       display:flex;
-      align-items:center;
       gap:10px;
       flex-wrap:wrap;
-      justify-content:flex-end;
     }
 
-    .chip-btn{
+    .top-btn{
       min-height:42px;
-      padding:0 16px;
+      padding:0 14px;
       border-radius:999px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(255,255,255,.06);
-      color:var(--text);
+      border:1px solid rgba(255,255,255,.25);
+      background:rgba(255,255,255,.12);
+      color:#fff;
       font:inherit;
       font-weight:700;
       cursor:pointer;
-      transition:transform .2s ease, background-color .2s ease, border-color .2s ease;
+      transition:transform .2s ease, background-color .2s ease;
     }
 
-    .chip-btn:hover{
+    .top-btn:hover{
       transform:translateY(-1px);
-      background:rgba(255,255,255,.10);
-      border-color:rgba(255,255,255,.18);
+      background:rgba(255,255,255,.20);
     }
 
-    .hero{
-      position:relative;
-      z-index:1;
+    .page-wrap{
       max-width:var(--maxw);
       margin:0 auto;
-      padding:44px 20px 26px;
+      padding:22px 16px 40px;
     }
 
-    .hero-shell{
-      position:relative;
-      overflow:hidden;
-      border-radius:38px;
-      border:1px solid rgba(255,255,255,.08);
-      background:
-        linear-gradient(135deg, rgba(237,30,121,.18), rgba(255,255,255,.04) 34%, rgba(251,176,52,.12)),
-        rgba(255,255,255,.05);
+    .intro-block{
+      background:#fff;
+      border-radius:var(--radius);
       box-shadow:var(--shadow);
-      padding:38px 34px;
-      min-height:310px;
+      padding:18px 20px;
+      margin-bottom:20px;
+      border:1px solid var(--line);
     }
 
-    .hero-shell::before{
-      content:"";
-      position:absolute;
-      width:360px;
-      height:360px;
-      border-radius:50%;
-      right:-80px;
-      top:-120px;
-      background:radial-gradient(circle, rgba(255,95,177,.38) 0%, transparent 68%);
-      filter:blur(6px);
+    .intro-block p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.6;
+      font-size:.97rem;
     }
 
-    .hero-shell::after{
-      content:"";
-      position:absolute;
-      width:280px;
-      height:280px;
-      border-radius:50%;
-      left:-120px;
-      bottom:-140px;
-      background:radial-gradient(circle, rgba(251,176,52,.24) 0%, transparent 70%);
-      filter:blur(6px);
-    }
-
-    .hero-grid{
-      position:relative;
-      z-index:1;
-      display:grid;
-      grid-template-columns: 1.4fr .9fr;
-      gap:28px;
-      align-items:end;
-    }
-
-    .hero-copy small{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 12px;
-      border-radius:999px;
-      background:rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.08);
-      color:#ffd7ea;
-      font-weight:700;
-      letter-spacing:.03em;
+    .states{
       margin-bottom:18px;
     }
 
-    .hero-copy h2{
-      margin:0;
-      font-size:clamp(2.2rem, 5vw, 4.7rem);
-      line-height:.96;
-      font-weight:900;
-      letter-spacing:-.05em;
-      max-width:10ch;
+    .loading-state,
+    .empty-state,
+    .error-state{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:28px 22px;
+      text-align:center;
     }
 
-    .hero-copy .gradient{
-      background:linear-gradient(135deg, #fff 10%, #ffd6e8 45%, #ffc14f 100%);
-      -webkit-background-clip:text;
-      background-clip:text;
-      color:transparent;
-    }
-
-    .hero-copy p{
-      margin:18px 0 0;
-      max-width:62ch;
-      color:var(--muted);
-      font-size:1rem;
-      line-height:1.7;
-    }
-
-    .hero-side{
-      display:grid;
-      gap:14px;
-      align-self:stretch;
-    }
-
-    .hero-card{
-      border-radius:24px;
-      border:1px solid rgba(255,255,255,.08);
-      background:rgba(255,255,255,.07);
-      padding:18px 18px;
-      backdrop-filter:blur(8px);
-    }
-
-    .hero-card strong{
+    .loading-state strong,
+    .empty-state strong,
+    .error-state strong{
       display:block;
-      font-size:1.5rem;
-      font-weight:900;
-      margin-bottom:6px;
+      margin-bottom:8px;
+      font-size:1.05rem;
     }
 
-    .hero-card span{
+    .loading-state span,
+    .empty-state span,
+    .error-state span{
       color:var(--muted);
-      font-size:.92rem;
       line-height:1.5;
     }
 
-    .hero-badges{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      margin-top:18px;
-    }
-
-    .hero-badge{
-      display:inline-flex;
-      align-items:center;
-      min-height:40px;
-      padding:0 14px;
-      border-radius:999px;
-      background:rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.08);
-      font-weight:700;
-      color:#fff;
-    }
-
-    .content-wrap{
-      position:relative;
-      z-index:1;
-      max-width:var(--maxw);
-      margin:0 auto;
-      padding:12px 20px 40px;
-    }
-
-    .toolbar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-      margin-bottom:18px;
-      flex-wrap:wrap;
-    }
-
-    .toolbar-left h3{
-      margin:0;
-      font-size:1.2rem;
-      font-weight:900;
-    }
-
-    .toolbar-left p{
-      margin:6px 0 0;
-      color:var(--muted);
-      font-size:.92rem;
-    }
-
-    .toolbar-right{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    .select-input{
-      min-height:44px;
-      padding:0 14px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.08);
-      color:var(--text);
-      font:inherit;
-      outline:none;
-    }
-
     .board{
-      position:relative;
       display:grid;
       grid-template-columns:repeat(var(--columns, 4), minmax(0,1fr));
       grid-auto-rows:var(--row-height, 180px);
       gap:var(--gap, 16px);
-      align-items:stretch;
-    }
-
-    .board::before{
-      content:"";
-      position:absolute;
-      inset:-10px;
-      border-radius:36px;
-      border:1px solid rgba(255,255,255,.05);
-      pointer-events:none;
+      margin-bottom:28px;
     }
 
     .bulletin-card{
@@ -362,22 +227,21 @@
       display:flex;
       flex-direction:column;
       min-width:0;
-      border-radius:30px;
-      border:1px solid rgba(255,255,255,.08);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:28px;
       box-shadow:var(--shadow);
-      backdrop-filter:blur(12px);
+      cursor:pointer;
+      transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease;
       opacity:0;
-      transform:translateY(18px) scale(.985);
+      transform:translateY(18px);
       animation:cardIn .55s ease forwards;
-      transition:transform .26s ease, box-shadow .26s ease, border-color .26s ease;
     }
 
     .bulletin-card:hover{
       transform:translateY(-4px);
-      border-color:rgba(255,255,255,.16);
-      box-shadow:0 24px 70px rgba(0,0,0,.34);
+      border-color:#f7b4d3;
+      box-shadow:0 18px 40px rgba(237,30,121,.10);
     }
 
     .bulletin-card.has-image{
@@ -390,7 +254,7 @@
       content:"";
       position:absolute;
       inset:0;
-      background:linear-gradient(180deg, rgba(9,11,20,.20), rgba(9,11,20,.62));
+      background:linear-gradient(180deg, rgba(255,255,255,.12), rgba(0,0,0,.30));
       z-index:0;
     }
 
@@ -399,18 +263,18 @@
       z-index:1;
     }
 
-    .bulletin-card.text-dark{
-      color:#1d2430;
-    }
-
-    .bulletin-card.text-dark .card-title,
-    .bulletin-card.text-dark .card-short,
-    .bulletin-card.text-dark .card-meta{
-      color:#1d2430;
-    }
-
     .bulletin-card.text-light{
       color:#fff;
+    }
+
+    .bulletin-card.text-light .card-title,
+    .bulletin-card.text-light .card-short,
+    .bulletin-card.text-light .card-type{
+      color:#fff;
+    }
+
+    .bulletin-card.text-dark{
+      color:var(--text);
     }
 
     .card-top{
@@ -427,16 +291,20 @@
       min-height:32px;
       padding:0 12px;
       border-radius:999px;
-      background:rgba(255,255,255,.10);
-      border:1px solid rgba(255,255,255,.08);
-      font-size:.78rem;
+      background:#fde7f1;
+      color:var(--pink);
+      font-size:.76rem;
       font-weight:800;
-      letter-spacing:.03em;
       text-transform:uppercase;
+      letter-spacing:.03em;
+    }
+
+    .bulletin-card.text-light .card-type{
+      background:rgba(255,255,255,.16);
     }
 
     .card-icon{
-      font-size:1.7rem;
+      font-size:1.65rem;
       line-height:1;
       flex-shrink:0;
     }
@@ -445,14 +313,13 @@
       display:flex;
       flex-direction:column;
       gap:12px;
-      padding:14px 18px 18px;
-      min-width:0;
       height:100%;
+      padding:14px 18px 18px;
     }
 
     .card-title{
       margin:0;
-      font-size:1.18rem;
+      font-size:1.15rem;
       line-height:1.18;
       font-weight:900;
       letter-spacing:-.03em;
@@ -463,175 +330,262 @@
       margin:0;
       color:var(--muted);
       line-height:1.65;
-      font-size:.96rem;
+      font-size:.95rem;
     }
 
     .card-footer{
       margin-top:auto;
       display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
+      justify-content:flex-end;
       padding-top:8px;
-    }
-
-    .card-meta{
-      color:var(--muted);
-      font-size:.82rem;
-      font-weight:700;
-      opacity:.88;
     }
 
     .card-link{
       display:inline-flex;
       align-items:center;
-      gap:8px;
       min-height:40px;
       padding:0 14px;
       border-radius:999px;
-      background:linear-gradient(135deg, rgba(237,30,121,.95), rgba(255,95,177,.95));
+      background:var(--pink);
       color:#fff;
       font-size:.88rem;
       font-weight:800;
-      box-shadow:0 10px 24px rgba(237,30,121,.25);
+      box-shadow:0 8px 20px rgba(237,30,121,.18);
     }
 
     .card-link:hover{
-      transform:translateY(-1px);
+      background:var(--pink-dark);
     }
 
-    .empty-state,
-    .loading-state,
-    .error-state{
-      border-radius:28px;
-      border:1px solid rgba(255,255,255,.08);
-      background:rgba(255,255,255,.07);
-      padding:34px 26px;
+    .archives-block{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:var(--radius);
       box-shadow:var(--shadow);
-      text-align:center;
-      color:var(--muted);
+      padding:20px;
+      margin-bottom:24px;
     }
 
-    .empty-state strong,
-    .loading-state strong,
-    .error-state strong{
-      display:block;
+    .archives-block h3{
+      margin:0 0 8px;
+      font-size:1.15rem;
+      font-weight:900;
+      letter-spacing:-.02em;
+    }
+
+    .archives-block p{
+      margin:0 0 14px;
+      color:var(--muted);
+      line-height:1.6;
+      font-size:.94rem;
+    }
+
+    .archives-controls{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .archive-select{
+      flex:1 1 260px;
+      min-height:46px;
+      padding:0 14px;
+      border-radius:14px;
+      border:1px solid #ddd;
+      background:#fff;
+      font:inherit;
+      color:var(--text);
+      outline:none;
+    }
+
+    .archive-btn{
+      min-height:46px;
+      padding:0 16px;
+      border-radius:14px;
+      border:none;
+      background:var(--pink);
       color:#fff;
-      font-size:1.1rem;
-      margin-bottom:8px;
+      font:inherit;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    .archive-btn:hover{
+      background:var(--pink-dark);
+    }
+
+    .team-band{
+      background:linear-gradient(135deg, var(--pink) 0%, #ff5fb1 100%);
+      color:#fff;
+      border-radius:30px;
+      padding:24px 22px;
+      box-shadow:0 12px 28px rgba(237,30,121,.18);
+      margin-bottom:16px;
+    }
+
+    .team-band h4{
+      margin:0 0 8px;
+      font-size:1.3rem;
+      font-weight:900;
+      letter-spacing:-.03em;
+    }
+
+    .team-band p{
+      margin:0;
+      line-height:1.65;
+      opacity:.96;
     }
 
     .footer{
-      position:relative;
-      z-index:1;
-      max-width:var(--maxw);
-      margin:28px auto 36px;
-      padding:0 20px;
+      text-align:center;
+      color:#777;
+      font-size:.88rem;
+      padding:6px 0 0;
     }
 
-    .footer-shell{
-      overflow:hidden;
-      border-radius:34px;
-      border:1px solid rgba(255,255,255,.08);
-      background:
-        linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.03)),
-        linear-gradient(135deg, rgba(237,30,121,.10), rgba(251,176,52,.10));
-      box-shadow:var(--shadow);
-      padding:28px 26px;
+    .footer strong{
+      color:#444;
     }
 
-    .footer-grid{
-      display:grid;
-      grid-template-columns:1.2fr .8fr;
-      gap:20px;
-      align-items:end;
+    .modal{
+      position:fixed;
+      inset:0;
+      z-index:200;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      background:rgba(0,0,0,.46);
+      backdrop-filter:blur(4px);
     }
 
-    .footer h4{
-      margin:0 0 10px;
+    .modal.open{
+      display:flex;
+    }
+
+    .modal-content{
+      width:min(900px, 100%);
+      max-height:calc(100vh - 40px);
+      overflow:auto;
+      background:#fff;
+      border-radius:30px;
+      box-shadow:0 30px 80px rgba(0,0,0,.22);
+      border:1px solid #eee;
+    }
+
+    .modal-header{
+      position:sticky;
+      top:0;
+      z-index:2;
+      background:#fff;
+      border-bottom:1px solid var(--line);
+      padding:22px 22px 18px;
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      align-items:flex-start;
+    }
+
+    .modal-header h3{
+      margin:0;
       font-size:1.35rem;
       font-weight:900;
       letter-spacing:-.03em;
     }
 
-    .footer p{
-      margin:0;
+    .modal-header p{
+      margin:8px 0 0;
       color:var(--muted);
-      line-height:1.7;
-      max-width:60ch;
+      line-height:1.5;
+      font-size:.95rem;
     }
 
-    .footer-right{
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      align-items:flex-start;
+    .close-btn{
+      width:42px;
+      height:42px;
+      border:none;
+      border-radius:14px;
+      background:#f6f6f8;
+      color:#333;
+      font-size:1rem;
+      cursor:pointer;
+      flex-shrink:0;
     }
 
-    .footer-pill{
+    .modal-body{
+      padding:22px;
+    }
+
+    .modal-type{
       display:inline-flex;
       align-items:center;
-      min-height:40px;
-      padding:0 14px;
+      min-height:34px;
+      padding:0 12px;
       border-radius:999px;
-      background:rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.08);
+      background:#fde7f1;
+      color:var(--pink);
+      font-size:.78rem;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.03em;
+      margin-bottom:14px;
+    }
+
+    .modal-content-text{
+      color:#333;
+      line-height:1.75;
+      font-size:1rem;
+    }
+
+    .modal-content-text p:first-child{
+      margin-top:0;
+    }
+
+    .modal-content-text p:last-child{
+      margin-bottom:0;
+    }
+
+    .modal-link-wrap{
+      padding-top:18px;
+      display:flex;
+      justify-content:flex-end;
+    }
+
+    .modal-link{
+      display:inline-flex;
+      align-items:center;
+      min-height:44px;
+      padding:0 16px;
+      border-radius:999px;
+      background:var(--pink);
       color:#fff;
-      font-weight:700;
-      font-size:.88rem;
+      font-weight:800;
     }
 
-    .reveal{
-      opacity:0;
-      transform:translateY(20px);
-      transition:opacity .7s ease, transform .7s ease;
-    }
-
-    .reveal.in{
-      opacity:1;
-      transform:none;
+    .modal-link:hover{
+      background:var(--pink-dark);
     }
 
     @keyframes cardIn{
       to{
         opacity:1;
-        transform:translateY(0) scale(1);
+        transform:translateY(0);
       }
     }
 
-    @media (max-width: 1100px){
-      .hero-grid,
-      .footer-grid{
-        grid-template-columns:1fr;
-      }
-    }
-
-    @media (max-width: 900px){
+    @media (max-width: 980px){
       .board{
         grid-template-columns:repeat(2, minmax(0,1fr)) !important;
-      }
-
-      .hero-shell{
-        padding:28px 22px;
       }
     }
 
     @media (max-width: 640px){
-      .topbar-inner,
-      .hero,
-      .content-wrap,
-      .footer{
-        padding-left:14px;
-        padding-right:14px;
-      }
-
       .board{
         grid-template-columns:1fr !important;
       }
 
-      .hero-copy h2{
-        max-width:none;
+      .top-line{
+        align-items:flex-start;
       }
 
       .top-actions{
@@ -639,108 +593,94 @@
         justify-content:flex-start;
       }
 
-      .toolbar{
-        align-items:flex-start;
-      }
-
-      .toolbar-right{
+      .archive-select,
+      .archive-btn{
         width:100%;
       }
 
-      .select-input,
-      .chip-btn{
-        width:100%;
+      .modal{
+        padding:12px;
+      }
+
+      .modal-content{
+        max-height:calc(100vh - 24px);
       }
     }
   </style>
 </head>
 <body>
-  <div class="page-noise"></div>
 
-  <header class="topbar">
-    <div class="topbar-inner">
-      <a href="#" class="brand">
-        <div class="brand-mark">S</div>
-        <div class="brand-text">
-          <h1>Fréquence SUD</h1>
-          <p id="topbarPeriod">Chargement du bulletin…</p>
+  <header class="top-banner">
+    <div class="top-banner-inner">
+      <div class="top-line">
+        <div>
+          <h1 class="site-title">
+            <span class="glish" id="siteTitle" data-text="FréquenCE SUD">FréquenCE SUD</span>
+          </h1>
+          <p class="top-subtitle" id="siteSubtitle">Bulletin syndical de chargement…</p>
         </div>
-      </a>
 
-      <div class="top-actions">
-        <button class="chip-btn" id="scrollCardsBtn">Voir le bulletin</button>
-        <button class="chip-btn" id="reloadBtn">Actualiser</button>
+        <div class="top-actions">
+          <button class="top-btn" id="scrollCardsBtn">Lire le bulletin</button>
+          <button class="top-btn" id="reloadBtn">Actualiser</button>
+        </div>
       </div>
     </div>
   </header>
 
-  <section class="hero reveal">
-    <div class="hero-shell">
-      <div class="hero-grid">
-        <div class="hero-copy">
-          <small>● Bulletin publié</small>
-          <h2><span class="gradient" id="heroTitle">Fréquence SUD</span></h2>
-          <p id="heroIntro">
-            Le bulletin se charge…
-          </p>
+  <main class="page-wrap">
+    <section class="intro-block">
+      <p id="introText">
+        Bienvenue sur le bulletin public des salariés. Retrouvez ici les informations publiées par l’équipe SUD dans une lecture claire, simple et structurée.
+      </p>
+    </section>
 
-          <div class="hero-badges">
-            <span class="hero-badge" id="heroPeriod">Période</span>
-            <span class="hero-badge" id="heroCount">0 carte</span>
-          </div>
-        </div>
+    <div id="statesContainer" class="states"></div>
 
-        <div class="hero-side">
-          <div class="hero-card">
-            <strong id="heroStrongPeriod">—</strong>
-            <span>Période actuellement affichée</span>
-          </div>
-          <div class="hero-card">
-            <strong id="heroStrongCards">0</strong>
-            <span>Blocs d’information disponibles dans ce bulletin</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+    <section id="board" class="board" style="display:none;"></section>
 
-  <main class="content-wrap">
-    <section class="toolbar reveal">
-      <div class="toolbar-left">
-        <h3>Plan de lecture</h3>
-        <p>Une mise en page dynamique, moderne et conçue pour une lecture fluide.</p>
-      </div>
+    <section class="archives-block">
+      <h3>Archives des bulletins</h3>
+      <p>Tu peux consulter une ancienne édition en la sélectionnant ci-dessous.</p>
 
-      <div class="toolbar-right">
-        <select id="archiveSelect" class="select-input">
-          <option value="">Chargement des bulletins…</option>
+      <div class="archives-controls">
+        <select id="archiveSelect" class="archive-select">
+          <option value="">Chargement des archives…</option>
         </select>
-        <button class="chip-btn" id="loadArchiveBtn">Charger</button>
+        <button id="loadArchiveBtn" class="archive-btn">Afficher</button>
       </div>
     </section>
 
-    <div id="statesContainer"></div>
-    <section id="board" class="board reveal" style="display:none;"></section>
+    <section class="team-band">
+      <h4>L’équipe SUD</h4>
+      <p>
+        Ce bulletin est mis à disposition par l’équipe SUD afin d’informer les salariés sur les actualités, les informations utiles, les communications syndicales et les sujets du moment.
+      </p>
+    </section>
+
+    <footer class="footer">
+      <strong id="footerTitle">FréquenCE SUD</strong> — <span id="footerPeriod">Période</span><br>
+      © <span id="footerYear"></span> — Bulletin public salariés
+    </footer>
   </main>
 
-  <footer class="footer reveal">
-    <div class="footer-shell">
-      <div class="footer-grid">
+  <div id="cardModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
         <div>
-          <h4 id="footerTitle">Fréquence SUD</h4>
-          <p id="footerText">
-            Bulletin d’information publié en ligne. Retrouvez ici les actualités, contenus, liens utiles et communications mises en avant dans cette édition.
-          </p>
+          <h3 id="modalTitle">Titre de la carte</h3>
+          <p id="modalSubtitle">Lecture complète</p>
         </div>
+        <button id="closeModalBtn" class="close-btn" type="button">✕</button>
+      </div>
 
-        <div class="footer-right">
-          <span class="footer-pill" id="footerPeriod">Période</span>
-          <span class="footer-pill" id="footerCards">0 carte</span>
-          <span class="footer-pill">Publication web</span>
-        </div>
+      <div class="modal-body">
+        <div id="modalType" class="modal-type">Type</div>
+        <div id="modalContent" class="modal-content-text"></div>
+        <div class="modal-link-wrap" id="modalLinkWrap"></div>
       </div>
     </div>
-  </footer>
+  </div>
 
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
@@ -763,41 +703,44 @@
     const PUBLIC_COLLECTION = "bulletin_v3_public";
 
     const DOM = {
-      topbarPeriod: document.getElementById("topbarPeriod"),
-      heroTitle: document.getElementById("heroTitle"),
-      heroIntro: document.getElementById("heroIntro"),
-      heroPeriod: document.getElementById("heroPeriod"),
-      heroCount: document.getElementById("heroCount"),
-      heroStrongPeriod: document.getElementById("heroStrongPeriod"),
-      heroStrongCards: document.getElementById("heroStrongCards"),
+      siteTitle: document.getElementById("siteTitle"),
+      siteSubtitle: document.getElementById("siteSubtitle"),
+      introText: document.getElementById("introText"),
       footerTitle: document.getElementById("footerTitle"),
-      footerText: document.getElementById("footerText"),
       footerPeriod: document.getElementById("footerPeriod"),
-      footerCards: document.getElementById("footerCards"),
+      footerYear: document.getElementById("footerYear"),
+
+      scrollCardsBtn: document.getElementById("scrollCardsBtn"),
+      reloadBtn: document.getElementById("reloadBtn"),
       archiveSelect: document.getElementById("archiveSelect"),
       loadArchiveBtn: document.getElementById("loadArchiveBtn"),
-      reloadBtn: document.getElementById("reloadBtn"),
-      scrollCardsBtn: document.getElementById("scrollCardsBtn"),
+
       board: document.getElementById("board"),
-      statesContainer: document.getElementById("statesContainer")
+      statesContainer: document.getElementById("statesContainer"),
+
+      cardModal: document.getElementById("cardModal"),
+      closeModalBtn: document.getElementById("closeModalBtn"),
+      modalTitle: document.getElementById("modalTitle"),
+      modalSubtitle: document.getElementById("modalSubtitle"),
+      modalType: document.getElementById("modalType"),
+      modalContent: document.getElementById("modalContent"),
+      modalLinkWrap: document.getElementById("modalLinkWrap")
     };
 
     let archiveList = [];
     let currentBulletin = null;
 
     document.addEventListener("DOMContentLoaded", async () => {
+      DOM.footerYear.textContent = new Date().getFullYear();
       bindEvents();
-      revealOnScroll();
       showLoadingState();
       await loadArchives();
       await loadInitialBulletin();
     });
 
     function bindEvents() {
-      DOM.loadArchiveBtn.addEventListener("click", async () => {
-        const selectedId = DOM.archiveSelect.value;
-        if (!selectedId) return;
-        await loadBulletinById(selectedId);
+      DOM.scrollCardsBtn.addEventListener("click", () => {
+        DOM.board.scrollIntoView({ behavior: "smooth", block: "start" });
       });
 
       DOM.reloadBtn.addEventListener("click", async () => {
@@ -806,8 +749,23 @@
         await loadInitialBulletin();
       });
 
-      DOM.scrollCardsBtn.addEventListener("click", () => {
-        DOM.board.scrollIntoView({ behavior: "smooth", block: "start" });
+      DOM.loadArchiveBtn.addEventListener("click", async () => {
+        const selectedId = DOM.archiveSelect.value;
+        if (!selectedId) return;
+        await loadBulletinById(selectedId);
+      });
+
+      DOM.closeModalBtn.addEventListener("click", closeModal);
+      DOM.cardModal.addEventListener("click", (event) => {
+        if (event.target === DOM.cardModal) {
+          closeModal();
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          closeModal();
+        }
       });
     }
 
@@ -886,7 +844,7 @@
         if (!archiveList.length) {
           const option = document.createElement("option");
           option.value = "";
-          option.textContent = "Aucun bulletin publié";
+          option.textContent = "Aucun bulletin disponible";
           DOM.archiveSelect.appendChild(option);
           return;
         }
@@ -905,7 +863,7 @@
     function renderBulletin(data) {
       currentBulletin = {
         id: data.id,
-        title: data.title || "Fréquence SUD",
+        title: data.title || "FréquenCE SUD",
         period: data.period || "Bulletin",
         columns: Number(data.columns || 4),
         rowHeight: Number(data.rowHeight || 180),
@@ -913,40 +871,21 @@
         cards: Array.isArray(data.cards) ? sanitizeCards(data.cards) : []
       };
 
-      updateHero(currentBulletin);
-      renderBoard(currentBulletin);
-      updateFooter(currentBulletin);
-      syncArchiveSelect(currentBulletin.id);
+      DOM.siteTitle.textContent = currentBulletin.title;
+      DOM.siteTitle.setAttribute("data-text", currentBulletin.title);
+      DOM.siteSubtitle.textContent = `Bulletin syndical de ${currentBulletin.period}`;
+      DOM.footerTitle.textContent = currentBulletin.title;
+      DOM.footerPeriod.textContent = currentBulletin.period;
+      DOM.introText.textContent = `Bienvenue sur le bulletin public des salariés pour ${currentBulletin.period}. Tu peux consulter ci-dessous les informations mises en avant dans cette édition, puis accéder aux archives si tu veux relire les précédents bulletins.`;
 
       DOM.statesContainer.innerHTML = "";
-      DOM.board.style.display = "grid";
-
-      revealOnScroll();
-    }
-
-    function updateHero(data) {
-      const cardCount = data.cards.length;
-      const labelCount = `${cardCount} ${cardCount > 1 ? "cartes" : "carte"}`;
-
-      DOM.topbarPeriod.textContent = data.period;
-      DOM.heroTitle.textContent = data.title;
-      DOM.heroIntro.textContent = `Découvre l’édition ${data.period} dans une mise en page immersive, structurée et agréable à parcourir. Les informations importantes sont organisées en cartes pour une lecture rapide et moderne.`;
-      DOM.heroPeriod.textContent = data.period;
-      DOM.heroCount.textContent = labelCount;
-      DOM.heroStrongPeriod.textContent = data.period;
-      DOM.heroStrongCards.textContent = String(cardCount);
-    }
-
-    function updateFooter(data) {
-      const cardCount = data.cards.length;
-      DOM.footerTitle.textContent = data.title;
-      DOM.footerText.textContent = `Cette édition de ${data.period} est disponible en lecture web. Le contenu a été mis en page sous forme de cartes dynamiques pour une consultation simple, claire et moderne.`;
-      DOM.footerPeriod.textContent = data.period;
-      DOM.footerCards.textContent = `${cardCount} ${cardCount > 1 ? "cartes" : "carte"}`;
+      renderBoard(currentBulletin);
+      syncArchiveSelect(currentBulletin.id);
     }
 
     function renderBoard(data) {
       DOM.board.innerHTML = "";
+      DOM.board.style.display = "grid";
       DOM.board.style.setProperty("--columns", data.columns);
       DOM.board.style.setProperty("--row-height", `${data.rowHeight}px`);
       DOM.board.style.setProperty("--gap", `${data.gap}px`);
@@ -958,10 +897,10 @@
 
       sortedCards.forEach((card, index) => {
         const article = document.createElement("article");
-        article.className = "bulletin-card reveal";
-        article.style.animationDelay = `${index * 0.05}s`;
+        article.className = "bulletin-card";
         article.style.gridColumn = `${card.x} / span ${card.w}`;
         article.style.gridRow = `${card.y} / span ${card.h}`;
+        article.style.animationDelay = `${index * 0.04}s`;
 
         if (card.image) {
           article.classList.add("has-image");
@@ -986,20 +925,42 @@
             <p class="card-short">${escapeHtml(shortPreview || "Aucun contenu.")}</p>
 
             <div class="card-footer">
-              <span class="card-meta">${card.w} × ${card.h}</span>
-              ${card.link ? `<a class="card-link" href="${escapeHtmlAttribute(card.link)}" target="_blank" rel="noopener noreferrer">Ouvrir</a>` : `<span></span>`}
+              <span></span>
+              <span class="card-link">Lire</span>
             </div>
           </div>
         `;
 
+        article.addEventListener("click", () => openCardModal(card));
         DOM.board.appendChild(article);
       });
+    }
+
+    function openCardModal(card) {
+      DOM.modalTitle.textContent = card.title || "Sans titre";
+      DOM.modalSubtitle.textContent = currentBulletin ? `Bulletin syndical de ${currentBulletin.period}` : "Lecture complète";
+      DOM.modalType.textContent = getTypeLabel(card.type);
+
+      const fullContent = (card.longText && card.longText.trim()) || (card.shortText && card.shortText.trim()) || "<p>Aucun contenu disponible.</p>";
+      DOM.modalContent.innerHTML = fullContent;
+
+      if (card.link) {
+        DOM.modalLinkWrap.innerHTML = `<a class="modal-link" href="${escapeHtmlAttribute(card.link)}" target="_blank" rel="noopener noreferrer">Ouvrir le lien</a>`;
+      } else {
+        DOM.modalLinkWrap.innerHTML = "";
+      }
+
+      DOM.cardModal.classList.add("open");
+    }
+
+    function closeModal() {
+      DOM.cardModal.classList.remove("open");
     }
 
     function showLoadingState() {
       DOM.board.style.display = "none";
       DOM.statesContainer.innerHTML = `
-        <div class="loading-state reveal in">
+        <div class="loading-state">
           <strong>Chargement…</strong>
           <span>Le bulletin est en cours de récupération.</span>
         </div>
@@ -1009,7 +970,7 @@
     function showEmptyState() {
       DOM.board.style.display = "none";
       DOM.statesContainer.innerHTML = `
-        <div class="empty-state reveal in">
+        <div class="empty-state">
           <strong>Aucun bulletin publié</strong>
           <span>Publie un bulletin depuis le dashboard pour l’afficher ici.</span>
         </div>
@@ -1019,7 +980,7 @@
     function showErrorState(message) {
       DOM.board.style.display = "none";
       DOM.statesContainer.innerHTML = `
-        <div class="error-state reveal in">
+        <div class="error-state">
           <strong>Erreur</strong>
           <span>${escapeHtml(message)}</span>
         </div>
@@ -1073,7 +1034,7 @@
 
     function buildCardBackground(color) {
       const safe = normalizeColor(color || "#ffffff");
-      return `linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.08)), ${safe}`;
+      return `linear-gradient(180deg, rgba(255,255,255,.96), rgba(250,250,252,.98)), ${safe}`;
     }
 
     function buildPublishedDocId(period) {
@@ -1084,22 +1045,6 @@
         .trim()
         .replace(/\s+/g, "_")
         .toLowerCase();
-    }
-
-    function revealOnScroll() {
-      const targets = document.querySelectorAll(".reveal");
-
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("in");
-          }
-        });
-      }, {
-        threshold: 0.08
-      });
-
-      targets.forEach((el) => observer.observe(el));
     }
 
     function normalizeColor(value) {
