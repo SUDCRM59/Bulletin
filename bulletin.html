@@ -2,1115 +2,1147 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>FrequenCE SUD - Sud CRM59</title>
-  <link rel="icon" href="img/logo.gif" sizes="any">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>Fréquence SUD</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="icon" href="assets/img/logo.gif" sizes="any">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
   <style>
-    :root {
-      --bento-gap: 16px; /* Espacement global */
-      --bento-border-radius: 24px; /* Arrondi global */
-      --color-primary: #ff66c4; /* Rose SUD */
-      --color-secondary: #fffe00; /* Jaune SUD */
-      --color-text: #202020;
-      --color-background-card: #ffffff; /* Le blanc du cadre et des cartes */
-      --color-background-page: #f0f2f5; /* Fond de page gris clair */
-      --color-text-on-secondary: #202020; /* Texte sur fond jaune */
+    :root{
+      --bg:#0f1220;
+      --bg-2:#161a2e;
+      --panel:rgba(255,255,255,.08);
+      --panel-strong:rgba(255,255,255,.14);
+      --line:rgba(255,255,255,.10);
+      --text:#f5f7ff;
+      --muted:#c3c9de;
+      --primary:#ed1e79;
+      --primary-2:#ff5fb1;
+      --secondary:#fbb034;
+      --shadow:0 20px 60px rgba(0,0,0,.28);
+      --radius:28px;
+      --radius-sm:18px;
+      --maxw:1280px;
+      --grid-gap:18px;
     }
 
-    body {
-      font-family: 'Inter', Arial, sans-serif;
-      background-color: var(--color-background-page);
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
-      color: var(--color-text);
-      display: flex; /* Utilisation de flexbox pour centrer le cadre blanc */
-      justify-content: center;
-      align-items: flex-start; /* Aligne le contenu en haut si pas assez de hauteur */
-      padding: var(--bento-gap) 0; /* Padding vertical pour le corps */
+    *{
+      box-sizing:border-box;
     }
 
-    /* --- NOUVEAU CONTENEUR POUR LE CADRE BLANC --- */
-    .main-white-frame {
-        background-color: var(--color-background-card); /* Fond blanc */
-        max-width: 1040px; /* Légèrement plus large que le contenu intérieur (1000px + padding) */
-        width: calc(100% - var(--bento-gap) * 2); /* Prend 100% de la largeur moins le padding du body */
-        border-radius: var(--bento-border-radius);
-        box-shadow: 0 8px 30px rgba(0,0,0,0.1); /* Ombre pour l'effet flottant */
-        overflow: hidden; /* Important pour les coins arrondis et le contenu qui déborde */
-        margin: 0; /* Marges gérées par le body */
-        display: flex;
-        flex-direction: column; /* Organise les sections verticalement */
-        align-items: stretch; /* Les sections s'étirent sur toute la largeur */
+    html{
+      scroll-behavior:smooth;
     }
 
-    .header-banner {
-      background-color: var(--color-primary); /* Fond rose SUD */
-      padding: 30px var(--bento-gap);
-      text-align: center;
-      max-width: 100%; /* S'adapte à son parent */
-      margin: 0; /* Pas de marge car il est dans le cadre blanc */
-      border-radius: 0; /* Pas d'arrondis sur le header lui-même car le cadre blanc les fournit */
-      box-shadow: none; /* Pas d'ombre individuelle */
-      color: var(--color-text-on-secondary);
-      box-sizing: border-box;
-    }
-    .header-banner img.logo-syndicat {
-      width: 160px;
-      border-radius: 50%;
-      border: 3px solid var(--color-primary);
-      background: #fff;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      margin-bottom: 10px;
-      object-fit: cover;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .header-banner h1 {
-      margin: 0 0 5px 0;
-      font-size: 1.8em;
-      font-weight: 700;
-      color: var(--color-secondary);
-    }
-    .header-banner p { margin: 0; font-size: 1em; color: var(--color-text-on-secondary);}
-
-.bento-board {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      grid-auto-rows: minmax(150px, auto); /* Permet aux lignes de s'agrandir */
-      gap: var(--bento-gap);
-      max-width: 100%; /* S'adapte à son parent */
-      margin: var(--bento-gap) var(--bento-gap) 40px var(--bento-gap); /* Top, Left/Right, Bottom margins */
-      padding: 0; /* Pas de padding ici */
-      border-radius: 0; /* Pas d'arrondis ici */
-      overflow: visible; /* <--- MODIFIÉ: Autorise le contenu des cartes à ne pas être tronqué */
+    body{
+      margin:0;
+      font-family:'Inter', Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(237,30,121,.22), transparent 28%),
+        radial-gradient(circle at top right, rgba(251,176,52,.16), transparent 24%),
+        linear-gradient(180deg, #12152a 0%, #0f1220 100%);
+      min-height:100vh;
+      overflow-x:hidden;
     }
 
-    .card {
-      background-color: var(--color-background-card);
-      border-radius: var(--bento-border-radius);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.03);
-      padding: 20px;
-      position: relative;
-      transition: transform .2s ease-out, box-shadow .2s ease-out;
-      opacity: 0;
-      animation: fadeInPop .5s ease-out forwards;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      color: var(--color-text);
+    a{
+      color:inherit;
+      text-decoration:none;
     }
 
-    /* --- Tailles des cartes (doivent correspondre au dashboard) --- */
-    .card-col-span-2 { grid-column: span 2; }
-    .card-col-span-3 { grid-column: span 3; }
-    .card-col-span-4 { grid-column: span 4; }
-    .card-row-span-2 { grid-row: span 2; min-height: calc( (150px * 2) + var(--bento-gap) ); }
-    .card.card-col-span-2.card-row-span-2 { min-height: calc( (150px * 2) + var(--bento-gap) ); }
-
-
-    /* Style interne des cartes */
-    .card-icon-large {
-        font-size: 2.8em;
-        margin-bottom: 12px;
-        color: var(--color-primary);
-        line-height: 1;
+    .page-noise{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.06;
+      background-image:
+        radial-gradient(circle at 20% 20%, #fff 0 1px, transparent 1px),
+        radial-gradient(circle at 80% 30%, #fff 0 1px, transparent 1px),
+        radial-gradient(circle at 40% 80%, #fff 0 1px, transparent 1px);
+      background-size: 180px 180px, 240px 240px, 300px 300px;
+      z-index:0;
     }
-     .emoji-icon {
-        font-size: 1.8em;
-        margin-right: 10px;
-        vertical-align: -0.15em;
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:50;
+      backdrop-filter:blur(16px);
+      background:rgba(10,12,22,.52);
+      border-bottom:1px solid rgba(255,255,255,.06);
     }
-    .card-title {
-      font-size: 1em;
-      font-weight: 600;
+
+    .topbar-inner{
+      max-width:var(--maxw);
+      margin:0 auto;
+      padding:14px 20px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      min-width:0;
+    }
+
+    .brand-mark{
+      width:48px;
+      height:48px;
+      border-radius:16px;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(135deg,var(--primary),var(--secondary));
+      color:#fff;
+      font-weight:900;
+      box-shadow:0 10px 30px rgba(237,30,121,.28);
+      flex-shrink:0;
+    }
+
+    .brand-text{
+      min-width:0;
+    }
+
+    .brand-text h1{
+      margin:0;
+      font-size:1rem;
+      font-weight:900;
+      letter-spacing:.02em;
+    }
+
+    .brand-text p{
+      margin:3px 0 0;
+      color:var(--muted);
+      font-size:.84rem;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .top-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .chip-btn{
+      min-height:42px;
+      padding:0 16px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      font:inherit;
+      font-weight:700;
+      cursor:pointer;
+      transition:transform .2s ease, background-color .2s ease, border-color .2s ease;
+    }
+
+    .chip-btn:hover{
+      transform:translateY(-1px);
+      background:rgba(255,255,255,.10);
+      border-color:rgba(255,255,255,.18);
+    }
+
+    .hero{
+      position:relative;
+      z-index:1;
+      max-width:var(--maxw);
+      margin:0 auto;
+      padding:44px 20px 26px;
+    }
+
+    .hero-shell{
+      position:relative;
+      overflow:hidden;
+      border-radius:38px;
+      border:1px solid rgba(255,255,255,.08);
+      background:
+        linear-gradient(135deg, rgba(237,30,121,.18), rgba(255,255,255,.04) 34%, rgba(251,176,52,.12)),
+        rgba(255,255,255,.05);
+      box-shadow:var(--shadow);
+      padding:38px 34px;
+      min-height:310px;
+    }
+
+    .hero-shell::before{
+      content:"";
+      position:absolute;
+      width:360px;
+      height:360px;
+      border-radius:50%;
+      right:-80px;
+      top:-120px;
+      background:radial-gradient(circle, rgba(255,95,177,.38) 0%, transparent 68%);
+      filter:blur(6px);
+    }
+
+    .hero-shell::after{
+      content:"";
+      position:absolute;
+      width:280px;
+      height:280px;
+      border-radius:50%;
+      left:-120px;
+      bottom:-140px;
+      background:radial-gradient(circle, rgba(251,176,52,.24) 0%, transparent 70%);
+      filter:blur(6px);
+    }
+
+    .hero-grid{
+      position:relative;
+      z-index:1;
+      display:grid;
+      grid-template-columns: 1.4fr .9fr;
+      gap:28px;
+      align-items:end;
+    }
+
+    .hero-copy small{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+      color:#ffd7ea;
+      font-weight:700;
+      letter-spacing:.03em;
+      margin-bottom:18px;
+    }
+
+    .hero-copy h2{
+      margin:0;
+      font-size:clamp(2.2rem, 5vw, 4.7rem);
+      line-height:.96;
+      font-weight:900;
+      letter-spacing:-.05em;
+      max-width:10ch;
+    }
+
+    .hero-copy .gradient{
+      background:linear-gradient(135deg, #fff 10%, #ffd6e8 45%, #ffc14f 100%);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+
+    .hero-copy p{
+      margin:18px 0 0;
+      max-width:62ch;
+      color:var(--muted);
+      font-size:1rem;
+      line-height:1.7;
+    }
+
+    .hero-side{
+      display:grid;
+      gap:14px;
+      align-self:stretch;
+    }
+
+    .hero-card{
+      border-radius:24px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.07);
+      padding:18px 18px;
+      backdrop-filter:blur(8px);
+    }
+
+    .hero-card strong{
+      display:block;
+      font-size:1.5rem;
+      font-weight:900;
+      margin-bottom:6px;
+    }
+
+    .hero-card span{
+      color:var(--muted);
+      font-size:.92rem;
+      line-height:1.5;
+    }
+
+    .hero-badges{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:18px;
+    }
+
+    .hero-badge{
+      display:inline-flex;
+      align-items:center;
+      min-height:40px;
+      padding:0 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+      font-weight:700;
+      color:#fff;
+    }
+
+    .content-wrap{
+      position:relative;
+      z-index:1;
+      max-width:var(--maxw);
+      margin:0 auto;
+      padding:12px 20px 40px;
+    }
+
+    .toolbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+    }
+
+    .toolbar-left h3{
+      margin:0;
+      font-size:1.2rem;
+      font-weight:900;
+    }
+
+    .toolbar-left p{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size:.92rem;
+    }
+
+    .toolbar-right{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .select-input{
+      min-height:44px;
+      padding:0 14px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.08);
+      color:var(--text);
+      font:inherit;
+      outline:none;
+    }
+
+    .board{
+      position:relative;
+      display:grid;
+      grid-template-columns:repeat(var(--columns, 4), minmax(0,1fr));
+      grid-auto-rows:var(--row-height, 180px);
+      gap:var(--gap, 16px);
+      align-items:stretch;
+    }
+
+    .board::before{
+      content:"";
+      position:absolute;
+      inset:-10px;
+      border-radius:36px;
+      border:1px solid rgba(255,255,255,.05);
+      pointer-events:none;
+    }
+
+    .bulletin-card{
+      position:relative;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      min-width:0;
+      border-radius:30px;
+      border:1px solid rgba(255,255,255,.08);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(12px);
+      opacity:0;
+      transform:translateY(18px) scale(.985);
+      animation:cardIn .55s ease forwards;
+      transition:transform .26s ease, box-shadow .26s ease, border-color .26s ease;
+    }
+
+    .bulletin-card:hover{
+      transform:translateY(-4px);
+      border-color:rgba(255,255,255,.16);
+      box-shadow:0 24px 70px rgba(0,0,0,.34);
+    }
+
+    .bulletin-card.has-image{
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+    }
+
+    .bulletin-card.has-image::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(180deg, rgba(9,11,20,.20), rgba(9,11,20,.62));
+      z-index:0;
+    }
+
+    .bulletin-card > *{
+      position:relative;
+      z-index:1;
+    }
+
+    .bulletin-card.text-dark{
+      color:#1d2430;
+    }
+
+    .bulletin-card.text-dark .card-title,
+    .bulletin-card.text-dark .card-short,
+    .bulletin-card.text-dark .card-meta{
+      color:#1d2430;
+    }
+
+    .bulletin-card.text-light{
+      color:#fff;
+    }
+
+    .card-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      padding:18px 18px 0;
+    }
+
+    .card-type{
+      display:inline-flex;
+      align-items:center;
+      min-height:32px;
+      padding:0 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.08);
+      font-size:.78rem;
+      font-weight:800;
+      letter-spacing:.03em;
+      text-transform:uppercase;
+    }
+
+    .card-icon{
+      font-size:1.7rem;
+      line-height:1;
+      flex-shrink:0;
+    }
+
+    .card-body{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      padding:14px 18px 18px;
+      min-width:0;
+      height:100%;
+    }
+
+    .card-title{
+      margin:0;
+      font-size:1.18rem;
+      line-height:1.18;
+      font-weight:900;
+      letter-spacing:-.03em;
+      word-break:break-word;
+    }
+
+    .card-short{
+      margin:0;
+      color:var(--muted);
+      line-height:1.65;
+      font-size:.96rem;
+    }
+
+    .card-footer{
+      margin-top:auto;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      padding-top:8px;
+    }
+
+    .card-meta{
+      color:var(--muted);
+      font-size:.82rem;
+      font-weight:700;
+      opacity:.88;
+    }
+
+    .card-link{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      min-height:40px;
+      padding:0 14px;
+      border-radius:999px;
+      background:linear-gradient(135deg, rgba(237,30,121,.95), rgba(255,95,177,.95));
+      color:#fff;
+      font-size:.88rem;
+      font-weight:800;
+      box-shadow:0 10px 24px rgba(237,30,121,.25);
+    }
+
+    .card-link:hover{
+      transform:translateY(-1px);
+    }
+
+    .empty-state,
+    .loading-state,
+    .error-state{
+      border-radius:28px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.07);
+      padding:34px 26px;
+      box-shadow:var(--shadow);
       text-align:center;
-      margin-bottom: 8px;
-      color: var(--color-text);
-      line-height: 1.3;
-    }
-    .card-content-wrapper {
-        flex-grow: 1;
-        overflow-y: auto;
-        font-size: 0.8em;
-        line-height: 1.5;
-        color: #444;
-    }
-     .card-content-wrapper .extra-content {
-        display: none;
-        margin-top:10px;
-    }
-    .card.expanded .card-content-wrapper .extra-content {
-        display: block;
-    }
-    /* Cas d'une carte avec image de fond */
-    .card-with-image {
-        background-size: cover;
-        background-position: center;
-        color: white;
-        position: relative;
-    }
-    .card-with-image::before {
-        content: '';
-        position: absolute;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background-color: rgba(0,0,0,0.3);
-        border-radius: var(--bento-border-radius);
-        z-index: 0;
-    }
-    .card-with-image > * { position: relative; z-index: 1; }
-    .card-with-image .card-title, .card-with-image .card-content-wrapper, .card-with-image .card-icon-large { color: white; }
-
-
-    .card-actions {
-      margin-top: auto;
-      padding-top: 15px;
-      flex-shrink: 0;
-    }
-    .btn {
-      display: inline-block;
-      background-color: var(--color-primary);
-      color: white !important;
-      padding: 8px 16px;
-      border-radius: 50px;
-      font-weight: 500;
-      text-decoration: none;
-      font-size: 0.85em;
-      border: none;
-      cursor: pointer;
-      transition: background-color .2s, transform .2s;
-    }
-    .btn:hover { background-color: #d6136a; transform: translateY(-1px); }
-    .btn-secondary {
-        background-color: transparent;
-        color: var(--color-primary) !important;
-        border: 1px solid var(--color-primary);
-    }
-    .btn-secondary:hover { background-color: #fde7f0; }
-
-    /* Classe pour texte clair sur fond sombre */
-    .card.text-light {
-        color: #fff;
-    }
-    .card.text-light .card-title {
-        color: #fff;
-    }
-    .card.text-light .card-content-wrapper {
-        color: #eee;
-    }
-    .card.text-light .btn-secondary {
-        color: #fff !important;
-        border-color: #fff;
-    }
-    .card.text-light .btn-secondary:hover {
-        background-color: rgba(255,255,255,0.1);
-    }
-    .card.text-light .emoji-icon {
-        background: rgba(255,255,255,0.1);
-        border-color: rgba(255,255,255,0.2);
-    }
-    .card.text-light .card-icon-large {
-        color: #fff;
+      color:var(--muted);
     }
 
-
-    .card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.07), 0 2px 6px rgba(0,0,0,0.04);
-    }
-    .card.expanded { }
-
-    @keyframes fadeInPop {
-      from { opacity:0; transform: scale(0.95) translateY(10px); }
-      to { opacity:1; transform: scale(1) translateY(0); }
+    .empty-state strong,
+    .loading-state strong,
+    .error-state strong{
+      display:block;
+      color:#fff;
+      font-size:1.1rem;
+      margin-bottom:8px;
     }
 
-    /* --- Styles du menu d'archives --- */
-    .archive-section {
-        max-width: 100%; /* S'adapte à son parent */
-margin: 0 var(--bento-gap) 40px var(--bento-gap); 
-        padding: 0; /* Pas de padding ici */
-        text-align: center;
-        box-sizing: border-box;
-    }
-    .archive-section h3 {
-        color: var(--color-text);
-        font-size: 1.2em;
-        font-weight: 700;
-        margin-bottom: 20px;
-        padding: 0 var(--bento-gap); /* Padding pour le texte */
-    }
-    .archive-menu {
-        display: flex;
-        flex-wrap: nowrap; /* Empêche les chips de passer à la ligne */
-        overflow-x: auto; /* Permet le défilement horizontal */
-        -webkit-overflow-scrolling: touch; /* Pour un défilement fluide sur iOS */
-        gap: 12px; /* Espace entre les chips */
-        padding: 12px var(--bento-gap); /* Padding pour le défilement */
-        justify-content: center; /* Centre les chips si l'espace le permet */
-        scrollbar-width: thin; /* For Firefox */
-        scrollbar-color: var(--color-primary) var(--color-background-page); /* For Firefox */
-    }
-    /* Style de la scrollbar pour Webkit (Chrome, Safari) */
-    .archive-menu::-webkit-scrollbar {
-        height: 6px;
-    }
-    .archive-menu::-webkit-scrollbar-track {
-        background: var(--color-background-page);
-        border-radius: 10px;
-    }
-    .archive-menu::-webkit-scrollbar-thumb {
-        background-color: var(--color-primary);
-        border-radius: 10px;
-        border: 1px solid var(--color-background-page);
+    .footer{
+      position:relative;
+      z-index:1;
+      max-width:var(--maxw);
+      margin:28px auto 36px;
+      padding:0 20px;
     }
 
-    .archive-chip {
-        display: inline-flex; /* Pour centrer le texte verticalement */
-        align-items: center;
-        padding: 8px 16px;
-        background-color: #fff;
-        border-radius: 20px; /* Coins très arrondis */
-        text-decoration: none;
-        color: var(--color-text);
-        font-size: 0.9em;
-        font-weight: 500;
-        white-space: nowrap; /* Empêche le texte de passer à la ligne */
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        transition: background-color 0.2s, box-shadow 0.2s, transform 0.1s;
-        border: 1px solid #e0e0e0; /* Légère bordure pour le relief */
-        flex-shrink: 0; /* Empêche les chips de rétrécir en défilant */
-    }
-    .archive-chip:hover {
-        background-color: var(--color-primary);
-        color: #fff;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        transform: translateY(-1px);
-        border-color: var(--color-primary);
-    }
-    .archive-chip.active {
-        background-color: var(--color-primary);
-        color: #fff;
-        box-shadow: 0 0 0 2px var(--color-primary), 0 2px 8px rgba(0,0,0,0.1);
-        font-weight: 600;
-        cursor: default;
+    .footer-shell{
+      overflow:hidden;
+      border-radius:34px;
+      border:1px solid rgba(255,255,255,.08);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.03)),
+        linear-gradient(135deg, rgba(237,30,121,.10), rgba(251,176,52,.10));
+      box-shadow:var(--shadow);
+      padding:28px 26px;
     }
 
-    /* --- Styles pour la ligne de séparation --- */
-    .section-separator {
-        display: block; /* Assure que c'est un bloc */
-        height: 1px; /* Assure une hauteur minimale */
-        width: 100%; /* S'étend sur la largeur disponible du parent */
-        max-width: calc(100% - var(--bento-gap) * 2); /* Limité par les marges du conteneur parent */
-        background-color: var(--color-primary); /* Utilise la couleur primaire rose */
-        /* background-color: red !important;  <-- Vous pouvez temporairement le mettre en rouge vif pour le test */
-        border: 0; /* Élimine toutes les bordures par défaut (plus fort que 'none') */
-        padding: 0; /* Élimine tout padding par défaut */
-        margin: 40px auto; /* Espacement vertical, centré */
-        box-sizing: border-box;
+    .footer-grid{
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:20px;
+      align-items:end;
     }
 
-    /* --- Styles pour la section ÉQUIPE --- */
-    .team-contact-section {
-        max-width: 100%; /* S'adapte à son parent */
-        margin: var(--bento-gap); /* Marge intérieure au cadre blanc */
-        padding: 0; /* Pas de padding ici */
-        text-align: center;
-        box-sizing: border-box;
-        color: var(--color-text);
-    }
-    .team-contact-section p {
-        font-size: 0.9em;
-        line-height: 1.5;
-        margin-bottom: 10px;
-        padding: 0 var(--bento-gap); /* Padding pour le texte */
-    }
-    .team-contact-section p:last-of-type {
-        margin-bottom: 20px;
-    }
-    .team-contact-section a {
-        color: var(--color-primary);
-        text-decoration: none;
-        font-weight: 500;
-    }
-    .team-contact-section a:hover {
-        text-decoration: underline;
+    .footer h4{
+      margin:0 0 10px;
+      font-size:1.35rem;
+      font-weight:900;
+      letter-spacing:-.03em;
     }
 
-    .team-photos {
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 15px;
-        margin-top: 20px;
-        margin-bottom: 20px;
-        padding: 0 var(--bento-gap); /* Padding pour les photos */
-    }
-    .team-photo-wrapper {
-        text-align: center;
-        flex-shrink: 0;
-    }
-    .team-photo-wrapper img {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 3px solid var(--color-secondary);
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        display: block;
-        margin: 0 auto;
-        transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
-    }
-    .team-photo-wrapper img:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    .footer p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.7;
+      max-width:60ch;
     }
 
-    /* --- STYLES POUR LA BANNIÈRE DE L'APP (IMAGE UNIQUE) --- */
-    .app-banner-section {
-          /* <--- MODIFIÉ: Laisser Flexbox gérer le centrage, pas de width fixe */
-          margin: calc(var(--bento-gap) * 0.8);
-          padding: 0; /* Important pour que l'image remplisse */
+    .footer-right{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      align-items:flex-start;
+    }
+
+    .footer-pill{
+      display:inline-flex;
+      align-items:center;
+      min-height:40px;
+      padding:0 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+      color:#fff;
+      font-weight:700;
+      font-size:.88rem;
+    }
+
+    .reveal{
+      opacity:0;
+      transform:translateY(20px);
+      transition:opacity .7s ease, transform .7s ease;
+    }
+
+    .reveal.in{
+      opacity:1;
+      transform:none;
+    }
+
+    @keyframes cardIn{
+      to{
+        opacity:1;
+        transform:translateY(0) scale(1);
       }
-      /* Ajustement du lien a à l'intérieur pour le centrage */
-      .app-banner-section a {
-          width: auto; /* Laisse l'élément a déterminer sa largeur par le contenu */
-          max-width: 100%; /* S'assure que le lien ne déborde pas */
-          margin: 0 auto; /* Centre le lien lui-même */
+    }
+
+    @media (max-width: 1100px){
+      .hero-grid,
+      .footer-grid{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width: 900px){
+      .board{
+        grid-template-columns:repeat(2, minmax(0,1fr)) !important;
       }
 
-    .app-banner-section img.app-banner-image {
-        width: 100%;
-        height: auto;
-        display: block;
-        border-radius: var(--bento-border-radius);
-        /* AJOUT: S'assurer que l'image ne déborde pas à cause de son propre contenu ou bordures */
-        max-width: 100%;
-        box-sizing: border-box; /* S'assurer que padding/border ne s'ajoutent pas à la largeur */
-    }
-
-    /* --- Styles du footer (Raffiné) --- */
-    .footer-contact {
-        background-color: var(--color-primary);
-        color: #fff;
-        padding: 30px var(--bento-gap);
-        text-align: center;
-        margin: 0; /* Pas de marge pour coller au bas du cadre blanc */
-        max-width: 100%; /* S'adapte à son parent */
-        border-radius: 0; /* Pas d'arrondis sur le footer lui-même */
-        box-shadow: none; /* Pas d'ombre individuelle */
-        box-sizing: border-box;
-    }
-    .footer-contact .qr-code {
-        margin-bottom: 20px;
-        border-radius: 12px;
-        border: 4px solid #fff;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        max-width: calc(100% - 40px); /* <--- AJOUTÉ: Empêche le débordement de l'image si elle a une bordure */
-        height: 200px; /* <--- AJOUTÉ: Pour maintenir le ratio si max-width est appliquée */
-    }
-    .footer-contact p {
-        margin: 0 0 8px 0;
-        font-size: 0.9em;
-        line-height: 1.6;
-    }
-    .footer-contact a {
-        color: #fff;
-        text-decoration: underline;
-        font-weight: 500;
-    }
-    .footer-contact a:hover {
-        text-decoration: none;
-        opacity: 0.8;
-    }
-
-    /* --- NOUVEAUX STYLES POUR LES CARTES ET LA MODALE --- */
-    .card .open-modal-btn {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background-color: rgba(255, 255, 255, 0.8);
-        border: 1px solid rgba(0,0,0,0.1);
-        border-radius: 50%;
-        width: 30px;
-        height: 30px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5em;
-        line-height: 1;
-        cursor: pointer;
-        transition: background-color 0.2s, transform 0.2s, opacity 0.2s;
-        opacity: 0.7;
-        z-index: 2;
-        color: var(--color-text);
-        font-weight: bold;
-    }
-    .card .open-modal-btn:hover {
-        background-color: #fff;
-        transform: scale(1.1);
-        opacity: 1;
-    }
-
-    .card-modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.6);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.3s ease, visibility 0.3s ease;
-    }
-
-    .card-modal.is-open {
-        opacity: 1;
-        visibility: visible;
-    }
-
-    .card-modal-content {
-        background-color: #fff;
-        border-radius: var(--bento-border-radius);
-        padding: 30px;
-        max-width: 800px;
-        width: 90%;
-        max-height: 90vh;
-        overflow-y: auto;
-        position: relative;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-        transform: scale(0.9);
-        transition: transform 0.3s ease;
-        display: flex;
-        flex-direction: column;
-        color: var(--color-text);
-    }
-    .card-modal.is-open .card-modal-content {
-        transform: scale(1);
-    }
-
-    .card-modal-close-btn {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        background: none;
-        border: none;
-        font-size: 2.5em;
-        cursor: pointer;
-        color: #777;
-        line-height: 1;
-        transition: color 0.2s;
-    }
-    .card-modal-close-btn:hover {
-        color: #333;
-    }
-
-    .modal-header {
-        display: flex;
-        align-items: center;
-        margin-bottom: 20px;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 15px;
-    }
-    .modal-emoji {
-        font-size: 2.5em;
-        margin-right: 15px;
-        line-height: 1;
-        flex-shrink: 0;
-    }
-    .modal-title {
-        margin: 0;
-        font-size: 1.6em;
-        font-weight: 700;
-        color: var(--color-primary);
-        line-height: 1.3;
-    }
-    .modal-image-container {
-        margin-bottom: 20px;
-        text-align: center;
-    }
-    .modal-image {
-        max-width: 100%;
-        height: auto;
-        border-radius: 12px;
-        display: block;
-        margin: 0 auto;
-    }
-    .modal-content-text {
-        font-size: 1em;
-        line-height: 1.6;
-        color: #444;
-        flex-grow: 1;
-        margin-bottom: 20px;
-    }
-    .modal-content-text .extra-content {
-        margin-top: 15px;
-        border-top: 1px dashed #ddd;
-        padding-top: 15px;
-    }
-
-    .modal-actions {
-        margin-top: auto;
-        text-align: center;
-        padding-top: 15px;
-        border-top: 1px solid #eee;
-    }
-    .modal-btn-link {
-        background-color: var(--color-primary);
-        color: white !important;
-        padding: 10px 20px;
-        border-radius: 50px;
-        font-weight: 500;
-        text-decoration: none;
-        font-size: 0.95em;
-        transition: background-color .2s, transform .2s;
-    }
-    .modal-btn-link:hover {
-        background-color: #d6136a;
-        transform: translateY(-1px);
-    }
-
-    .card-modal-content.text-light .modal-title,
-    .card-modal-content.text-light .modal-content-text,
-    .card-modal-content.text-light .modal-emoji {
-        color: #fff;
-    }
-    .card-modal-content.text-light .card-modal-close-btn {
-        color: #ccc;
-    }
-    .card-modal-content.text-light .card-modal-close-btn:hover {
-        color: #fff;
-    }
-
-
-    /* --- Responsive --- */
-    @media (max-width: 900px) {
-        .bento-board {
-            grid-template-columns: repeat(3, 1fr);
-        }
-        .card-col-span-4 { grid-column: span 3; }
-        .main-white-frame {
-            width: calc(100% - var(--bento-gap)); /* Réduit un peu plus le cadre sur les côtés */
-            border-radius: 20px; /* Légèrement moins arrondi */
-        }
-        /* Les sections internes s'adapteront car elles sont à max-width: 100% */
-        .section-separator {
-            max-width: calc(100% - var(--bento-gap) * 2); /* Garde la séparation à l'intérieur du cadre */
-        }
-    }
-
-    @media (max-width: 680px) {
-      .bento-board {
-        grid-template-columns: repeat(2, 1fr);
-        grid-auto-rows: minmax(140px, auto);
-        gap: calc(var(--bento-gap) * 0.8);
-        margin: calc(var(--bento-gap) * 0.8); /* Marge intérieure réduite */
+      .hero-shell{
+        padding:28px 22px;
       }
-      .card { padding: 15px; }
-      .card-col-span-3, .card-col-span-4 { grid-column: span 2; }
-      .card.card-row-span-2 { min-height: calc( (140px * 2) + var(--bento-gap) * 0.8 );}
-      .card.card-col-span-2.card-row-span-2 { min-height: calc( (140px * 2) + var(--bento-gap) * 0.8 );}
+    }
 
-      .header-banner {
-          padding: 20px calc(var(--bento-gap) * 0.8);
-      }
-      .header-banner h1 {font-size:1.6em;}
-      .header-banner p {font-size:0.9em;}
-      .card-title { font-size: 1em; }
-      .card-content-wrapper { font-size: 0.85em; }
-      .archive-section {
-          margin: calc(var(--bento-gap) * 0.8);
-      }
-      .archive-menu {
-          padding: 8px calc(var(--bento-gap) * 0.8);
-      }
-      .section-separator {
-          margin: 30px auto;
-          max-width: calc(100% - var(--bento-gap) * 1.6); /* Ajuste pour le padding du body */
-      }
-      .team-contact-section {
-          margin: calc(var(--bento-gap) * 0.8);
-      }
-      .team-contact-section p {
-          padding: 0 calc(var(--bento-gap) * 0.8);
-      }
-      .team-photos {
-          padding: 0 calc(var(--bento-gap) * 0.8);
-      }
-      .team-photo-wrapper img {
-          width: 70px;
-          height: 70px;
-      }
-      .app-banner-section {
-          margin: calc(var(--bento-gap) * 0.8);
-          width:250px;
-          text-align:center;
-      }
-      .footer-contact {
-          padding: 20px calc(var(--bento-gap) * 0.8);
+    @media (max-width: 640px){
+      .topbar-inner,
+      .hero,
+      .content-wrap,
+      .footer{
+        padding-left:14px;
+        padding-right:14px;
       }
 
-      /* Modale responsive */
-      .card-modal-content {
-            padding: 20px;
-        }
-        .modal-header {
-            flex-direction: column;
-            align-items: flex-start;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-        }
-        .modal-emoji {
-            margin-right: 0;
-            margin-bottom: 10px;
-        }
-        .modal-title {
-            font-size: 1.4em;
-        }
-        .modal-content-text {
-            font-size: 0.95em;
-        }
-        .card-modal-close-btn {
-            font-size: 2em;
-        }
-    }
+      .board{
+        grid-template-columns:1fr !important;
+      }
 
-    @media (max-width: 480px) {
-        .bento-board {
-            grid-template-columns: 1fr;
-        }
-        .card-col-span-2, .card-col-span-3, .card-col-span-4 { grid-column: span 1; }
-        .card.card-row-span-2 { min-height: calc( (140px * 2) + var(--bento-gap) * 0.8 );}
-        .card.card-col-span-2.card-row-span-2 { min-height: calc( (140px * 2) + var(--bento-gap) * 0.8 );}
-    .app-banner-section {
-            margin: calc(var(--bento-gap) * 0.8) auto 30px auto; /* Centrer la section horizontalement et un peu moins de marge */
-        }
-        .app-banner-section a {
-            max-width: 100%; /* S'assurer qu'il prend toute la largeur disponible du parent (qui est maintenant centré) */
-        }
-    }
+      .hero-copy h2{
+        max-width:none;
+      }
 
-</style>
+      .top-actions{
+        width:100%;
+        justify-content:flex-start;
+      }
+
+      .toolbar{
+        align-items:flex-start;
+      }
+
+      .toolbar-right{
+        width:100%;
+      }
+
+      .select-input,
+      .chip-btn{
+        width:100%;
+      }
+    }
+  </style>
 </head>
 <body>
+  <div class="page-noise"></div>
 
-  <div class="main-white-frame"> <!-- DÉBUT DU CADRE BLANC -->
-
-    <header class="header-banner">
-      <img src="https://raw.githubusercontent.com/SUDCRM59/Bulletin/refs/heads/main/img/logo.gif" alt="Logo Sud CRM59" class="logo-syndicat">
-      <h1>FrequenCE SUD</h1>
-      <p>Bulletin d'Information Syndical - <span id="bulletinPeriodDisplay">Chargement...</span></p>
-    </header>
-
-    <div class="bento-board" id="bentoBoard">
-      <p style="grid-column: 1 / -1; text-align: center; color: #777;">Chargement du bulletin...</p>
-    </div>
-<hr>
-    <section class="archive-section">
-        <h3>Archives des Bulletins</h3>
-        <div id="archiveMenu" class="archive-menu">
-            <!-- Les chips d'archives seront insérées ici par JavaScript -->
-            <p class="loading-message" style="margin:0; font-size:0.9em;">Chargement des archives...</p>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a href="#" class="brand">
+        <div class="brand-mark">S</div>
+        <div class="brand-text">
+          <h1>Fréquence SUD</h1>
+          <p id="topbarPeriod">Chargement du bulletin…</p>
         </div>
-    </section>
+      </a>
 
-    <hr class="section-separator"> <!-- Ligne de séparation 1 -->
-
-    <!-- SECTION POUR L'ÉQUIPE -->
-    <section class="team-contact-section">
-        <p>
-           <b>Pour toutes questions ou informations complémentaires, rapprochez-vous de vos élus SUD.</b><br>
-        </p>
-        <p>
-            <strong>Représentant Syndical :</strong> Laurent Martens (Enedis)
-        </p>
-        <div class="team-photos">
-            <div class="team-photo-wrapper">
-                <img src="https://raw.githubusercontent.com/SUDCRM59/Bulletin/refs/heads/main/membres/sb.jpg" alt="Souad Belal">
-                <p>Souad Belal<br>Abeille<br>06.23.91.45.95</p>
-            </div>
-            <div class="team-photo-wrapper">
-                <img src="https://raw.githubusercontent.com/SUDCRM59/Bulletin/refs/heads/main/membres/bb.jpg" alt="Bouchra Bensaddik">
-                <p>Bouchra Bensaddik<br>Enedis</p>
-            </div>
-            <div class="team-photo-wrapper">
-                <img src="https://raw.githubusercontent.com/SUDCRM59/Bulletin/refs/heads/main/membres/ld.jpg" alt="Latifa Daussy">
-               <p>Latifa Daussy<br>Enedis</p>
-            </div>
-            <div class="team-photo-wrapper">
-                <img src="https://raw.githubusercontent.com/SUDCRM59/Bulletin/refs/heads/main/membres/jn.jpg" alt="Julien Nunne">
-                <p>Julien Nunne<br>AG2R<br>06.17.97.31.42</p>
-            </div>
-            <div class="team-photo-wrapper">
-                <img src="https://raw.githubusercontent.com/SUDCRM59/Bulletin/refs/heads/main/membres/rb.jpg" alt="Rudy Bodart">
-                <p>Rudy Bodart<br>EHS<br>06.26.15.61.40</p>
-            </div>
-
-        </div>
-    </section>
-    <!-- FIN SECTION ÉQUIPE -->
-
-    <hr class="section-separator"> <!-- Ligne de séparation 2 -->
-
-    <!-- BANNIÈRE DE L'APPLICATION MOBILE (IMAGE UNIQUE) -->
-    <section class="app-banner-section">
-        <!-- Le lien doit englober l'image entière pour être cliquable -->
-        <a href="#" target="_blank">
-            <picture>
-                <!-- Source pour les écrans <= 680px (mobile) -->
-                <source media="(max-width: 680px)" srcset="https://raw.githubusercontent.com/SUDCRM59/Bulletin/refs/heads/main/img/SUD-App-BanMobile.png">
-                <!-- Source par défaut pour les écrans > 680px (desktop), ou fallback si <picture> n'est pas supporté -->
-                <img src="https://raw.githubusercontent.com/SUDCRM59/Bulletin/refs/heads/main/img/SUD-App-Ban.png" 
-                     alt="L'application mobile du syndicat SUD P2ST est arrivée ! Téléchargez-la sur Android ou Apple Store en recherchant SUD P2ST." 
-                     class="app-banner-image">
-            </picture>
-        </a>
-    </section>
-    <!-- FIN BANNIÈRE APPLICATION MOBILE -->
-
-    <hr class="section-separator"> <!-- Ligne de séparation 3 (Optionnel, mais bien pour séparer du footer) -->
-
-    <!-- FOOTER RAFFINÉ -->
-    <footer class="footer-contact">
-      <img src="https://raw.githubusercontent.com/SUDCRM59/Bulletin/refs/heads/main/img/qrcode-SiteSUD.png"
-           alt="QR Code Site Web SUD CRM59" class="qr-code">
-      <p>
-          <strong>CONTACT SUD CRM59</strong><br>
-          <a href="mailto:syndicatsud59@gmail.com">syndicatsud59@gmail.com</a><br>
-          Déléguée Syndicale: Souad Belal – 06.23.91.45.95
-      </p>
-      <p>
-          <a href="HTTP://WWW.SYNDICATSUDCRM59.FR" target="_blank">Site Web</a> |
-          <a href="https://www.facebook.com/syndicatsudcrm59" target="_blank">Facebook</a>
-      </p>
-    </footer>
-    <!-- FIN FOOTER RAFFINÉ -->
-
-  </div> <!-- FIN DU CADRE BLANC (.main-white-frame) -->
-
-  <!-- Modal pour l'affichage étendu de la carte -->
-  <div id="cardModal" class="card-modal">
-      <div class="card-modal-content">
-          <button class="card-modal-close-btn">×</button>
-          <div class="modal-header">
-              <span id="modalEmoji" class="modal-emoji"></span>
-              <h2 id="modalTitle" class="modal-title"></h2>
-          </div>
-          <div class="modal-image-container">
-              <img id="modalImage" src="" alt="" class="modal-image">
-          </div>
-          <div id="modalContent" class="modal-content-text"></div>
-          <div class="modal-actions">
-              <a id="modalLink" href="#" target="_blank" class="btn btn-primary modal-btn-link" style="display:none;">Voir l'article complet</a>
-          </div>
+      <div class="top-actions">
+        <button class="chip-btn" id="scrollCardsBtn">Voir le bulletin</button>
+        <button class="chip-btn" id="reloadBtn">Actualiser</button>
       </div>
-  </div>
+    </div>
+  </header>
 
-  <!-- Firebase SDKs -->
+  <section class="hero reveal">
+    <div class="hero-shell">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <small>● Bulletin publié</small>
+          <h2><span class="gradient" id="heroTitle">Fréquence SUD</span></h2>
+          <p id="heroIntro">
+            Le bulletin se charge…
+          </p>
+
+          <div class="hero-badges">
+            <span class="hero-badge" id="heroPeriod">Période</span>
+            <span class="hero-badge" id="heroCount">0 carte</span>
+          </div>
+        </div>
+
+        <div class="hero-side">
+          <div class="hero-card">
+            <strong id="heroStrongPeriod">—</strong>
+            <span>Période actuellement affichée</span>
+          </div>
+          <div class="hero-card">
+            <strong id="heroStrongCards">0</strong>
+            <span>Blocs d’information disponibles dans ce bulletin</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="content-wrap">
+    <section class="toolbar reveal">
+      <div class="toolbar-left">
+        <h3>Plan de lecture</h3>
+        <p>Une mise en page dynamique, moderne et conçue pour une lecture fluide.</p>
+      </div>
+
+      <div class="toolbar-right">
+        <select id="archiveSelect" class="select-input">
+          <option value="">Chargement des bulletins…</option>
+        </select>
+        <button class="chip-btn" id="loadArchiveBtn">Charger</button>
+      </div>
+    </section>
+
+    <div id="statesContainer"></div>
+    <section id="board" class="board reveal" style="display:none;"></section>
+  </main>
+
+  <footer class="footer reveal">
+    <div class="footer-shell">
+      <div class="footer-grid">
+        <div>
+          <h4 id="footerTitle">Fréquence SUD</h4>
+          <p id="footerText">
+            Bulletin d’information publié en ligne. Retrouvez ici les actualités, contenus, liens utiles et communications mises en avant dans cette édition.
+          </p>
+        </div>
+
+        <div class="footer-right">
+          <span class="footer-pill" id="footerPeriod">Période</span>
+          <span class="footer-pill" id="footerCards">0 carte</span>
+          <span class="footer-pill">Publication web</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
   <script>
-    const bentoBoardPublic = document.getElementById('bentoBoard');
-    const bulletinPeriodDisplay = document.getElementById('bulletinPeriodDisplay');
-    const archiveMenu = document.getElementById('archiveMenu');
-
-    // Références DOM pour la modale
-    const cardModal = document.getElementById('cardModal');
-    const modalCloseBtn = document.querySelector('.card-modal-close-btn');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalEmoji = document.getElementById('modalEmoji');
-    const modalImage = document.getElementById('modalImage');
-    const modalContent = document.getElementById('modalContent');
-    const modalLink = document.getElementById('modalLink');
-    const modalContentContainer = document.querySelector('.card-modal-content');
-
-    function isDarkColor(hexColor) {
-        if (!hexColor || hexColor === '#ffffff') return false;
-        const r = parseInt(hexColor.substring(1, 3), 16);
-        const g = parseInt(hexColor.substring(3, 5), 16);
-        const b = parseInt(hexColor.substring(5, 7), 16);
-        const y = (r * 299 + g * 587 + b * 114) / 1000;
-        return y < 128;
-    }
-
-    function attachExpandListeners() {
-        bentoBoardPublic.addEventListener('click', function(e) {
-            // Gérer le bouton "Voir plus" / "Voir moins"
-            if (e.target && e.target.classList.contains('btn-expand')) {
-                const btn = e.target;
-                const card = btn.closest('.card');
-                if (card) {
-                    card.classList.toggle('expanded');
-                    if (card.classList.contains('expanded')) {
-                        btn.textContent = 'Voir moins';
-                    } else {
-                        btn.textContent = 'Voir plus';
-                    }
-                }
-            }
-
-            // Gérer le bouton "Ouvrir en grand" (+)
-            if (e.target && e.target.classList.contains('open-modal-btn')) {
-                const cardEl = e.target.closest('.card');
-                if (!cardEl) return;
-
-                const cardId = cardEl.id;
-                const cardData = currentBulletinCards.find(c => c.id === cardId);
-                if (!cardData) {
-                    console.error("Données de carte introuvables pour l'ID:", cardId);
-                    return;
-                }
-
-                // Remplir la modale
-                modalTitle.textContent = cardData.title || '';
-                modalEmoji.innerHTML = cardData.emoji || '';
-                
-                // Gérer l'image
-                if (cardData.image) {
-                    modalImage.src = cardData.image;
-                    modalImage.alt = cardData.title || 'Image de la carte';
-                    modalImage.style.display = 'block';
-                } else {
-                    modalImage.src = '';
-                    modalImage.alt = '';
-                    modalImage.style.display = 'none';
-                }
-
-                // Pour le contenu complet (initial + extra)
-                let fullModalContent = cardData.initialContent || '';
-                if (cardData.hasExpandButton && (cardData.extraContent || '').trim() !== '') {
-                    fullModalContent += `<div class="extra-content">${cardData.extraContent}</div>`;
-                } else if (cardData.content && !cardData.initialContent && !cardData.extraContent) {
-                    fullModalContent = cardData.content;
-                }
-                
-                modalContent.innerHTML = fullModalContent;
-
-                // Gérer le lien
-                if (cardData.linkUrl) {
-                    modalLink.href = cardData.linkUrl;
-                    modalLink.style.display = 'inline-block';
-                } else {
-                    modalLink.href = '#';
-                    modalLink.style.display = 'none';
-                }
-
-                // Appliquer les classes CSS personnalisées à la modale
-                modalContentContainer.className = 'card-modal-content'; // Réinitialiser pour éviter les cumuls
-                if (cardData.customClasses) {
-                    cardData.customClasses.split(' ').forEach(cls => {
-                        if (cls) modalContentContainer.classList.add(cls);
-                    });
-                }
-                // Appliquer la couleur de fond et la classe text-light
-                if (cardData.bgColor && isDarkColor(cardData.bgColor)) {
-                    modalContentContainer.style.backgroundColor = cardData.bgColor;
-                    modalContentContainer.classList.add('text-light');
-                } else {
-                    modalContentContainer.style.backgroundColor = '#fff';
-                    modalContentContainer.classList.remove('text-light');
-                }
-
-
-                cardModal.classList.add('is-open');
-                document.body.style.overflow = 'hidden';
-            }
-        });
-    }
-
-    // Fermer la modale
-    modalCloseBtn.addEventListener('click', () => {
-        cardModal.classList.remove('is-open');
-        document.body.style.overflow = '';
-    });
-
-    // Fermer la modale en cliquant en dehors du contenu
-    cardModal.addEventListener('click', (e) => {
-        if (e.target === cardModal) {
-            cardModal.classList.remove('is-open');
-            document.body.style.overflow = '';
-        }
-    });
-
-    // Fermer la modale avec la touche Échap
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && cardModal.classList.contains('is-open')) {
-            cardModal.classList.remove('is-open');
-            document.body.style.overflow = '';
-        }
-    });
-
-
-    // Votre firebaseConfig (copiée depuis votre console Firebase)
     const firebaseConfig = {
-        apiKey: "AIzaSyAmu14nCF6x0cblWBFmP44uHJ3tI1McDSA",
-        authDomain: "sudcrm59.firebaseapp.com",
-        projectId: "sudcrm59",
-        storageBucket: "sudcrm59.firebasestorage.app",
-        messagingSenderId: "487748398932",
-        appId: "1:487748398932:web:679ff7f5fcd8b1d6d762c1"
+      apiKey: "AIzaSyAmu14nCF6x0cblWBFmP44uHJ3tI1McDSA",
+      authDomain: "sudcrm59.firebaseapp.com",
+      projectId: "sudcrm59",
+      storageBucket: "sudcrm59.firebasestorage.app",
+      messagingSenderId: "487748398932",
+      appId: "1:487748398932:web:679ff7f5fcd8b1d6d762c1"
     };
 
-    // Initialiser Firebase
-    const app = firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+
     const db = firebase.firestore();
+    const PUBLIC_COLLECTION = "bulletin_v3_public";
 
-    let currentDisplayedBulletinId = null;
-    let currentBulletinCards = [];
+    const DOM = {
+      topbarPeriod: document.getElementById("topbarPeriod"),
+      heroTitle: document.getElementById("heroTitle"),
+      heroIntro: document.getElementById("heroIntro"),
+      heroPeriod: document.getElementById("heroPeriod"),
+      heroCount: document.getElementById("heroCount"),
+      heroStrongPeriod: document.getElementById("heroStrongPeriod"),
+      heroStrongCards: document.getElementById("heroStrongCards"),
+      footerTitle: document.getElementById("footerTitle"),
+      footerText: document.getElementById("footerText"),
+      footerPeriod: document.getElementById("footerPeriod"),
+      footerCards: document.getElementById("footerCards"),
+      archiveSelect: document.getElementById("archiveSelect"),
+      loadArchiveBtn: document.getElementById("loadArchiveBtn"),
+      reloadBtn: document.getElementById("reloadBtn"),
+      scrollCardsBtn: document.getElementById("scrollCardsBtn"),
+      board: document.getElementById("board"),
+      statesContainer: document.getElementById("statesContainer")
+    };
 
-    async function loadAndRenderBulletin() {
-        const params = new URLSearchParams(window.location.search);
-        const requestedBulletinId = params.get('id');
+    let archiveList = [];
+    let currentBulletin = null;
 
-        let bulletinDoc;
-
-        try {
-            if (requestedBulletinId) {
-                console.log(`Attempting to load bulletin with ID: ${requestedBulletinId}`);
-                bulletinDoc = await db.collection('bulletins').doc(requestedBulletinId).get();
-            } else {
-                console.log("Loading latest bulletin...");
-                const latestDocSnapshot = await db.collection('bulletins')
-                                                  .orderBy(firebase.firestore.FieldPath.documentId(), 'desc') 
-                                                  .limit(1) 
-                                                  .get();
-                if (!latestDocSnapshot.empty) {
-                    bulletinDoc = latestDocSnapshot.docs[0]; 
-                }
-            }
-
-            if (!bulletinDoc || !bulletinDoc.exists || !bulletinDoc.data()) {
-                bentoBoardPublic.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: #777;">Aucun bulletin disponible pour le moment ou l'ID spécifié n'existe pas.</p>`;
-                bulletinPeriodDisplay.textContent = "Non défini";
-                currentDisplayedBulletinId = null;
-                return;
-            }
-            
-            const data = bulletinDoc.data();
-            currentBulletinCards = data.cards;
-            const period = data.period || "Non défini"; 
-            currentDisplayedBulletinId = bulletinDoc.id;
-
-            bulletinPeriodDisplay.textContent = period;
-
-            if (!currentBulletinCards || currentBulletinCards.length === 0) {
-                bentoBoardPublic.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: #777;">Le bulletin est vide.</p>`;
-                return;
-            }
-
-            bentoBoardPublic.innerHTML = '';
-
-            currentBulletinCards.forEach((cardData, index) => {
-                const cardEl = document.createElement('div');
-                cardEl.className = 'card';
-                cardEl.id = cardData.id;
-
-                if (cardData.colSpan && cardData.colSpan > 1) cardEl.classList.add(`card-col-span-${cardData.colSpan}`);
-                if (cardData.rowSpan && cardData.rowSpan > 1) cardEl.classList.add(`card-row-span-${cardData.rowSpan}`);
-                if (cardData.customClasses) cardData.customClasses.split(' ').forEach(cls => { if(cls) cardEl.classList.add(cls);});
-                
-                if (cardData.bgColor && cardData.bgColor !== '#ffffff') {
-                    cardEl.style.backgroundColor = cardData.bgColor;
-                    if (isDarkColor(cardData.bgColor)) {
-                        cardEl.classList.add('text-light');
-                    }
-                }
-                
-                if (cardData.image) {
-                    cardEl.classList.add('card-with-image');
-                    cardEl.style.backgroundImage = `url('${cardData.image}')`;
-                }
-
-                cardEl.style.animationDelay = `${(index * 0.05) + 0.05}s`;
-
-                let cardInnerHtml = '';
-                if (cardData.emoji) {
-                    cardInnerHtml += `<span class="emoji-icon">${cardData.emoji}</span>`;
-                } else if (!cardData.image) {
-                    cardInnerHtml += `<div class="card-icon-large">📄</div>`;
-                }
-
-                cardInnerHtml += `<h2 class="card-title">${cardData.title || 'Titre de la carte'}</h2>`;
-                cardInnerHtml += `<div class="card-content-wrapper">`;
-                cardInnerHtml += `${cardData.content}`; 
-                cardInnerHtml += `</div>`;
-
-                cardInnerHtml += `<button class="open-modal-btn">+</button>`;
-
-
-                const tempDivForCheck = document.createElement('div');
-                tempDivForCheck.innerHTML = cardData.content || '';
-                const hasExtraContentDiv = tempDivForCheck.querySelector('.extra-content') !== null;
-
-                if (hasExtraContentDiv) {
-                    cardInnerHtml += `<div class="card-actions"><button class="btn btn-expand btn-secondary">Voir plus</button></div>`;
-                }
-
-                cardEl.innerHTML = cardInnerHtml;
-                bentoBoardPublic.appendChild(cardEl);
-            });
-            
-        } catch (error) {
-            console.error("Erreur de chargement du bulletin depuis Firebase:", error);
-            bentoBoardPublic.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: #c0392b;">Impossible de charger le bulletin. Veuillez contacter l'administrateur.</p>`;
-            bulletinPeriodDisplay.textContent = "Erreur de chargement";
-            currentDisplayedBulletinId = null;
-        } finally {
-            loadArchiveMenu();
-        }
-    }
-
-    async function loadArchiveMenu() {
-        if (!archiveMenu) return;
-        archiveMenu.innerHTML = `<p class="loading-message" style="margin:0; font-size:0.9em;">Chargement des archives...</p>`;
-
-        try {
-            const querySnapshot = await db.collection('bulletins')
-                                          .orderBy(firebase.firestore.FieldPath.documentId(), 'desc')
-                                          .get();
-
-            if (querySnapshot.empty) {
-                archiveMenu.innerHTML = `<p class="loading-message" style="margin:0; font-size:0.9em;">Aucun bulletin archivé.</p>`;
-                return;
-            }
-
-            archiveMenu.innerHTML = '';
-
-            querySnapshot.forEach(doc => {
-                const data = doc.data();
-                const bulletinId = doc.id;
-                const period = data.period || bulletinId;
-
-                const link = document.createElement('a');
-                link.href = `bulletin.html?id=${bulletinId}`;
-                link.textContent = period;
-                link.classList.add('archive-chip');
-
-                if (bulletinId === currentDisplayedBulletinId) {
-                    link.classList.add('active');
-                }
-
-                archiveMenu.appendChild(link);
-            });
-
-        } catch (error) {
-            console.error("Erreur lors du chargement du menu d'archives depuis Firebase:", error);
-            archiveMenu.innerHTML = `<p class="error-message" style="margin:0; font-size:0.9em;">Erreur de chargement des archives.</p>`;
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        loadAndRenderBulletin();
-        attachExpandListeners();
+    document.addEventListener("DOMContentLoaded", async () => {
+      bindEvents();
+      revealOnScroll();
+      showLoadingState();
+      await loadArchives();
+      await loadInitialBulletin();
     });
 
+    function bindEvents() {
+      DOM.loadArchiveBtn.addEventListener("click", async () => {
+        const selectedId = DOM.archiveSelect.value;
+        if (!selectedId) return;
+        await loadBulletinById(selectedId);
+      });
+
+      DOM.reloadBtn.addEventListener("click", async () => {
+        showLoadingState();
+        await loadArchives();
+        await loadInitialBulletin();
+      });
+
+      DOM.scrollCardsBtn.addEventListener("click", () => {
+        DOM.board.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+
+    async function loadInitialBulletin() {
+      const params = new URLSearchParams(window.location.search);
+      const requestedPeriod = params.get("period");
+
+      if (requestedPeriod) {
+        const cleanId = buildPublishedDocId(requestedPeriod);
+        await loadBulletinById(cleanId);
+        return;
+      }
+
+      await loadLatestBulletin();
+    }
+
+    async function loadLatestBulletin() {
+      try {
+        const snapshot = await db
+          .collection(PUBLIC_COLLECTION)
+          .orderBy("timestamp", "desc")
+          .limit(1)
+          .get();
+
+        if (snapshot.empty) {
+          showEmptyState();
+          return;
+        }
+
+        const doc = snapshot.docs[0];
+        renderBulletin({
+          id: doc.id,
+          ...doc.data()
+        });
+      } catch (error) {
+        console.error(error);
+        showErrorState("Impossible de charger le dernier bulletin.");
+      }
+    }
+
+    async function loadBulletinById(docId) {
+      try {
+        showLoadingState();
+
+        const doc = await db.collection(PUBLIC_COLLECTION).doc(docId).get();
+
+        if (!doc.exists) {
+          showErrorState("Le bulletin demandé est introuvable.");
+          return;
+        }
+
+        renderBulletin({
+          id: doc.id,
+          ...doc.data()
+        });
+      } catch (error) {
+        console.error(error);
+        showErrorState("Impossible de charger ce bulletin.");
+      }
+    }
+
+    async function loadArchives() {
+      try {
+        const snapshot = await db
+          .collection(PUBLIC_COLLECTION)
+          .orderBy("timestamp", "desc")
+          .get();
+
+        archiveList = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+
+        DOM.archiveSelect.innerHTML = "";
+
+        if (!archiveList.length) {
+          const option = document.createElement("option");
+          option.value = "";
+          option.textContent = "Aucun bulletin publié";
+          DOM.archiveSelect.appendChild(option);
+          return;
+        }
+
+        archiveList.forEach((archive) => {
+          const option = document.createElement("option");
+          option.value = archive.id;
+          option.textContent = archive.period || archive.id;
+          DOM.archiveSelect.appendChild(option);
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    function renderBulletin(data) {
+      currentBulletin = {
+        id: data.id,
+        title: data.title || "Fréquence SUD",
+        period: data.period || "Bulletin",
+        columns: Number(data.columns || 4),
+        rowHeight: Number(data.rowHeight || 180),
+        gap: Number(data.gap || 16),
+        cards: Array.isArray(data.cards) ? sanitizeCards(data.cards) : []
+      };
+
+      updateHero(currentBulletin);
+      renderBoard(currentBulletin);
+      updateFooter(currentBulletin);
+      syncArchiveSelect(currentBulletin.id);
+
+      DOM.statesContainer.innerHTML = "";
+      DOM.board.style.display = "grid";
+
+      revealOnScroll();
+    }
+
+    function updateHero(data) {
+      const cardCount = data.cards.length;
+      const labelCount = `${cardCount} ${cardCount > 1 ? "cartes" : "carte"}`;
+
+      DOM.topbarPeriod.textContent = data.period;
+      DOM.heroTitle.textContent = data.title;
+      DOM.heroIntro.textContent = `Découvre l’édition ${data.period} dans une mise en page immersive, structurée et agréable à parcourir. Les informations importantes sont organisées en cartes pour une lecture rapide et moderne.`;
+      DOM.heroPeriod.textContent = data.period;
+      DOM.heroCount.textContent = labelCount;
+      DOM.heroStrongPeriod.textContent = data.period;
+      DOM.heroStrongCards.textContent = String(cardCount);
+    }
+
+    function updateFooter(data) {
+      const cardCount = data.cards.length;
+      DOM.footerTitle.textContent = data.title;
+      DOM.footerText.textContent = `Cette édition de ${data.period} est disponible en lecture web. Le contenu a été mis en page sous forme de cartes dynamiques pour une consultation simple, claire et moderne.`;
+      DOM.footerPeriod.textContent = data.period;
+      DOM.footerCards.textContent = `${cardCount} ${cardCount > 1 ? "cartes" : "carte"}`;
+    }
+
+    function renderBoard(data) {
+      DOM.board.innerHTML = "";
+      DOM.board.style.setProperty("--columns", data.columns);
+      DOM.board.style.setProperty("--row-height", `${data.rowHeight}px`);
+      DOM.board.style.setProperty("--gap", `${data.gap}px`);
+
+      const sortedCards = [...data.cards].sort((a, b) => {
+        if (a.y !== b.y) return a.y - b.y;
+        return a.x - b.x;
+      });
+
+      sortedCards.forEach((card, index) => {
+        const article = document.createElement("article");
+        article.className = "bulletin-card reveal";
+        article.style.animationDelay = `${index * 0.05}s`;
+        article.style.gridColumn = `${card.x} / span ${card.w}`;
+        article.style.gridRow = `${card.y} / span ${card.h}`;
+
+        if (card.image) {
+          article.classList.add("has-image");
+          article.style.backgroundImage = `url("${escapeHtmlAttribute(card.image)}")`;
+        } else {
+          article.style.background = buildCardBackground(card.bgColor);
+        }
+
+        article.classList.add(shouldUseLightText(card) ? "text-light" : "text-dark");
+
+        const shortText = stripHtml(card.shortText || "");
+        const shortPreview = truncateText(shortText, card.h >= 2 ? 460 : 220);
+
+        article.innerHTML = `
+          <div class="card-top">
+            <span class="card-type">${escapeHtml(getTypeLabel(card.type))}</span>
+            <span class="card-icon">${escapeHtml(card.icon || "📄")}</span>
+          </div>
+
+          <div class="card-body">
+            <h3 class="card-title">${escapeHtml(card.title || "Sans titre")}</h3>
+            <p class="card-short">${escapeHtml(shortPreview || "Aucun contenu.")}</p>
+
+            <div class="card-footer">
+              <span class="card-meta">${card.w} × ${card.h}</span>
+              ${card.link ? `<a class="card-link" href="${escapeHtmlAttribute(card.link)}" target="_blank" rel="noopener noreferrer">Ouvrir</a>` : `<span></span>`}
+            </div>
+          </div>
+        `;
+
+        DOM.board.appendChild(article);
+      });
+    }
+
+    function showLoadingState() {
+      DOM.board.style.display = "none";
+      DOM.statesContainer.innerHTML = `
+        <div class="loading-state reveal in">
+          <strong>Chargement…</strong>
+          <span>Le bulletin est en cours de récupération.</span>
+        </div>
+      `;
+    }
+
+    function showEmptyState() {
+      DOM.board.style.display = "none";
+      DOM.statesContainer.innerHTML = `
+        <div class="empty-state reveal in">
+          <strong>Aucun bulletin publié</strong>
+          <span>Publie un bulletin depuis le dashboard pour l’afficher ici.</span>
+        </div>
+      `;
+    }
+
+    function showErrorState(message) {
+      DOM.board.style.display = "none";
+      DOM.statesContainer.innerHTML = `
+        <div class="error-state reveal in">
+          <strong>Erreur</strong>
+          <span>${escapeHtml(message)}</span>
+        </div>
+      `;
+    }
+
+    function syncArchiveSelect(docId) {
+      if (!docId) return;
+      DOM.archiveSelect.value = docId;
+    }
+
+    function sanitizeCards(cards) {
+      return cards.map((card) => ({
+        id: card.id || "",
+        type: card.type || "news",
+        title: card.title || "Sans titre",
+        icon: card.icon || "📄",
+        shortText: card.shortText || "",
+        longText: card.longText || "",
+        emailText: card.emailText || "",
+        link: card.link || "",
+        image: card.image || "",
+        bgColor: normalizeColor(card.bgColor || "#ffffff"),
+        textColorMode: card.textColorMode || "auto",
+        x: Math.max(1, Number(card.x || 1)),
+        y: Math.max(1, Number(card.y || 1)),
+        w: Math.max(1, Number(card.w || 1)),
+        h: Math.max(1, Number(card.h || 1))
+      }));
+    }
+
+    function getTypeLabel(type) {
+      const labels = {
+        news: "Actu",
+        event: "Événement",
+        info: "Info",
+        link: "Lien",
+        app: "Application",
+        image: "Image",
+        custom: "Bloc"
+      };
+      return labels[type] || "Carte";
+    }
+
+    function shouldUseLightText(card) {
+      if (card.textColorMode === "light") return true;
+      if (card.textColorMode === "dark") return false;
+      if (card.image) return true;
+      return isDarkColor(card.bgColor || "#ffffff");
+    }
+
+    function buildCardBackground(color) {
+      const safe = normalizeColor(color || "#ffffff");
+      return `linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,.08)), ${safe}`;
+    }
+
+    function buildPublishedDocId(period) {
+      return String(period || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^\w\s-]/g, "")
+        .trim()
+        .replace(/\s+/g, "_")
+        .toLowerCase();
+    }
+
+    function revealOnScroll() {
+      const targets = document.querySelectorAll(".reveal");
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("in");
+          }
+        });
+      }, {
+        threshold: 0.08
+      });
+
+      targets.forEach((el) => observer.observe(el));
+    }
+
+    function normalizeColor(value) {
+      if (!value || typeof value !== "string") return "#ffffff";
+      if (/^#[0-9A-Fa-f]{6}$/.test(value)) return value;
+      return "#ffffff";
+    }
+
+    function stripHtml(html) {
+      const div = document.createElement("div");
+      div.innerHTML = html || "";
+      return (div.textContent || div.innerText || "").trim();
+    }
+
+    function truncateText(text, maxLength) {
+      if (!text) return "";
+      if (text.length <= maxLength) return text;
+      return `${text.slice(0, maxLength).trim()}…`;
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function escapeHtmlAttribute(value) {
+      return escapeHtml(value).replaceAll("`", "&#096;");
+    }
+
+    function isDarkColor(hexColor) {
+      if (!hexColor || !/^#[0-9A-Fa-f]{6}$/.test(hexColor)) return false;
+
+      const r = parseInt(hexColor.slice(1, 3), 16);
+      const g = parseInt(hexColor.slice(3, 5), 16);
+      const b = parseInt(hexColor.slice(5, 7), 16);
+
+      const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+      return brightness < 150;
+    }
   </script>
 </body>
 </html>
