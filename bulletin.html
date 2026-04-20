@@ -479,33 +479,117 @@
       background:var(--pink-dark);
     }
 
-    .team-band{
-  width:100%;
-  background:linear-gradient(135deg, var(--pink) 0%, #ff5fb1 100%);
-  color:#fff;
-  border-top:4px solid var(--pink-dark);
-  margin-top:8px;
+.team-band{
+  margin-top: 26px;
+  margin-bottom: 18px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  box-shadow: var(--shadow);
+  padding: 28px 22px;
 }
 
 .team-band-inner{
-  max-width:var(--maxw);
-  margin:0 auto;
-  padding:24px 16px;
+  max-width: 1000px;
+  margin: 0 auto;
+  text-align: center;
 }
 
-.team-band h4{
-  margin:0 0 8px;
-  font-size:1.25rem;
-  font-weight:900;
-  letter-spacing:-.03em;
+.team-signature-top-line{
+  width: 220px;
+  max-width: 60%;
+  height: 4px;
+  margin: 0 auto 26px;
+  background: #111;
+  border-radius: 999px;
 }
 
-.team-band p{
-  margin:0;
-  line-height:1.7;
-  opacity:.98;
+.team-signature-intro{
+  margin: 0 0 18px;
+  font-size: 1rem;
+  line-height: 1.7;
+  font-weight: 700;
+  color: #222;
 }
 
+.team-signature-main{
+  margin: 0 0 28px;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: #222;
+}
+
+.team-signature-main strong{
+  font-weight: 900;
+}
+
+.team-members-grid{
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 22px 16px;
+  align-items: start;
+}
+
+.team-member-card{
+  text-align: center;
+}
+
+.team-member-photo{
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 4px solid #f3b23c;
+  box-shadow: 0 6px 16px rgba(0,0,0,.10);
+  display: block;
+  margin: 0 auto 12px;
+  background: #fff;
+}
+
+.team-member-card h5{
+  margin: 0 0 4px;
+  font-size: 1rem;
+  line-height: 1.35;
+  font-weight: 800;
+  color: #444;
+}
+
+.team-member-card p{
+  margin: 0 0 4px;
+  font-size: .95rem;
+  line-height: 1.4;
+  color: #666;
+  font-weight: 600;
+}
+
+.team-member-card span{
+  display: block;
+  font-size: .95rem;
+  line-height: 1.4;
+  color: #666;
+  font-weight: 700;
+}
+
+@media (max-width: 980px){
+  .team-members-grid{
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px){
+  .team-band{
+    padding: 22px 16px;
+  }
+
+  .team-members-grid{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .team-member-photo{
+    width: 86px;
+    height: 86px;
+  }
+}
     .footer{
       text-align:center;
       color:#666;
@@ -739,11 +823,55 @@
       </div>
     </section>
 <section class="team-band">
-      <h4>L’équipe SUD</h4>
-      <p>
-        Ce bulletin est mis à disposition par l’équipe SUD afin d’informer les salariés sur les actualités, les informations utiles, les communications syndicales et les sujets du moment.
-      </p>
-    </section>
+  <div class="team-band-inner">
+    <div class="team-signature-top-line"></div>
+
+    <p class="team-signature-intro">
+      Pour toutes questions ou informations complémentaires, rapprochez-vous de vos élus SUD.
+    </p>
+
+    <p class="team-signature-main">
+      <strong>Représentant Syndical :</strong> Laurent Martens (Enedis)
+    </p>
+
+    <div class="team-members-grid">
+      <article class="team-member-card">
+        <img src="assets/img/team/souad.jpg" alt="Souad Belal Abeille" class="team-member-photo">
+        <h5>Souad Belal Abeille</h5>
+        <p>Enedis</p>
+        <span>06.23.91.45.95</span>
+      </article>
+
+      <article class="team-member-card">
+        <img src="assets/img/team/bouchra.jpg" alt="Bouchra Bensaddik" class="team-member-photo">
+        <h5>Bouchra Bensaddik</h5>
+        <p>Enedis</p>
+        <span>06.00.00.00.00</span>
+      </article>
+
+      <article class="team-member-card">
+        <img src="assets/img/team/latifa.jpg" alt="Latifa Daussy" class="team-member-photo">
+        <h5>Latifa Daussy</h5>
+        <p>Enedis</p>
+        <span>06.00.00.00.00</span>
+      </article>
+
+      <article class="team-member-card">
+        <img src="assets/img/team/julien.jpg" alt="Julien Nunne" class="team-member-photo">
+        <h5>Julien Nunne</h5>
+        <p>AG2R</p>
+        <span>06.17.97.31.42</span>
+      </article>
+
+      <article class="team-member-card">
+        <img src="assets/img/team/rudy.jpg" alt="Rudy Bodart" class="team-member-photo">
+        <h5>Rudy Bodart</h5>
+        <p>EHS</p>
+        <span>06.00.00.00.00</span>
+      </article>
+    </div>
+  </div>
+</section>
       </main>
 
 
