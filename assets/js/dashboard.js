@@ -43,7 +43,16 @@ let dragState = {
   originX: 1,
   originY: 1
 };
-
+let resizeState = {
+  active: false,
+  cardId: null,
+  startX: 0,
+  startY: 0,
+  originW: 1,
+  originH: 1,
+  x: 1,
+  y: 1
+};
 const DOM = {};
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -228,8 +237,15 @@ function bindEvents() {
     }
   });
 
-  document.addEventListener("pointermove", handlePointerMove);
-  document.addEventListener("pointerup", handlePointerUp);
+ document.addEventListener("pointermove", (event) => {
+  handlePointerMove(event);
+  handleResizeMove(event);
+});
+
+document.addEventListener("pointerup", async (event) => {
+  await handlePointerUp(event);
+  await handleResizeEnd(event);
+});
 }
 
 function initAuthObserver() {
@@ -816,7 +832,137 @@ function getBoardMetrics() {
     rowHeightStep: settings.rowHeight + gap
   };
 }
+function startResizingCard(event, card, article) {
+  selectCard(card.id);
 
+  resizeState = {
+    active: true,
+    cardId: card.id,
+    startX: event.clientX,
+    startY: event.clientY,
+    originW: card.w,
+    originH: card.h,
+    x: card.x,
+    y: card.y
+  };
+
+  article.classList.add("is-resizing");
+}
+
+function handleResizeMove(event) {
+  if (!resizeState.active || !resizeState.cardId) return;
+
+  const card = getCardById(resizeState.cardId);
+  if (!card) return;
+
+  const metrics = getBoardMetrics();
+  if (!metrics) return;
+
+  const deltaX = event.clientX - resizeState.startX;
+  const deltaY = event.clientY - resizeState.startY;
+
+  let nextW = resizeState.originW + Math.round(deltaX / metrics.colWidth);
+  let nextH = resizeState.originH + Math.round(deltaY / metrics.rowHeightStep);
+
+  nextW = Math.max(1, nextW);
+  nextH = Math.max(1, nextH);
+
+  const maxW = metrics.columns - resizeState.x + 1;
+  nextW = Math.min(nextW, maxW);
+
+  const valid = isPositionFreeForCard(
+    card.id,
+    resizeState.x,
+    resizeState.y,
+    nextW,
+    nextH
+  );
+
+  previewResizedCard(card.id, resizeState.x, resizeState.y, nextW, nextH, valid);
+}
+
+async function handleResizeEnd(event) {
+  if (!resizeState.active || !resizeState.cardId) return;
+
+  const card = getCardById(resizeState.cardId);
+  if (!card) {
+    resetResizeState();
+    return;
+  }
+
+  const metrics = getBoardMetrics();
+  if (!metrics) {
+    resetResizeState();
+    return;
+  }
+
+  const deltaX = event.clientX - resizeState.startX;
+  const deltaY = event.clientY - resizeState.startY;
+
+  let nextW = resizeState.originW + Math.round(deltaX / metrics.colWidth);
+  let nextH = resizeState.originH + Math.round(deltaY / metrics.rowHeightStep);
+
+  nextW = Math.max(1, nextW);
+  nextH = Math.max(1, nextH);
+
+  const maxW = metrics.columns - resizeState.x + 1;
+  nextW = Math.min(nextW, maxW);
+
+  clearResizePreview();
+
+  if (isPositionFreeForCard(card.id, resizeState.x, resizeState.y, nextW, nextH)) {
+    const index = getCardIndexById(card.id);
+    if (index !== -1) {
+      cardsData[index] = {
+        ...cardsData[index],
+        w: nextW,
+        h: nextH
+      };
+
+      try {
+        await saveDraftToFirestore();
+        showToast("Taille mise à jour");
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }
+
+  resetResizeState();
+  renderBoard();
+}
+
+function previewResizedCard(cardId, x, y, w, h, valid) {
+  const element = DOM.cardsLayer?.querySelector(`.v3-card[data-id="${cardId}"]`);
+  if (!element) return;
+
+  element.style.gridColumn = `${x} / span ${w}`;
+  element.style.gridRow = `${y} / span ${h}`;
+  element.classList.add("is-resizing");
+  element.classList.toggle("drag-preview", !!valid);
+  element.classList.toggle("invalid-drop", !valid);
+}
+
+function clearResizePreview() {
+  DOM.cardsLayer?.querySelectorAll(".v3-card").forEach((element) => {
+    element.classList.remove("drag-preview");
+    element.classList.remove("invalid-drop");
+    element.classList.remove("is-resizing");
+  });
+}
+
+function resetResizeState() {
+  resizeState = {
+    active: false,
+    cardId: null,
+    startX: 0,
+    startY: 0,
+    originW: 1,
+    originH: 1,
+    x: 1,
+    y: 1
+  };
+}
 /* =========================
    POSITION / COLLISION
 ========================= */
