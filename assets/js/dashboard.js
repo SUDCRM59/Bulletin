@@ -62,6 +62,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   applyBoardSettings(DEFAULT_GRID);
   initAuthObserver();
   renderBoard();
+  if (localStorage.getItem("sidebarHidden") === "1") {
+   DOM.dashboardLayout.classList.add("sidebar-hidden");
+  }
 });
 
 function bindDom() {
@@ -117,6 +120,9 @@ function bindDom() {
 
   DOM.toast = document.getElementById("toast");
   DOM.toastText = document.getElementById("toastText");
+  
+  DOM.toggleSidebarBtn = document.getElementById("toggleSidebarBtn");
+  DOM.dashboardLayout = document.querySelector(".dashboard-layout");
 }
 
 function initEditors() {
@@ -150,6 +156,7 @@ function initEditors() {
 
 function bindEvents() {
   DOM.addCardBtn?.addEventListener("click", handleAddCard);
+  DOM.toggleSidebarBtn?.addEventListener("click", toggleSidebar);
   DOM.saveDraftBtn?.addEventListener("click", async () => {
     try {
       await saveDraftToFirestore();
@@ -246,6 +253,14 @@ document.addEventListener("pointerup", async (event) => {
   await handlePointerUp(event);
   await handleResizeEnd(event);
 });
+}
+
+function toggleSidebar() {
+  DOM.dashboardLayout.classList.toggle("sidebar-hidden");
+
+  const hidden = DOM.dashboardLayout.classList.contains("sidebar-hidden");
+
+  localStorage.setItem("sidebarHidden", hidden ? "1" : "0");
 }
 
 function initAuthObserver() {
