@@ -2,308 +2,528 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>FréquenCE SUD - Newsletter</title>
+  <title>FréquenCE SUD - Générateur Email</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="assets/img/logo.gif" sizes="any">
+
+  <style>
+    body{
+      margin:0;
+      padding:24px;
+      background:#f3f3f5;
+      font-family:Arial,Helvetica,sans-serif;
+      color:#111;
+    }
+
+    .page-tools{
+      max-width:700px;
+      margin:0 auto 20px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:center;
+    }
+
+    .tool-btn{
+      border:none;
+      background:#111;
+      color:#fff;
+      padding:12px 18px;
+      border-radius:999px;
+      font-weight:700;
+      cursor:pointer;
+      font:inherit;
+    }
+
+    .tool-btn.secondary{
+      background:#ed1e79;
+    }
+
+    .status-box{
+      max-width:700px;
+      margin:0 auto 20px;
+      background:#fff;
+      border:1px solid #e8e8ee;
+      border-radius:14px;
+      padding:14px 16px;
+      text-align:center;
+      color:#555;
+    }
+
+    .copy-note{
+      max-width:700px;
+      margin:0 auto 20px;
+      text-align:center;
+      color:#666;
+      font-size:14px;
+      line-height:1.5;
+    }
+
+    .hidden{
+      display:none;
+    }
+  </style>
 </head>
-<body style="margin:0;padding:0;background:#f3f3f5;font-family:Arial,Helvetica,sans-serif;">
+<body>
 
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f3f3f5;margin:0;padding:30px 0;">
-    <tr>
-      <td align="center">
+  <div class="page-tools">
+    <button class="tool-btn secondary" id="copyNewsletterBtn">Copier la newsletter</button>
+    <button class="tool-btn" id="reloadBtn">Actualiser</button>
+  </div>
 
-        <!-- CONTAINER -->
-        <table role="presentation" width="620" cellpadding="0" cellspacing="0" border="0" style="width:620px;max-width:620px;background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid #e8e8ee;">
+  <div class="status-box" id="statusBox">Chargement du bulletin…</div>
 
-          <!-- HEADER -->
-          <tr>
-            <td style="background:#ed1e79;padding:28px 26px 22px 26px;border-bottom:5px solid #c71563;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td width="88" valign="middle" style="width:88px;">
-                    <img
-                      src="https://via.placeholder.com/80x80.png?text=SUD"
-                      alt="Logo SUD"
-                      width="72"
-                      style="display:block;border:0;outline:none;text-decoration:none;"
-                    >
-                  </td>
+  <div class="copy-note">
+    Cette page génère la newsletter à partir du bulletin publié.<br>
+    Clique sur <strong>Copier la newsletter</strong>, puis colle dans Gmail.
+  </div>
 
-                  <td valign="middle" style="padding-left:10px;">
-                    <div style="font-family:Arial Black,Arial,Helvetica,sans-serif;font-size:34px;line-height:36px;font-weight:900;color:#ffffff;letter-spacing:1px;text-transform:uppercase;">
-                      FRÉQUENCE SUD
-                    </div>
+  <!-- ZONE A COPIER -->
+  <div id="newsletterWrapper">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f3f3f5;margin:0;padding:30px 0;font-family:Arial,Helvetica,sans-serif;">
+      <tr>
+        <td align="center">
 
-                    <div style="margin-top:8px;display:inline-block;background:#111111;color:#ffffff;font-size:13px;line-height:18px;font-weight:700;padding:6px 12px;border-radius:4px;text-transform:uppercase;letter-spacing:0.6px;">
-                      Bulletin syndical – Juin 2026
-                    </div>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
+          <table role="presentation" width="620" cellpadding="0" cellspacing="0" border="0" style="width:620px;max-width:620px;background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid #e8e8ee;">
 
-          <!-- INTRO -->
-          <tr>
-            <td style="padding:24px 28px 10px 28px;">
-              <div style="font-size:15px;line-height:24px;color:#333333;">
-                Bonjour,
-                <br><br>
-                Retrouvez dans cette édition les informations publiées par <strong>FréquenCE SUD</strong> :
-                actualités, points de vigilance, informations utiles et sujets suivis pour les salariés.
-              </div>
-            </td>
-          </tr>
+            <!-- HEADER -->
+            <tr>
+              <td style="background:#ed1e79;padding:28px 26px 22px 26px;border-bottom:5px solid #c71563;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td width="88" valign="middle" style="width:88px;">
+                      <img
+                        id="mailLogo"
+                        src="https://via.placeholder.com/72x72.png?text=SUD"
+                        alt="Logo SUD"
+                        width="72"
+                        style="display:block;border:0;outline:none;text-decoration:none;"
+                      >
+                    </td>
 
-          <!-- CARD 1 -->
+                    <td valign="middle" style="padding-left:10px;">
+                      <div
+                        id="mailTitle"
+                        style="font-family:Arial Black,Arial,Helvetica,sans-serif;font-size:34px;line-height:36px;font-weight:900;color:#ffffff;letter-spacing:1px;text-transform:uppercase;"
+                      >
+                        FRÉQUENCE SUD
+                      </div>
+
+                      <div
+                        id="mailPeriod"
+                        style="margin-top:8px;display:inline-block;background:#111111;color:#ffffff;font-size:13px;line-height:18px;font-weight:700;padding:6px 12px;border-radius:4px;text-transform:uppercase;letter-spacing:0.6px;"
+                      >
+                        Bulletin syndical – Période
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- INTRO -->
+            <tr>
+              <td style="padding:24px 28px 10px 28px;">
+                <div id="mailIntro" style="font-size:15px;line-height:24px;color:#333333;">
+                  Bonjour,<br><br>
+                  Retrouvez dans cette édition les informations publiées par <strong>FréquenCE SUD</strong>.
+                </div>
+              </td>
+            </tr>
+
+            <!-- CARDS -->
+            <tbody id="cardsContainer">
+            </tbody>
+
+            <!-- CTA -->
+            <tr>
+              <td align="center" style="padding:28px 28px 24px 28px;">
+                <a
+                  id="mainBulletinBtn"
+                  href="#"
+                  target="_blank"
+                  style="display:inline-block;background:#111111;color:#ffffff;text-decoration:none;font-size:15px;line-height:20px;font-weight:800;padding:14px 28px;border-radius:999px;"
+                >
+                  Lire le bulletin
+                </a>
+              </td>
+            </tr>
+
+            <!-- TEAM -->
+            <tr>
+              <td style="background:#ed1e79;padding:24px 22px 18px 22px;text-align:center;color:#ffffff;border-top:5px solid #c71563;">
+                <div style="font-size:24px;line-height:28px;font-weight:900;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">
+                  L’ÉQUIPE SUD
+                </div>
+
+                <div style="display:inline-block;background:#111111;color:#ffffff;font-size:13px;line-height:18px;font-weight:700;padding:6px 12px;border-radius:4px;">
+                  RS : Laurent Martens &nbsp;|&nbsp; DS : Rudy Bodart
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding:20px 16px 18px 16px;background:#ed1e79;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+
+                    <td align="center" valign="top" width="20%" style="padding:8px 6px;color:#ffffff;">
+                      <img src="https://via.placeholder.com/82x82.png?text=RB" alt="Rudy B." width="78" style="display:block;margin:0 auto 8px auto;border:3px solid #111111;border-radius:8px;">
+                      <div style="font-size:13px;line-height:18px;font-weight:800;margin-bottom:4px;">Rudy B.</div>
+                      <div style="display:inline-block;background:#fbb034;color:#111111;font-size:12px;line-height:16px;font-weight:800;padding:3px 6px;border-radius:3px;">06.26.15.61.40</div>
+                    </td>
+
+                    <td align="center" valign="top" width="20%" style="padding:8px 6px;color:#ffffff;">
+                      <img src="https://via.placeholder.com/82x82.png?text=SB" alt="Souad B." width="78" style="display:block;margin:0 auto 8px auto;border:3px solid #111111;border-radius:8px;">
+                      <div style="font-size:13px;line-height:18px;font-weight:800;margin-bottom:4px;">Souad B.</div>
+                      <div style="display:inline-block;background:#fbb034;color:#111111;font-size:12px;line-height:16px;font-weight:800;padding:3px 6px;border-radius:3px;">06.23.91.45.95</div>
+                    </td>
+
+                    <td align="center" valign="top" width="20%" style="padding:8px 6px;color:#ffffff;">
+                      <img src="https://via.placeholder.com/82x82.png?text=BB" alt="Bouchra B." width="78" style="display:block;margin:0 auto 8px auto;border:3px solid #111111;border-radius:8px;">
+                      <div style="font-size:13px;line-height:18px;font-weight:800;margin-bottom:4px;">Bouchra B.</div>
+                      <div style="display:inline-block;background:#fbb034;color:#111111;font-size:12px;line-height:16px;font-weight:800;padding:3px 6px;border-radius:3px;">Enedis</div>
+                    </td>
+
+                    <td align="center" valign="top" width="20%" style="padding:8px 6px;color:#ffffff;">
+                      <img src="https://via.placeholder.com/82x82.png?text=LD" alt="Latifa D." width="78" style="display:block;margin:0 auto 8px auto;border:3px solid #111111;border-radius:8px;">
+                      <div style="font-size:13px;line-height:18px;font-weight:800;margin-bottom:4px;">Latifa D.</div>
+                      <div style="display:inline-block;background:#fbb034;color:#111111;font-size:12px;line-height:16px;font-weight:800;padding:3px 6px;border-radius:3px;">Rep. terrain</div>
+                    </td>
+
+                    <td align="center" valign="top" width="20%" style="padding:8px 6px;color:#ffffff;">
+                      <img src="https://via.placeholder.com/82x82.png?text=JN" alt="Julien N." width="78" style="display:block;margin:0 auto 8px auto;border:3px solid #111111;border-radius:8px;">
+                      <div style="font-size:13px;line-height:18px;font-weight:800;margin-bottom:4px;">Julien N.</div>
+                      <div style="display:inline-block;background:#fbb034;color:#111111;font-size:12px;line-height:16px;font-weight:800;padding:3px 6px;border-radius:3px;">06.17.97.31.42</div>
+                    </td>
+
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- FOOTER -->
+            <tr>
+              <td style="padding:24px 20px 28px 20px;text-align:center;">
+                <div id="mailFooter" style="font-size:12px;line-height:19px;color:#777777;">
+                  <strong style="color:#ed1e79;">FRÉQUENCE SUD</strong> — Bulletin syndical<br>
+                  © 2026 — Équipe SUD
+                </div>
+              </td>
+            </tr>
+
+          </table>
+
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAmu14nCF6x0cblWBFmP44uHJ3tI1McDSA",
+      authDomain: "sudcrm59.firebaseapp.com",
+      projectId: "sudcrm59",
+      storageBucket: "sudcrm59.firebasestorage.app",
+      messagingSenderId: "487748398932",
+      appId: "1:487748398932:web:679ff7f5fcd8b1d6d762c1"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+
+    const db = firebase.firestore();
+    const PUBLIC_COLLECTION = "bulletin_v3_public";
+
+    const DOM = {
+      statusBox: document.getElementById("statusBox"),
+      copyNewsletterBtn: document.getElementById("copyNewsletterBtn"),
+      reloadBtn: document.getElementById("reloadBtn"),
+      newsletterWrapper: document.getElementById("newsletterWrapper"),
+
+      mailTitle: document.getElementById("mailTitle"),
+      mailPeriod: document.getElementById("mailPeriod"),
+      mailIntro: document.getElementById("mailIntro"),
+      cardsContainer: document.getElementById("cardsContainer"),
+      mainBulletinBtn: document.getElementById("mainBulletinBtn"),
+      mailFooter: document.getElementById("mailFooter")
+    };
+
+    let currentBulletin = null;
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      bindEvents();
+      await loadInitialBulletin();
+    });
+
+    function bindEvents() {
+      DOM.copyNewsletterBtn.addEventListener("click", copyNewsletter);
+      DOM.reloadBtn.addEventListener("click", async () => {
+        await loadInitialBulletin();
+      });
+    }
+
+    async function loadInitialBulletin() {
+      setStatus("Chargement du bulletin…");
+
+      const params = new URLSearchParams(window.location.search);
+      const requestedPeriod = params.get("period");
+
+      if (requestedPeriod) {
+        await loadBulletinById(buildPublishedDocId(requestedPeriod));
+        return;
+      }
+
+      await loadLatestBulletin();
+    }
+
+    async function loadLatestBulletin() {
+      try {
+        const snapshot = await db
+          .collection(PUBLIC_COLLECTION)
+          .orderBy("timestamp", "desc")
+          .limit(1)
+          .get();
+
+        if (snapshot.empty) {
+          setStatus("Aucun bulletin publié trouvé.");
+          return;
+        }
+
+        const doc = snapshot.docs[0];
+        renderNewsletter({
+          id: doc.id,
+          ...doc.data()
+        });
+
+        setStatus("Newsletter générée à partir du dernier bulletin publié.");
+      } catch (error) {
+        console.error(error);
+        setStatus("Erreur lors du chargement du bulletin.");
+      }
+    }
+
+    async function loadBulletinById(docId) {
+      try {
+        const doc = await db.collection(PUBLIC_COLLECTION).doc(docId).get();
+
+        if (!doc.exists) {
+          setStatus("Bulletin introuvable.");
+          return;
+        }
+
+        renderNewsletter({
+          id: doc.id,
+          ...doc.data()
+        });
+
+        setStatus("Newsletter générée à partir du bulletin demandé.");
+      } catch (error) {
+        console.error(error);
+        setStatus("Erreur lors du chargement de ce bulletin.");
+      }
+    }
+
+    function renderNewsletter(data) {
+      currentBulletin = {
+        id: data.id,
+        title: data.title || "Fréquence SUD",
+        period: data.period || "Bulletin",
+        cards: Array.isArray(data.cards) ? sanitizeCards(data.cards) : []
+      };
+
+      DOM.mailTitle.textContent = currentBulletin.title.toUpperCase();
+      DOM.mailPeriod.textContent = `Bulletin syndical – ${currentBulletin.period}`;
+      DOM.mailIntro.innerHTML = `
+        Bonjour,<br><br>
+        Retrouvez dans cette édition les informations publiées par <strong>${escapeHtml(currentBulletin.title)}</strong> :
+        actualités, points de vigilance, informations utiles et sujets suivis pour les salariés.
+      `;
+
+      renderCards(currentBulletin.cards);
+      DOM.mainBulletinBtn.href = buildPublicBulletinLink(currentBulletin.id, currentBulletin.period);
+      DOM.mailFooter.innerHTML = `
+        <strong style="color:#ed1e79;">${escapeHtml(currentBulletin.title.toUpperCase())}</strong> — ${escapeHtml(currentBulletin.period)}<br>
+        © ${new Date().getFullYear()} — Équipe SUD
+      `;
+    }
+
+    function renderCards(cards) {
+      DOM.cardsContainer.innerHTML = "";
+
+      const pickedCards = [...cards]
+        .sort((a, b) => {
+          if (a.y !== b.y) return a.y - b.y;
+          return a.x - b.x;
+        })
+        .slice(0, 3);
+
+      if (!pickedCards.length) {
+        DOM.cardsContainer.innerHTML = `
           <tr>
             <td style="padding:14px 28px 0 28px;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #ececf1;border-radius:10px;overflow:hidden;">
                 <tr>
                   <td style="padding:18px 18px 18px 18px;">
-                    <div style="font-size:12px;line-height:16px;font-weight:800;color:#ed1e79;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">
-                      Information
+                    <div style="font-size:14px;line-height:23px;color:#555555;">
+                      Aucun contenu n’est disponible pour le moment dans ce bulletin.
                     </div>
-
-                    <div style="font-size:22px;line-height:26px;font-weight:900;color:#111111;margin-bottom:10px;">
-                      Titre de la première information
-                    </div>
-
-                    <div style="font-size:14px;line-height:23px;color:#555555;margin-bottom:14px;">
-                      Résumé court de l’information. Ce bloc permet de mettre en avant l’essentiel
-                      et d’inciter les salariés à consulter le bulletin complet en ligne.
-                    </div>
-
-                    <a
-                      href="https://ton-site.fr/bulletin.html"
-                      target="_blank"
-                      style="display:inline-block;background:#ed1e79;color:#ffffff;text-decoration:none;font-size:13px;line-height:18px;font-weight:800;padding:10px 16px;border-radius:6px;"
-                    >
-                      Lire la suite
-                    </a>
                   </td>
                 </tr>
               </table>
             </td>
           </tr>
+        `;
+        return;
+      }
 
-          <!-- CARD 2 -->
-          <tr>
-            <td style="padding:14px 28px 0 28px;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #ececf1;border-radius:10px;overflow:hidden;">
-                <tr>
-                  <td style="padding:18px 18px 18px 18px;">
-                    <div style="font-size:12px;line-height:16px;font-weight:800;color:#ed1e79;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">
-                      Actualité
-                    </div>
+      pickedCards.forEach((card) => {
+        const shortText = stripHtml(card.emailText || card.shortText || card.longText || "");
+        const shortPreview = truncateText(shortText, 220);
+        const typeLabel = getTypeLabel(card.type);
+        const readLink = card.link && card.link.trim()
+          ? card.link.trim()
+          : buildPublicBulletinLink(currentBulletin.id, currentBulletin.period);
 
-                    <div style="font-size:22px;line-height:26px;font-weight:900;color:#111111;margin-bottom:10px;">
-                      Deuxième sujet mis en avant
-                    </div>
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td style="padding:14px 28px 0 28px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #ececf1;border-radius:10px;overflow:hidden;">
+              <tr>
+                <td style="padding:18px 18px 18px 18px;">
+                  <div style="font-size:12px;line-height:16px;font-weight:800;color:#ed1e79;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">
+                    ${escapeHtml(typeLabel)}
+                  </div>
 
-                    <div style="font-size:14px;line-height:23px;color:#555555;margin-bottom:14px;">
-                      Un second résumé pour présenter une autre information importante du moment :
-                      communication syndicale, rappel utile ou point d’attention.
-                    </div>
+                  <div style="font-size:22px;line-height:26px;font-weight:900;color:#111111;margin-bottom:10px;">
+                    ${escapeHtml(card.title || "Information")}
+                  </div>
 
-                    <a
-                      href="https://ton-site.fr/bulletin.html"
-                      target="_blank"
-                      style="display:inline-block;background:#ed1e79;color:#ffffff;text-decoration:none;font-size:13px;line-height:18px;font-weight:800;padding:10px 16px;border-radius:6px;"
-                    >
-                      Consulter
-                    </a>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
+                  <div style="font-size:14px;line-height:23px;color:#555555;margin-bottom:14px;">
+                    ${escapeHtml(shortPreview || "Aucun résumé disponible.")}
+                  </div>
 
-          <!-- CARD 3 -->
-          <tr>
-            <td style="padding:14px 28px 0 28px;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #ececf1;border-radius:10px;overflow:hidden;">
-                <tr>
-                  <td style="padding:18px 18px 18px 18px;">
-                    <div style="font-size:12px;line-height:16px;font-weight:800;color:#ed1e79;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">
-                      Ressource utile
-                    </div>
+                  <a
+                    href="${escapeHtmlAttribute(readLink)}"
+                    target="_blank"
+                    style="display:inline-block;background:#ed1e79;color:#ffffff;text-decoration:none;font-size:13px;line-height:18px;font-weight:800;padding:10px 16px;border-radius:6px;"
+                  >
+                    Lire la suite
+                  </a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        `;
+        DOM.cardsContainer.appendChild(row);
+      });
+    }
 
-                    <div style="font-size:22px;line-height:26px;font-weight:900;color:#111111;margin-bottom:10px;">
-                      Troisième point ou ressource
-                    </div>
+    async function copyNewsletter() {
+      try {
+        const range = document.createRange();
+        range.selectNode(DOM.newsletterWrapper);
 
-                    <div style="font-size:14px;line-height:23px;color:#555555;margin-bottom:14px;">
-                      Tu peux utiliser ce troisième bloc pour un rappel, un lien utile, une annonce,
-                      ou une ressource pratique à destination des salariés.
-                    </div>
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
 
-                    <a
-                      href="https://ton-site.fr/bulletin.html"
-                      target="_blank"
-                      style="display:inline-block;background:#ed1e79;color:#ffffff;text-decoration:none;font-size:13px;line-height:18px;font-weight:800;padding:10px 16px;border-radius:6px;"
-                    >
-                      Voir le bulletin
-                    </a>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
+        const successful = document.execCommand("copy");
+        selection.removeAllRanges();
 
-          <!-- CTA -->
-          <tr>
-            <td align="center" style="padding:28px 28px 24px 28px;">
-              <a
-                href="https://ton-site.fr/bulletin.html"
-                target="_blank"
-                style="display:inline-block;background:#111111;color:#ffffff;text-decoration:none;font-size:15px;line-height:20px;font-weight:800;padding:14px 28px;border-radius:999px;"
-              >
-                Voir le bulletin complet
-              </a>
-            </td>
-          </tr>
+        if (successful) {
+          setStatus("Newsletter copiée. Tu peux la coller dans Gmail.");
+        } else {
+          setStatus("Copie non prise en charge automatiquement. Sélectionne puis copie manuellement.");
+        }
+      } catch (error) {
+        console.error(error);
+        setStatus("Impossible de copier automatiquement. Fais un copier manuel.");
+      }
+    }
 
-          <!-- TEAM HEADER -->
-          <tr>
-            <td style="background:#ed1e79;padding:24px 22px 18px 22px;text-align:center;color:#ffffff;border-top:5px solid #c71563;">
-              <div style="font-size:24px;line-height:28px;font-weight:900;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">
-                L’ÉQUIPE SUD
-              </div>
+    function setStatus(message) {
+      DOM.statusBox.textContent = message;
+    }
 
-              <div style="display:inline-block;background:#111111;color:#ffffff;font-size:13px;line-height:18px;font-weight:700;padding:6px 12px;border-radius:4px;">
-                RS : Laurent Martens &nbsp;|&nbsp; DS : Rudy Bodart
-              </div>
-            </td>
-          </tr>
+    function buildPublicBulletinLink(docId, period) {
+      const currentUrl = window.location.href;
+      const basePath = currentUrl.includes("/Email")
+        ? currentUrl.replace(/Email\.html.*$/i, "bulletin.html")
+        : "bulletin.html";
 
-          <!-- TEAM MEMBERS -->
-          <tr>
-            <td style="padding:20px 16px 18px 16px;background:#ed1e79;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
+      if (period && period.trim()) {
+        return `${basePath}?period=${encodeURIComponent(period.trim())}`;
+      }
 
-                  <td align="center" valign="top" width="20%" style="padding:8px 6px;color:#ffffff;">
-                    <img
-                      src="https://via.placeholder.com/82x82.png?text=RB"
-                      alt="Rudy B."
-                      width="78"
-                      style="display:block;margin:0 auto 8px auto;border:3px solid #111111;border-radius:8px;"
-                    >
-                    <div style="font-size:13px;line-height:18px;font-weight:800;margin-bottom:4px;">Rudy B.</div>
-                    <div style="display:inline-block;background:#fbb034;color:#111111;font-size:12px;line-height:16px;font-weight:800;padding:3px 6px;border-radius:3px;">
-                      06.26.15.61.40
-                    </div>
-                  </td>
+      return basePath;
+    }
 
-                  <td align="center" valign="top" width="20%" style="padding:8px 6px;color:#ffffff;">
-                    <img
-                      src="https://via.placeholder.com/82x82.png?text=SB"
-                      alt="Souad B."
-                      width="78"
-                      style="display:block;margin:0 auto 8px auto;border:3px solid #111111;border-radius:8px;"
-                    >
-                    <div style="font-size:13px;line-height:18px;font-weight:800;margin-bottom:4px;">Souad B.</div>
-                    <div style="display:inline-block;background:#fbb034;color:#111111;font-size:12px;line-height:16px;font-weight:800;padding:3px 6px;border-radius:3px;">
-                      06.23.91.45.95
-                    </div>
-                  </td>
+    function sanitizeCards(cards) {
+      return cards.map((card) => ({
+        id: card.id || "",
+        type: card.type || "news",
+        title: card.title || "Information",
+        shortText: card.shortText || "",
+        longText: card.longText || "",
+        emailText: card.emailText || "",
+        link: card.link || "",
+        x: Math.max(1, Number(card.x || 1)),
+        y: Math.max(1, Number(card.y || 1))
+      }));
+    }
 
-                  <td align="center" valign="top" width="20%" style="padding:8px 6px;color:#ffffff;">
-                    <img
-                      src="https://via.placeholder.com/82x82.png?text=BB"
-                      alt="Bouchra B."
-                      width="78"
-                      style="display:block;margin:0 auto 8px auto;border:3px solid #111111;border-radius:8px;"
-                    >
-                    <div style="font-size:13px;line-height:18px;font-weight:800;margin-bottom:4px;">Bouchra B.</div>
-                    <div style="display:inline-block;background:#fbb034;color:#111111;font-size:12px;line-height:16px;font-weight:800;padding:3px 6px;border-radius:3px;">
-                      Enedis
-                    </div>
-                  </td>
+    function getTypeLabel(type) {
+      const labels = {
+        news: "Information",
+        event: "Événement",
+        info: "Actualité",
+        link: "Lien utile",
+        app: "Application",
+        image: "Image",
+        custom: "Bloc"
+      };
+      return labels[type] || "Information";
+    }
 
-                  <td align="center" valign="top" width="20%" style="padding:8px 6px;color:#ffffff;">
-                    <img
-                      src="https://via.placeholder.com/82x82.png?text=LD"
-                      alt="Latifa D."
-                      width="78"
-                      style="display:block;margin:0 auto 8px auto;border:3px solid #111111;border-radius:8px;"
-                    >
-                    <div style="font-size:13px;line-height:18px;font-weight:800;margin-bottom:4px;">Latifa D.</div>
-                    <div style="display:inline-block;background:#fbb034;color:#111111;font-size:12px;line-height:16px;font-weight:800;padding:3px 6px;border-radius:3px;">
-                      Rep. terrain
-                    </div>
-                  </td>
+    function buildPublishedDocId(period) {
+      return String(period || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^\w\s-]/g, "")
+        .trim()
+        .replace(/\s+/g, "_")
+        .toLowerCase();
+    }
 
-                  <td align="center" valign="top" width="20%" style="padding:8px 6px;color:#ffffff;">
-                    <img
-                      src="https://via.placeholder.com/82x82.png?text=JN"
-                      alt="Julien N."
-                      width="78"
-                      style="display:block;margin:0 auto 8px auto;border:3px solid #111111;border-radius:8px;"
-                    >
-                    <div style="font-size:13px;line-height:18px;font-weight:800;margin-bottom:4px;">Julien N.</div>
-                    <div style="display:inline-block;background:#fbb034;color:#111111;font-size:12px;line-height:16px;font-weight:800;padding:3px 6px;border-radius:3px;">
-                      06.17.97.31.42
-                    </div>
-                  </td>
+    function stripHtml(html) {
+      const div = document.createElement("div");
+      div.innerHTML = html || "";
+      return (div.textContent || div.innerText || "").trim();
+    }
 
-                </tr>
-              </table>
-            </td>
-          </tr>
+    function truncateText(text, max) {
+      if (!text) return "";
+      return text.length > max ? `${text.slice(0, max).trim()}…` : text;
+    }
 
-          <!-- JOIN -->
-          <tr>
-            <td style="padding:26px 28px 10px 28px;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #ececf1;border-radius:10px;overflow:hidden;background:#ffffff;">
-                <tr>
-                  <td width="180" valign="middle" align="center" style="padding:18px 12px;width:180px;">
-                    <img
-                      src="https://via.placeholder.com/150x150.png?text=SUD+APP"
-                      alt="Application SUD"
-                      width="140"
-                      style="display:block;border:3px solid #111111;border-radius:10px;"
-                    >
-                  </td>
+    function escapeHtml(val) {
+      return String(val ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
 
-                  <td valign="middle" style="padding:18px 18px 18px 6px;">
-                    <div style="font-size:24px;line-height:28px;font-weight:900;color:#111111;margin-bottom:8px;text-transform:uppercase;">
-                      Rejoignez SUD
-                    </div>
-
-                    <div style="font-size:14px;line-height:23px;color:#555555;margin-bottom:14px;">
-                      Retrouve les actualités, les informations utiles et les ressources importantes
-                      directement sur l’application mobile.
-                    </div>
-
-                    <a
-                      href="https://play.google.com/store"
-                      target="_blank"
-                      style="display:inline-block;background:#fbb034;color:#111111;text-decoration:none;font-size:13px;line-height:18px;font-weight:900;padding:10px 16px;border-radius:6px;border:2px solid #111111;"
-                    >
-                      Télécharger l’application
-                    </a>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- FOOTER -->
-          <tr>
-            <td style="padding:24px 20px 28px 20px;text-align:center;">
-              <div style="font-size:12px;line-height:19px;color:#777777;">
-                <strong style="color:#ed1e79;">FRÉQUENCE SUD</strong> — Bulletin syndical<br>
-                © 2026 — Équipe SUD
-              </div>
-            </td>
-          </tr>
-
-        </table>
-
-      </td>
-    </tr>
-  </table>
+    function escapeHtmlAttribute(val) {
+      return escapeHtml(val).replaceAll("`", "&#096;");
+    }
+  </script>
 
 </body>
 </html>
