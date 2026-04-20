@@ -968,7 +968,17 @@ button:active{
   border-color: rgba(255,255,255,0.18);
   color: #ffffff;
 }
+.dashboard-layout.sidebar-hidden{
+  grid-template-columns: 0 minmax(0, 1fr);
+}
 
+.dashboard-layout.sidebar-hidden .left-panel{
+  display: none;
+}
+
+.dashboard-layout{
+  transition: grid-template-columns .25s ease;
+}
 .v3-card.is-resizing{
   opacity: .92;
 }
