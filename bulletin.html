@@ -606,6 +606,57 @@
         max-height:calc(100vh - 24px);
       }
     }
+    .site-title{
+  position:relative;
+  font-weight:900;
+  letter-spacing:-.04em;
+}
+
+.glitch{
+  position:relative;
+  display:inline-block;
+}
+
+.glitch::before,
+.glitch::after{
+  content:attr(data-text);
+  position:absolute;
+  left:0;
+  top:0;
+  width:100%;
+  overflow:hidden;
+  pointer-events:none;
+}
+
+.glitch::before{
+  color:#ffd1e7;
+  transform:translate(2px,0);
+  opacity:.7;
+}
+
+.glitch::after{
+  color:#fff8c9;
+  transform:translate(-2px,0);
+  opacity:.7;
+}
+
+/* animation douce */
+@keyframes glitchAnim{
+  0%{ transform:translate(0) }
+  20%{ transform:translate(-1px,1px) }
+  40%{ transform:translate(1px,-1px) }
+  60%{ transform:translate(-1px,0) }
+  80%{ transform:translate(1px,1px) }
+  100%{ transform:translate(0) }
+}
+
+.glitch.active::before{
+  animation:glitchAnim .35s linear;
+}
+
+.glitch.active::after{
+  animation:glitchAnim .35s linear reverse;
+}
   </style>
 </head>
 <body>
@@ -614,8 +665,8 @@
     <div class="top-banner-inner">
       <div class="top-line">
         <div>
-          <h1 class="site-title">
-            <span class="glish" id="siteTitle" data-text="FréquenCE SUD">FréquenCE SUD</span>
+          <h1 class="site-title glitch" id="siteTitle" data-text="FréquenCE SUD">
+            FréquenCE SUD
           </h1>
           <p class="top-subtitle" id="siteSubtitle">Bulletin syndical de chargement…</p>
         </div>
@@ -1088,6 +1139,18 @@
       const brightness = (r * 299 + g * 587 + b * 114) / 1000;
       return brightness < 150;
     }
+    function triggerGlitch(){
+  const el = document.getElementById("siteTitle");
+
+  el.classList.remove("active");
+  void el.offsetWidth;
+  el.classList.add("active");
+}
+
+/* glitch léger toutes les 6 à 12 secondes */
+setInterval(()=>{
+  triggerGlitch();
+}, 6000 + Math.random()*6000);
   </script>
 </body>
 </html>
