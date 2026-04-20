@@ -480,26 +480,31 @@
     }
 
     .team-band{
-      background:linear-gradient(135deg, var(--pink) 0%, #ff5fb1 100%);
-      color:#fff;
-      border-radius:0;
-      padding:24px 22px;
-      border-top:4px solid var(--pink-dark);
-      margin-bottom:0;
-    }
+  width:100%;
+  background:linear-gradient(135deg, var(--pink) 0%, #ff5fb1 100%);
+  color:#fff;
+  border-top:4px solid var(--pink-dark);
+  margin-top:8px;
+}
 
-    .team-band h4{
-      margin:0 0 8px;
-      font-size:1.25rem;
-      font-weight:900;
-      letter-spacing:-.03em;
-    }
+.team-band-inner{
+  max-width:var(--maxw);
+  margin:0 auto;
+  padding:24px 16px;
+}
 
-    .team-band p{
-      margin:0;
-      line-height:1.7;
-      opacity:.98;
-    }
+.team-band h4{
+  margin:0 0 8px;
+  font-size:1.25rem;
+  font-weight:900;
+  letter-spacing:-.03em;
+}
+
+.team-band p{
+  margin:0;
+  line-height:1.7;
+  opacity:.98;
+}
 
     .footer{
       text-align:center;
@@ -734,7 +739,8 @@
       </div>
     </section>
 
-    <section class="team-band">
+      </main>
+<section class="team-band">
       <h4>L’équipe SUD</h4>
       <p>
         Ce bulletin est mis à disposition par l’équipe SUD afin d’informer les salariés sur les actualités, les informations utiles, les communications syndicales et les sujets du moment.
@@ -745,7 +751,6 @@
       <strong id="footerTitle">FréquenCE SUD</strong> — <span id="footerPeriod">Période</span><br>
       © <span id="footerYear"></span> — Bulletin public salariés
     </footer>
-  </main>
 
   <div id="cardModal" class="modal">
     <div class="modal-content">
