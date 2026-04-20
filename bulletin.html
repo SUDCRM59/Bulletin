@@ -108,7 +108,19 @@
       text-transform:uppercase;
       margin-bottom:12px;
     }
+.journal-header-row{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  flex-wrap:wrap;
+}
 
+.logo-sud{
+  height:64px;
+  width:auto;
+  object-fit:contain;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,.15));
+}
     .site-title{
       position:relative;
       margin:0;
@@ -155,7 +167,110 @@
       opacity:.7;
       animation:glitchAfter .42s steps(2, end);
     }
+.glitch-strong{
+  position:relative;
+  display:inline-block;
+}
 
+.glitch-strong::before,
+.glitch-strong::after{
+  content:attr(data-text);
+  position:absolute;
+  left:0;
+  top:0;
+  width:100%;
+  overflow:hidden;
+  pointer-events:none;
+}
+
+.glitch-strong::before{
+  color:#ffd6ea;
+  text-shadow:
+    2px 0 #ff5fb1,
+    -1px 0 #fff;
+
+  clip-path: inset(0 0 0 0);
+  opacity:0;
+}
+
+.glitch-strong::after{
+  color:#fff3c1;
+
+  text-shadow:
+    -2px 0 #fbb034,
+    1px 0 #fff;
+
+  clip-path: inset(0 0 0 0);
+  opacity:0;
+}
+
+.glitch-strong.active::before{
+  opacity:.9;
+  animation:glitchStrong1 .45s linear;
+}
+
+.glitch-strong.active::after{
+  opacity:.8;
+  animation:glitchStrong2 .45s linear;
+}
+
+@keyframes glitchStrong1{
+
+  0%{
+    transform:translate(0);
+    clip-path: inset(0 0 80% 0);
+  }
+
+  20%{
+    transform:translate(-3px,1px);
+    clip-path: inset(20% 0 55% 0);
+  }
+
+  40%{
+    transform:translate(3px,-1px);
+    clip-path: inset(60% 0 5% 0);
+  }
+
+  60%{
+    transform:translate(-2px,0);
+    clip-path: inset(35% 0 35% 0);
+  }
+
+  100%{
+    transform:translate(0);
+    opacity:0;
+  }
+
+}
+
+@keyframes glitchStrong2{
+
+  0%{
+    transform:translate(0);
+    clip-path: inset(75% 0 0 0);
+  }
+
+  20%{
+    transform:translate(3px,-1px);
+    clip-path: inset(5% 0 70% 0);
+  }
+
+  40%{
+    transform:translate(-3px,1px);
+    clip-path: inset(45% 0 25% 0);
+  }
+
+  60%{
+    transform:translate(2px,0);
+    clip-path: inset(65% 0 10% 0);
+  }
+
+  100%{
+    transform:translate(0);
+    opacity:0;
+  }
+
+}
     @keyframes glitchBefore{
       0%{ transform:translate(0,0); clip-path:inset(0 0 84% 0); }
       20%{ transform:translate(2px,-1px); clip-path:inset(18% 0 58% 0); }
@@ -881,29 +996,72 @@
 </head>
 <body>
 
-  <header class="top-banner">
-    <div class="top-banner-inner">
-      <div class="journal-kicker">Bulletin syndical</div>
+<header class="top-banner">
 
-      <h1 class="site-title glitch" id="siteTitle" data-text="FréquenCE SUD">
+  <div class="top-banner-inner">
+
+    <div class="journal-kicker">
+      Bulletin syndical
+    </div>
+
+    <div class="journal-header-row">
+
+      <img 
+        src="assets/img/logo-sud.png" 
+        alt="Logo SUD"
+        class="logo-sud"
+      >
+
+      <h1 
+        class="site-title glitch-strong"
+        id="siteTitle"
+        data-text="FréquenCE SUD"
+      >
         FréquenCE SUD
       </h1>
 
-      <div class="journal-meta-row">
-        <div class="journal-meta-left">
-          <span class="journal-meta-item">Édition publique salariés</span>
-          <span class="journal-sep"></span>
-          <span class="journal-meta-item" id="siteSubtitle">Bulletin syndical de chargement…</span>
-        </div>
-
-        <div class="top-actions">
-          <button class="top-btn" id="scrollCardsBtn">Lire le bulletin</button>
-          <button class="top-btn" id="reloadBtn">Actualiser</button>
-        </div>
-      </div>
     </div>
-  </header>
 
+    <div class="journal-meta-row">
+
+      <div class="journal-meta-left">
+        <span class="journal-meta-item">
+          Édition publique salariés
+        </span>
+
+        <span class="journal-sep"></span>
+
+        <span 
+          class="journal-meta-item"
+          id="siteSubtitle"
+        >
+          Bulletin syndical de ...
+        </span>
+      </div>
+
+      <div class="top-actions">
+
+        <button 
+          class="top-btn"
+          id="scrollCardsBtn"
+        >
+          Lire le bulletin
+        </button>
+
+        <button 
+          class="top-btn"
+          id="reloadBtn"
+        >
+          Actualiser
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</header>
   <main class="page-wrap">
     <section class="intro-block">
       <p id="introText">
