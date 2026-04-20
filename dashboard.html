@@ -1,404 +1,304 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>Dashboard Bulletin</title>
+  <meta charset="UTF-8">
+  <title>Dashboard V3 - Frequence SUD</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="assets/img/logo.gif" sizes="any">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-<link rel="stylesheet" href="assets/css/dashboard.css">
-
-<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-
+  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/dashboard.css">
 </head>
-
 <body>
 
-<header class="topbar">
-
-<div class="topbar-left">
-<h1>Frequence SUD</h1>
-<input
-type="text"
-id="bulletinPeriod"
-placeholder="Période du bulletin"
->
-</div>
-
-<div class="topbar-actions">
-
-<button id="addCardBtn">
-➕ Carte
-</button>
-
-<button id="publishWebBtn">
-🌐 Publier Web
-</button>
-
-<button id="publishEmailBtn">
-📧 Publier Email
-</button>
-
-<button id="openArchivesBtn">
-📂 Archives
-</button>
-
-<button id="logoutBtn">
-🚪 Déconnexion
-</button>
-
-</div>
-
-</header>
-
-
-
-<main class="dashboard-main">
-
-<div class="board-wrapper">
-
-<div
-class="bento-board"
-id="bentoBoard"
->
-
-</div>
-
-</div>
-
-</main>
-
-
-
-<div
-class="modal"
-id="cardModal"
->
-
-<div class="modal-content">
-
-<div class="modal-header">
-
-<h2>
-Carte
-</h2>
-
-<button
-class="close-modal"
-id="closeModal"
->
-✕
-</button>
-
-</div>
-
-
-
-<div class="modal-body">
-
-<div class="form-grid">
-
-
-<div class="form-group">
-
-<label>
-Titre
-</label>
-
-<input
-type="text"
-id="cardTitle"
->
-
-</div>
-
-
-
-<div class="form-group">
-
-<label>
-Type de carte
-</label>
-
-<select id="cardType">
-
-<option value="news">
-Actu
-</option>
-
-<option value="event">
-Événement
-</option>
-
-<option value="info">
-Info
-</option>
-
-<option value="link">
-Lien
-</option>
-
-<option value="app">
-Application
-</option>
-
-<option value="custom">
-Personnalisée
-</option>
-
-</select>
-
-</div>
-
-
-
-<div class="form-group">
-
-<label>
-Icône / emoji
-</label>
-
-<input
-type="text"
-id="cardIcon"
-placeholder="📢"
->
-
-</div>
-
-
-
-<div class="form-group">
-
-<label>
-Lien
-</label>
-
-<input
-type="text"
-id="cardLink"
-placeholder="https://"
->
-
-</div>
-
-
-
-<div class="form-group">
-
-<label>
-Image de fond
-</label>
-
-<input
-type="text"
-id="cardImage"
-placeholder="https://..."
->
-
-</div>
-
-
-
-<div class="form-group">
-
-<label>
-Couleur fond
-</label>
-
-<input
-type="color"
-id="cardBgColor"
-value="#ffffff"
->
-
-</div>
-
-
-
-<div class="form-group">
-
-<label>
-Largeur
-</label>
-
-<select id="cardColSpan">
-
-<option value="1">
-1
-</option>
-
-<option value="2">
-2
-</option>
-
-<option value="3">
-3
-</option>
-
-<option value="4">
-4
-</option>
-
-</select>
-
-</div>
-
-
-
-<div class="form-group">
-
-<label>
-Hauteur
-</label>
-
-<select id="cardRowSpan">
-
-<option value="1">
-1
-</option>
-
-<option value="2">
-2
-</option>
-
-</select>
-
-</div>
-
-
-
-<div class="form-group full">
-
-<label>
-Texte court
-</label>
-
-<div id="shortTextEditor">
-
-</div>
-
-</div>
-
-
-
-<div class="form-group full">
-
-<label>
-Texte long
-</label>
-
-<div id="longTextEditor">
-
-</div>
-
-</div>
-
-
-
-<div class="form-group full">
-
-<label>
-Texte email
-</label>
-
-<textarea
-id="cardEmailText"
-rows="3"
-></textarea>
-
-</div>
-
-
-
-</div>
-
-</div>
-
-
-
-<div class="modal-footer">
-
-<button
-class="btn-secondary"
-id="deleteCardBtn"
->
-Supprimer
-</button>
-
-<button
-class="btn-primary"
-id="saveCardBtn"
->
-Enregistrer
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-
-
-<div
-class="modal"
-id="archiveModal"
->
-
-<div class="modal-content small">
-
-<div class="modal-header">
-
-<h2>
-Archives
-</h2>
-
-<button
-class="close-modal"
-data-close="archiveModal"
->
-✕
-</button>
-
-</div>
-
-
-
-<select
-id="archiveSelect"
->
-
-</select>
-
-
-
-<button
-class="btn-primary full"
-id="loadArchiveBtn"
->
-Charger
-</button>
-
-</div>
-
-</div>
-
-
-
-<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-
-<script src="assets/js/dashboard.js"></script>
-<div id="toast" class="toast">
-  <span id="toastText">Brouillon enregistré</span>
-</div>
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="brand-block">
+        <h1>Frequence SUD</h1>
+        <p>Builder V3</p>
+      </div>
+
+      <div class="period-block">
+        <label for="bulletinPeriod">Période</label>
+        <input type="text" id="bulletinPeriod" placeholder="Ex : Mai 2026">
+      </div>
+
+      <div class="period-block small">
+        <label for="bulletinTitle">Titre</label>
+        <input type="text" id="bulletinTitle" placeholder="Titre du bulletin">
+      </div>
+    </div>
+
+    <div class="topbar-actions">
+      <button id="addCardBtn" class="btn-primary">➕ Carte</button>
+      <button id="saveDraftBtn" class="btn-secondary">💾 Brouillon</button>
+      <button id="publishWebBtn" class="btn-primary">🌐 Publier Web</button>
+      <button id="publishEmailBtn" class="btn-primary">📧 Publier Email</button>
+      <button id="openArchivesBtn" class="btn-secondary">📂 Archives</button>
+      <button id="logoutBtn" class="btn-danger">🚪 Déconnexion</button>
+    </div>
+  </header>
+
+  <main class="dashboard-layout">
+
+    <aside class="left-panel">
+      <section class="panel-card">
+        <div class="panel-card-header">
+          <h2>Grille</h2>
+        </div>
+
+        <div class="form-stack">
+          <div class="form-group">
+            <label for="gridColumns">Colonnes</label>
+            <select id="gridColumns">
+              <option value="4">4 colonnes</option>
+              <option value="5">5 colonnes</option>
+              <option value="6">6 colonnes</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="gridRowHeight">Hauteur ligne</label>
+            <select id="gridRowHeight">
+              <option value="140">140 px</option>
+              <option value="160">160 px</option>
+              <option value="180" selected>180 px</option>
+              <option value="200">200 px</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="gridGap">Espacement</label>
+            <select id="gridGap">
+              <option value="12">12 px</option>
+              <option value="16" selected>16 px</option>
+              <option value="20">20 px</option>
+              <option value="24">24 px</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel-card">
+        <div class="panel-card-header">
+          <h2>Carte sélectionnée</h2>
+        </div>
+
+        <div id="selectedCardInfo" class="empty-state compact">
+          Aucune carte sélectionnée
+        </div>
+
+        <div id="quickCardActions" class="quick-actions hidden">
+          <button id="editSelectedCardBtn" class="btn-secondary full">✏️ Modifier</button>
+          <button id="duplicateSelectedCardBtn" class="btn-secondary full">⧉ Dupliquer</button>
+          <button id="deleteSelectedCardBtn" class="btn-danger full">🗑 Supprimer</button>
+        </div>
+      </section>
+
+      <section class="panel-card">
+        <div class="panel-card-header">
+          <h2>Aide rapide</h2>
+        </div>
+
+        <div class="help-list">
+          <p>• Clique sur une carte pour la sélectionner</p>
+          <p>• Déplace-la dans la grille</p>
+          <p>• Redimensionne-la dans la fenêtre d’édition</p>
+          <p>• Publie seulement quand ton brouillon est prêt</p>
+        </div>
+      </section>
+    </aside>
+
+    <section class="workspace">
+      <div class="workspace-header">
+        <div>
+          <h2>Plan de mise en page</h2>
+          <p>Grille visuelle avec positions réelles</p>
+        </div>
+
+        <div class="workspace-actions">
+          <button id="toggleGridBtn" class="btn-secondary"># Grille</button>
+          <button id="fitBoardBtn" class="btn-secondary">↔ Ajuster</button>
+        </div>
+      </div>
+
+      <div class="board-shell">
+        <div id="boardCanvas" class="board-canvas show-grid">
+          <div id="boardGrid" class="board-grid"></div>
+          <div id="cardsLayer" class="cards-layer"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div id="cardModal" class="modal">
+    <div class="modal-content large">
+
+      <div class="modal-header">
+        <div>
+          <h2>Éditer la carte</h2>
+          <p>Contenu, taille, position et apparence</p>
+        </div>
+        <button id="closeModal" class="close-modal" type="button">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+
+          <div class="modal-section">
+            <h3>Contenu</h3>
+
+            <div class="form-group">
+              <label for="cardTitle">Titre</label>
+              <input type="text" id="cardTitle" placeholder="Titre de la carte">
+            </div>
+
+            <div class="form-group">
+              <label for="cardType">Type</label>
+              <select id="cardType">
+                <option value="news">Actu</option>
+                <option value="event">Événement</option>
+                <option value="info">Info</option>
+                <option value="link">Lien</option>
+                <option value="app">Application</option>
+                <option value="image">Image</option>
+                <option value="custom">Personnalisée</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="cardIcon">Icône / Emoji</label>
+              <input type="text" id="cardIcon" placeholder="📢">
+            </div>
+
+            <div class="form-group full">
+              <label>Texte court</label>
+              <div id="shortTextEditor" class="editor-box"></div>
+            </div>
+
+            <div class="form-group full">
+              <label>Texte long</label>
+              <div id="longTextEditor" class="editor-box large"></div>
+            </div>
+
+            <div class="form-group full">
+              <label for="cardEmailText">Résumé email</label>
+              <textarea id="cardEmailText" rows="4" placeholder="Résumé court pour l’email"></textarea>
+            </div>
+          </div>
+
+          <div class="modal-section">
+            <h3>Disposition</h3>
+
+            <div class="form-row two-cols">
+              <div class="form-group">
+                <label for="cardX">Colonne</label>
+                <input type="number" id="cardX" min="1" value="1">
+              </div>
+
+              <div class="form-group">
+                <label for="cardY">Ligne</label>
+                <input type="number" id="cardY" min="1" value="1">
+              </div>
+            </div>
+
+            <div class="form-row two-cols">
+              <div class="form-group">
+                <label for="cardW">Largeur</label>
+                <select id="cardW">
+                  <option value="1">1 colonne</option>
+                  <option value="2">2 colonnes</option>
+                  <option value="3">3 colonnes</option>
+                  <option value="4">4 colonnes</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="cardH">Hauteur</label>
+                <select id="cardH">
+                  <option value="1">1 ligne</option>
+                  <option value="2">2 lignes</option>
+                  <option value="3">3 lignes</option>
+                  <option value="4">4 lignes</option>
+                </select>
+              </div>
+            </div>
+
+            <h3>Apparence</h3>
+
+            <div class="form-group">
+              <label for="cardLink">Lien</label>
+              <input type="text" id="cardLink" placeholder="https://...">
+            </div>
+
+            <div class="form-group">
+              <label for="cardImage">Image de fond</label>
+              <input type="text" id="cardImage" placeholder="https://...">
+            </div>
+
+            <div class="form-group">
+              <label for="cardBgColor">Couleur de fond</label>
+              <input type="color" id="cardBgColor" value="#ffffff">
+            </div>
+
+            <div class="form-group">
+              <label for="cardTextColorMode">Texte</label>
+              <select id="cardTextColorMode">
+                <option value="auto">Automatique</option>
+                <option value="dark">Texte sombre</option>
+                <option value="light">Texte clair</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="duplicateCardBtn" class="btn-secondary" type="button">⧉ Dupliquer</button>
+        <button id="deleteCardBtn" class="btn-danger" type="button">🗑 Supprimer</button>
+        <button id="saveCardBtn" class="btn-primary" type="button">Enregistrer</button>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="archiveModal" class="modal">
+    <div class="modal-content small">
+      <div class="modal-header">
+        <div>
+          <h2>Archives publiées</h2>
+          <p>Charger un bulletin publié dans le brouillon</p>
+        </div>
+        <button class="close-modal" data-close="archiveModal" type="button">✕</button>
+      </div>
+
+      <div class="modal-body single-column">
+        <div class="form-group">
+          <label for="archiveSelect">Choisir une archive</label>
+          <select id="archiveSelect"></select>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="loadArchiveBtn" class="btn-primary full" type="button">Charger</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">
+    <span id="toastText">Brouillon enregistré</span>
+  </div>
+
+  <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <script src="assets/js/dashboard.js"></script>
 </body>
 </html>
