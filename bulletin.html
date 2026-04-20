@@ -773,6 +773,110 @@
         max-height:calc(100vh - 24px);
       }
     }
+    .join-band{
+  margin-top: 28px;
+  margin-bottom: 24px;
+}
+
+.join-band-inner{
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.join-title{
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 900;
+  margin-bottom: 18px;
+  letter-spacing: .03em;
+}
+
+.join-card{
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 26px;
+  align-items: center;
+
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  padding: 22px;
+
+  box-shadow: var(--shadow);
+}
+
+.join-card-visual{
+  display: flex;
+  justify-content: center;
+}
+
+.join-image{
+  width: 100%;
+  max-width: 240px;
+  border-radius: 12px;
+}
+
+.join-card-content h4{
+  margin: 0 0 8px;
+  font-size: 1.2rem;
+  font-weight: 900;
+  letter-spacing: -.02em;
+}
+
+.join-card-content p{
+  margin: 0 0 12px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.join-btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 12px 18px;
+  border-radius: 999px;
+
+  background: var(--pink);
+  color: #fff;
+
+  font-weight: 800;
+  font-size: .95rem;
+
+  box-shadow: 0 8px 20px rgba(237,30,121,.18);
+
+  transition: .2s;
+}
+
+.join-btn:hover{
+  background: var(--pink-dark);
+  transform: translateY(-1px);
+}
+
+.join-small{
+  margin-top: 8px;
+  font-size: .85rem;
+  color: #777;
+}
+
+/* responsive */
+
+@media (max-width: 800px){
+
+  .join-card{
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .join-card-visual{
+    order: -1;
+  }
+
+  .join-image{
+    max-width: 180px;
+  }
+
+}
   </style>
 </head>
 <body>
@@ -841,7 +945,7 @@
         <img src="membres/rb.jpg" alt="Rudy Bodart" class="team-member-photo">
         <h5>Rudy Bodart</h5>
         <p>EHS</p>
-        <span>06.00.00.00.00</span>
+        <span>06.26.15.61.40</span>
       </article>
       
       <article class="team-member-card">
@@ -855,14 +959,14 @@
         <img src="membres/bb.jpg" alt="Bouchra Bensaddik" class="team-member-photo">
         <h5>Bouchra Bensaddik</h5>
         <p>Enedis</p>
-        <span>06.00.00.00.00</span>
+        <span></span>
       </article>
 
       <article class="team-member-card">
         <img src="membres/ld.jpg" alt="Latifa Daussy" class="team-member-photo">
         <h5>Latifa Daussy</h5>
         <p>Enedis</p>
-        <span>06.00.00.00.00</span>
+        <span></span>
       </article>
 
       <article class="team-member-card">
@@ -873,6 +977,52 @@
       </article>
 
     </div>
+  </div>
+</section>
+    <section class="join-band">
+  <div class="join-band-inner">
+
+    <h3 class="join-title">
+      REJOIGNEZ SUD
+    </h3>
+
+    <div class="join-card">
+
+      <div class="join-card-visual">
+        <img 
+          src="assets/img/sud-app.png" 
+          alt="Application mobile SUD"
+          class="join-image"
+        >
+      </div>
+
+      <div class="join-card-content">
+
+        <h4>
+          L'application mobile du syndicat SUD P2ST est disponible
+        </h4>
+
+        <p>
+          Retrouvez les actualités, vos droits, la convention collective
+          et les informations utiles directement sur votre téléphone.
+        </p>
+
+        <a 
+          href="https://play.google.com/store" 
+          target="_blank"
+          class="join-btn"
+        >
+          Télécharger l'application
+        </a>
+
+        <p class="join-small">
+          Disponible sur Android et Apple Store
+        </p>
+
+      </div>
+
+    </div>
+
   </div>
 </section>
       </main>
