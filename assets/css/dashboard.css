@@ -939,3 +939,36 @@ button:active{
     width: 100%;
   }
 }
+.resize-handle{
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 3;
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  border: 1px solid rgba(221, 228, 239, 0.95);
+  background: rgba(248,250,255,0.95);
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: inherit;
+  font-size: .95rem;
+  cursor: nwse-resize;
+  box-shadow: 0 4px 12px rgba(15,23,42,.05);
+}
+
+.resize-handle:hover{
+  background: #ffffff;
+}
+
+.v3-card.text-light .resize-handle{
+  background: rgba(255,255,255,0.14);
+  border-color: rgba(255,255,255,0.18);
+  color: #ffffff;
+}
+
+.v3-card.is-resizing{
+  opacity: .92;
+}
