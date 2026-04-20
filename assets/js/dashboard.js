@@ -317,7 +317,22 @@ function getMaxRows() {
     ...cardsData.map((card) => Number(card.y || 1) + Number(card.h || 1) - 1)
   );
 }
+async function handleAddCard() {
+  const newCard = createEmptyCard();
+  cardsData.push(newCard);
+  selectedCardId = newCard.id;
 
+  try {
+    await saveDraftToFirestore();
+    renderBoard();
+    updateSelectedCardPanel();
+    openCardEditor(newCard.id);
+    showToast("Nouvelle carte ajoutée");
+  } catch (error) {
+    console.error("Erreur ajout carte :", error);
+    alert("Impossible d'ajouter la carte.");
+  }
+}
 /* =========================
    RENDER
 ========================= */
