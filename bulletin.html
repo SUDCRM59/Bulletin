@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>FréquenCE SUD - Bulletin officiel</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
   <link rel="icon" href="assets/img/logo.gif" sizes="any">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,6 +23,8 @@
       --muted: #555;
       --glass-bg: rgba(255, 255, 255, 0.5);
       --line: rgba(0,0,0,.12);
+      --shadow-soft: 0 8px 25px rgba(0,0,0,0.05);
+      --shadow-strong: 10px 10px 0 rgba(0,0,0,0.05);
     }
 
     * { box-sizing: border-box; }
@@ -42,8 +43,7 @@
 
     .animated-bg {
       position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
+      inset: 0;
       z-index: -1;
       overflow: hidden;
       background: #fdfbfd;
@@ -55,6 +55,7 @@
       filter: blur(80px);
       animation: float 20s infinite alternate ease-in-out;
       opacity: 0.5;
+      pointer-events: none;
     }
 
     .orb-1 {
@@ -82,22 +83,21 @@
 
     .punk-header-wrapper {
       position: relative;
-      width: 100vw;
-      padding: 70px 0 46px 0;
-      background: transparent;
+      width: 100%;
+      padding: 56px 0 32px;
       z-index: 10;
     }
 
     .punk-ribbon {
       background: var(--punk-pink);
-      transform: rotate(-4deg) scale(1.05);
-      padding: 30px 16px;
+      transform: rotate(-3.2deg) scale(1.03);
+      padding: 28px 16px 34px;
       position: relative;
       display: flex;
       justify-content: center;
       border-top: 4px solid #111;
       border-bottom: 5px solid #111;
-      box-shadow: inset 0 4px 0 rgba(255,255,255,0.4), 0 20px 40px rgba(0,0,0,0.1);
+      box-shadow: inset 0 4px 0 rgba(255,255,255,0.4), 0 20px 40px rgba(0,0,0,0.08);
     }
 
     .punk-ribbon-content {
@@ -107,30 +107,33 @@
       display: flex;
       align-items: center;
       justify-content: flex-start;
+      min-height: 140px;
     }
 
     .punk-logo-zone {
       position: relative;
       margin-right: -20px;
       z-index: 5;
+      flex-shrink: 0;
     }
 
     .logo-sud {
       height: 120px;
       object-fit: contain;
       filter: drop-shadow(5px 5px 0 rgba(255,255,255,0.9)) drop-shadow(1px 1px 0 #111);
-      transform: rotate(-3deg) scale(1.1);
+      transform: rotate(-3deg) scale(1.08);
       transition: 0.3s;
       cursor: pointer;
+      display: block;
     }
 
     .logo-sud:hover {
-      transform: rotate(1deg) scale(1.2);
+      transform: rotate(1deg) scale(1.16);
     }
 
     .ekg-track {
       position: absolute;
-      bottom: -6px;
+      bottom: -4px;
       left: 100px;
       display: flex;
       align-items: flex-end;
@@ -145,6 +148,7 @@
       height: 3px;
       background: #111;
       margin-bottom: 25px;
+      flex-shrink: 0;
     }
 
     .ekg-spike {
@@ -168,38 +172,41 @@
       margin-left: 20px;
       position: relative;
       z-index: 4;
+      min-width: 0;
     }
 
     .site-title {
       font-family: 'Bangers', cursive, 'Inter';
-      font-size: clamp(3rem, 7vw, 6.5rem);
-      margin: 0 0 -5px 0;
+      font-size: clamp(3rem, 7vw, 6.2rem);
+      margin: 0 0 -2px 0;
       color: #111;
       text-transform: uppercase;
-      line-height: 0.9;
+      line-height: 0.88;
       letter-spacing: 2px;
-      transform: translateY(-2px);
+      transform: translateY(-8px);
       text-shadow: 2px 2px 0 rgba(255,255,255,0.7);
+      word-break: break-word;
     }
 
     .site-subtitle-tag {
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 900;
-      font-size: 1.02rem;
+      font-size: 1rem;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       margin-left: 5px;
-      margin-top: 6px;
+      margin-top: 12px;
       background: #111;
       color: #fff;
       display: inline-block;
-      padding: 5px 12px;
+      padding: 6px 12px;
       transform: rotate(1deg);
+      max-width: fit-content;
     }
 
     .controls-band {
       max-width: 1240px;
-      margin: -20px auto 34px;
+      margin: -12px auto 28px;
       padding: 0 20px;
       display: flex;
       justify-content: flex-end;
@@ -210,7 +217,7 @@
     }
 
     .top-btn {
-      padding: 12px 24px;
+      padding: 12px 22px;
       border-radius: 999px;
       font-family: 'Space Grotesk';
       font-size: 14px;
@@ -219,14 +226,14 @@
       color: #fff;
       font-weight: 700;
       cursor: pointer;
-      transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.2);
     }
 
     .top-btn:hover {
       background: var(--punk-pink);
       border-color: #111;
       color: #111;
-      transform: translateY(-4px);
+      transform: translateY(-3px);
       box-shadow: 6px 6px 0 rgba(0,0,0,1);
     }
 
@@ -290,7 +297,7 @@
     .page-wrap {
       max-width: 1240px;
       margin: 0 auto;
-      padding: 10px 16px 60px;
+      padding: 10px 16px 56px;
       position: relative;
       z-index: 5;
     }
@@ -302,10 +309,10 @@
       border-radius: 12px;
       padding: 24px;
       margin-bottom: 30px;
-      position: relative;
       font-family: 'Space Grotesk';
       font-weight: 600;
       box-shadow: 8px 8px 0 rgba(0,0,0,0.06);
+      line-height: 1.65;
     }
 
     .board {
@@ -315,16 +322,18 @@
       gap: var(--gap, 24px);
       margin-bottom: 40px;
       perspective: 2000px;
+      align-items: stretch;
     }
 
     .bulletin-card-container {
       position: relative;
       border-radius: 24px;
       opacity: 0;
-      transform: translateY(50px) scale(0.9) rotateX(-20deg);
-      animation: explodeIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards;
+      transform: translateY(40px) scale(0.94) rotateX(-16deg);
+      animation: explodeIn 0.75s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards;
       transform-style: preserve-3d;
       cursor: pointer;
+      min-width: 0;
     }
 
     @keyframes explodeIn {
@@ -340,15 +349,16 @@
       backdrop-filter: blur(25px);
       border: 1px solid rgba(255,255,255,0.9);
       border-radius: 20px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+      box-shadow: var(--shadow-soft);
       overflow: hidden;
       transform-style: preserve-3d;
       transition: transform 0.4s ease-out, box-shadow 0.4s ease, border-color 0.4s ease;
       position: relative;
+      min-width: 0;
     }
 
     .bulletin-card-container:hover .bulletin-card-tilt {
-      box-shadow: 0 30px 60px rgba(253, 104, 186, 0.4);
+      box-shadow: 0 24px 50px rgba(253, 104, 186, 0.32);
       border-color: rgba(253, 104, 186, 1);
     }
 
@@ -381,7 +391,8 @@
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-      padding: 20px;
+      gap: 12px;
+      padding: 20px 20px 0;
       transform: translateZ(25px);
     }
 
@@ -395,6 +406,7 @@
       text-transform: uppercase;
       font-family: 'Space Grotesk', sans-serif;
       letter-spacing: 1px;
+      max-width: 75%;
     }
 
     .text-light .card-type {
@@ -403,8 +415,9 @@
     }
 
     .card-icon {
-      font-size: 2.2rem;
-      transform: translateZ(40px);
+      font-size: 2.1rem;
+      transform: translateZ(35px);
+      flex-shrink: 0;
     }
 
     .card-body {
@@ -413,15 +426,17 @@
       flex-direction: column;
       flex: 1;
       transform: translateZ(15px);
+      min-width: 0;
     }
 
     .card-title {
       font-family: 'Space Grotesk', sans-serif;
       margin: 0 0 10px;
-      font-size: 1.35rem;
+      font-size: 1.32rem;
       font-weight: 900;
       line-height: 1.08;
       letter-spacing: -0.5px;
+      word-break: break-word;
     }
 
     .card-short {
@@ -430,6 +445,7 @@
       font-size: 0.95rem;
       font-weight: 500;
       color: #444;
+      word-break: break-word;
     }
 
     .text-light .card-short { color: #efefef; }
@@ -439,7 +455,7 @@
       display: flex;
       justify-content: flex-end;
       padding-top: 15px;
-      transform: translateZ(30px);
+      transform: translateZ(25px);
     }
 
     .card-link {
@@ -452,6 +468,7 @@
       text-transform: uppercase;
       font-size: 0.75rem;
       transition: 0.2s;
+      white-space: nowrap;
     }
 
     .bulletin-card-container:hover .card-link {
@@ -466,19 +483,19 @@
       backdrop-filter: blur(25px);
       border: 2px dashed rgba(0,0,0,0.1);
       border-radius: 20px;
-      padding: 35px;
+      padding: 32px;
       margin-bottom: 30px;
-      box-shadow: 10px 10px 0 rgba(0,0,0,0.03);
+      box-shadow: var(--shadow-strong);
       position: relative;
       overflow: hidden;
     }
 
     .archives-block h3 {
       font-family: 'Bangers', cursive;
-      font-size: 2.3rem;
-      margin-top: 0;
-      margin-bottom: 8px;
+      font-size: 2.2rem;
+      margin: 0 0 8px;
       letter-spacing: 2px;
+      line-height: 1.05;
     }
 
     .archives-block p {
@@ -505,6 +522,7 @@
       font-weight: 800;
       background: #fff;
       font-family: 'Space Grotesk';
+      min-width: 0;
     }
 
     .archive-btn {
@@ -518,6 +536,7 @@
       font-weight: 900;
       cursor: pointer;
       transition: 0.3s;
+      flex-shrink: 0;
     }
 
     .archive-btn:hover {
@@ -529,12 +548,12 @@
 
     .team-band {
       position: relative;
-      margin: 90px 0 60px 0;
-      padding: 50px 30px;
+      margin: 80px 0 56px;
+      padding: 42px 24px;
       text-align: center;
-      border: none;
       background: transparent;
       z-index: 1;
+      overflow: visible;
     }
 
     .team-band::before {
@@ -542,7 +561,7 @@
       position: absolute;
       inset: -5px -2vw 10px -2vw;
       background: var(--punk-pink);
-      transform: rotate(-1.5deg) scaleX(1.05);
+      transform: rotate(-1.2deg) scaleX(1.03);
       z-index: -1;
       border-top: 4px solid #111;
       border-bottom: 5px solid #111;
@@ -554,8 +573,8 @@
       position: absolute;
       left: -1vw;
       right: -2vw;
-      top: 100px;
-      font-size: 8vw;
+      top: 96px;
+      font-size: 7vw;
       font-family: 'Bangers';
       color: rgba(255, 255, 255, 0.2);
       pointer-events: none;
@@ -569,36 +588,37 @@
 
     .team-signature-intro {
       font-family: 'Bangers', cursive;
-      font-size: 3.2rem;
-      margin-top: -10px;
-      margin-bottom: 4px;
+      font-size: 3rem;
+      margin: -4px 0 6px;
       letter-spacing: 2px;
       color: #111;
       text-transform: uppercase;
       transform: rotate(-2deg);
       text-shadow: 2px 2px 0 #fff;
+      line-height: 0.95;
     }
 
     .team-subtext {
-      margin-bottom: 30px;
+      margin-bottom: 28px;
       color: #fff;
       font-family: 'Space Grotesk';
       font-weight: 900;
-      font-size: 1.05rem;
+      font-size: 1rem;
       transform: rotate(-2deg);
       text-shadow: 1px 1px 2px #000;
       display: inline-block;
       background: #111;
       padding: 6px 12px;
       box-shadow: -2px 2px 0 #fff;
+      line-height: 1.4;
     }
 
     .team-members-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-      gap: 40px 30px;
+      gap: 34px 24px;
       align-items: start;
-      margin-top: 50px;
+      margin-top: 40px;
     }
 
     .team-member-card {
@@ -641,32 +661,35 @@
     }
 
     .team-member-card:hover {
-      transform: translateY(-15px) rotate(0deg) scale(1.08) !important;
+      transform: translateY(-12px) rotate(0deg) scale(1.06) !important;
       box-shadow: 10px 10px 0 var(--yellow-neon);
     }
 
     .team-member-photo {
       width: 100%;
-      aspect-ratio: 1/1;
+      aspect-ratio: 1 / 1;
       border-radius: 4px;
       object-fit: cover;
       border: 2px solid #111;
       display: block;
       margin: 0 auto 10px;
       filter: grayscale(10%) contrast(1.1);
+      background: #fff;
     }
 
     .team-member-card h5 {
       font-family: 'Space Grotesk';
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 900;
       margin: 0 0 6px;
       color: #111;
+      line-height: 1.2;
+      word-break: break-word;
     }
 
     .team-member-info {
       margin: 0;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: #555;
       font-family: 'Space Grotesk';
       font-weight: 700;
@@ -675,12 +698,14 @@
       padding: 2px 5px;
       border-radius: 2px;
       display: inline-block;
+      line-height: 1.35;
+      word-break: break-word;
     }
 
     .join-card {
       display: flex;
       align-items: center;
-      gap: 40px;
+      gap: 34px;
       border-radius: 10px;
       border: 2px solid #111;
       background: #fff;
@@ -688,10 +713,12 @@
 
     .join-image {
       max-width: 200px;
+      width: 100%;
       border-radius: 12px;
       transform: rotate(4deg);
       transition: 0.3s;
       border: 3px solid #111;
+      flex-shrink: 0;
     }
 
     .join-card:hover .join-image {
@@ -703,10 +730,11 @@
       font-family: 'Bangers';
       margin: 0 0 10px;
       letter-spacing: 1px;
+      line-height: 1;
     }
 
     .join-text {
-      font-size: 1.02rem;
+      font-size: 1rem;
       color: #555;
       font-family: 'Space Grotesk';
       font-weight: 600;
@@ -725,6 +753,8 @@
       font-weight: 900;
       transition: 0.2s;
       box-shadow: 4px 4px 0 #111;
+      text-align: center;
+      justify-content: center;
     }
 
     .join-btn:hover {
@@ -736,25 +766,27 @@
 
     .footer {
       text-align: center;
-      padding: 40px;
+      padding: 34px 18px 28px;
       font-weight: 600;
       font-family: 'Space Grotesk';
       color: #444;
+      line-height: 1.6;
     }
 
     .loading-state,
     .empty-state,
     .error-state {
-      background: rgba(255,255,255,0.9);
+      background: rgba(255,255,255,0.92);
       border: 2px dashed #111;
-      padding: 40px;
+      padding: 34px 22px;
       border-radius: 12px;
       text-align: center;
       box-shadow: 6px 6px 0 rgba(0,0,0,1);
       font-family: 'Bangers';
       letter-spacing: 2px;
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       margin-top: 20px;
+      line-height: 1.2;
     }
 
     .modal {
@@ -788,7 +820,7 @@
     @keyframes popup { to { transform: scale(1); } }
 
     .modal-header {
-      padding: 30px;
+      padding: 26px 28px;
       border-bottom: 3px solid #111;
       display: flex;
       justify-content: space-between;
@@ -803,6 +835,7 @@
       font-size: 14px;
       letter-spacing: 1px;
       text-transform: uppercase;
+      line-height: 1.3;
     }
 
     .modal-title {
@@ -811,7 +844,8 @@
       font-weight: 900;
       letter-spacing: -1px;
       margin: 5px 0 0;
-      line-height: 1.1;
+      line-height: 1.05;
+      word-break: break-word;
     }
 
     .close-btn {
@@ -833,8 +867,8 @@
     }
 
     .modal-body {
-      padding: 30px;
-      font-size: 1.05rem;
+      padding: 28px;
+      font-size: 1.02rem;
       font-family: 'Inter';
       line-height: 1.75;
     }
@@ -860,395 +894,410 @@
     }
 
     @media (max-width: 980px) {
-      .board { grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
+      .board {
+        grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+      }
+
+      .team-members-grid {
+        grid-template-columns: repeat(3, minmax(0,1fr));
+      }
+
+      .join-card {
+        gap: 24px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .page-wrap {
+        padding: 8px 12px 40px;
+      }
+
+      .archives-block,
+      .join-card,
+      .intro-block {
+        padding: 20px 16px;
+        box-shadow: 4px 4px 0 rgba(0,0,0,0.08);
+      }
+
+      .archives-block h3 {
+        font-size: 1.8rem;
+        line-height: 1.1;
+      }
+
+      .team-signature-intro {
+        font-size: 2.3rem;
+        line-height: 1;
+      }
+
+      .team-subtext {
+        font-size: 0.95rem;
+        line-height: 1.4;
+        padding: 6px 10px;
+      }
+
+      .team-members-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 22px 16px;
+        margin-top: 28px;
+      }
+
+      .team-member-card {
+        padding: 10px;
+        box-shadow: 4px 4px 0 rgba(0,0,0,1);
+      }
+
+      .team-member-card::after {
+        width: 38px;
+        height: 16px;
+        top: -10px;
+      }
+
+      .team-member-photo {
+        max-width: 100%;
+        height: auto;
+        margin-bottom: 8px;
+      }
+
+      .team-member-card h5 {
+        font-size: 0.95rem;
+      }
+
+      .team-member-info {
+        font-size: 0.75rem;
+        line-height: 1.3;
+      }
+
+      .join-title {
+        font-size: 1.5rem;
+        line-height: 1.1;
+      }
+
+      .join-text {
+        font-size: 0.95rem;
+      }
+
+      .join-image {
+        max-width: 160px;
+      }
     }
 
     @media (max-width: 640px) {
-      .board { grid-template-columns: 1fr !important; }
-      .punk-ribbon-content { flex-direction: column; gap: 20px; text-align: center; }
-      .punk-title-area { margin-left: 0; align-items: center; }
-      .ekg-track { display: none; }
-      .join-card { flex-direction: column; text-align: center; }
-      .controls-band { justify-content: center; }
-      .archive-controls { flex-direction: column; }
-      .archive-select, .archive-btn { width: 100%; }
+      body {
+        overflow-x: hidden;
+      }
+
+      .punk-header-wrapper {
+        padding: 30px 0 18px;
+      }
+
+      .punk-ribbon {
+        transform: none;
+        padding: 18px 12px 20px;
+      }
+
+      .punk-ribbon-content {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+        min-height: auto;
+      }
+
+      .punk-logo-zone {
+        margin-right: 0;
+      }
+
+      .logo-sud {
+        height: 76px;
+        transform: none;
+      }
+
+      .logo-sud:hover {
+        transform: scale(1.05);
+      }
+
+      .punk-title-area {
+        margin-left: 0;
+        align-items: center;
+      }
+
+      .site-title {
+        font-size: clamp(2.2rem, 14vw, 3.8rem);
+        line-height: 0.92;
+        letter-spacing: 1px;
+        transform: none;
+        text-align: center;
+      }
+
+      .site-subtitle-tag {
+        margin-left: 0;
+        margin-top: 10px;
+        font-size: 0.82rem;
+        line-height: 1.3;
+        padding: 6px 10px;
+        transform: none;
+        max-width: 100%;
+        white-space: normal;
+        text-align: center;
+      }
+
+      .ekg-track {
+        display: none;
+      }
+
+      .controls-band {
+        margin: 8px auto 20px;
+        padding: 0 12px;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .top-btn {
+        width: 100%;
+        max-width: 320px;
+        padding: 12px 16px;
+        font-size: 13px;
+        box-shadow: none;
+      }
+
+      .intro-block {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        padding: 16px 14px;
+        margin-bottom: 20px;
+      }
+
+      .board {
+        grid-template-columns: 1fr !important;
+        grid-auto-rows: auto !important;
+        gap: 16px !important;
+        margin-bottom: 24px;
+      }
+
+      .bulletin-card-container {
+        grid-column: auto !important;
+        grid-row: auto !important;
+        min-height: auto;
+      }
+
+      .bulletin-card-tilt {
+        min-height: 250px;
+        border-radius: 18px;
+      }
+
+      .card-top {
+        padding: 16px 16px 0;
+      }
+
+      .card-body {
+        padding: 0 16px 16px;
+      }
+
+      .card-title {
+        font-size: 1.08rem;
+        line-height: 1.12;
+      }
+
+      .card-short {
+        font-size: 0.92rem;
+        line-height: 1.55;
+      }
+
+      .archives-block {
+        padding: 18px 14px;
+        margin-bottom: 20px;
+      }
+
+      .archives-block h3 {
+        font-size: 1.45rem;
+        line-height: 1.05;
+        margin-bottom: 8px;
+      }
+
+      .archives-block p {
+        font-size: 0.92rem;
+        line-height: 1.5;
+      }
+
+      .archive-controls {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .archive-select,
+      .archive-btn {
+        width: 100%;
+        min-height: 46px;
+      }
+
+      .archive-select {
+        padding: 0 14px;
+        font-size: 0.95rem;
+      }
+
+      .archive-btn {
+        font-size: 0.9rem;
+      }
+
+      .team-band {
+        margin: 34px 0 26px;
+        padding: 24px 14px;
+      }
+
+      .team-band::before {
+        inset: -4px -8px 6px -8px;
+        transform: rotate(-1deg) scaleX(1.01);
+      }
+
+      .team-band::after {
+        display: none;
+      }
+
+      .team-signature-intro {
+        font-size: 1.8rem;
+        margin-top: 0;
+        margin-bottom: 8px;
+        transform: none;
+        text-shadow: 1px 1px 0 #fff;
+      }
+
+      .team-subtext {
+        transform: none;
+        font-size: 0.82rem;
+        margin-bottom: 18px;
+        box-shadow: none;
+      }
+
+      .team-members-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 16px 12px;
+        margin-top: 18px;
+      }
+
+      .team-member-card,
+      .team-member-card:nth-child(even),
+      .team-member-card:nth-child(odd) {
+        transform: none;
+      }
+
+      .team-member-card:hover {
+        transform: translateY(-6px) scale(1.02) !important;
+        box-shadow: 6px 6px 0 var(--yellow-neon);
+      }
+
+      .team-member-photo {
+        width: 100%;
+        max-width: 100%;
+        aspect-ratio: 1 / 1;
+      }
+
+      .team-member-card h5 {
+        font-size: 0.88rem;
+        line-height: 1.2;
+      }
+
+      .team-member-info {
+        font-size: 0.72rem;
+        padding: 2px 4px;
+      }
+
+      .join-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 18px;
+        padding: 18px 14px;
+      }
+
+      .join-image {
+        max-width: 140px;
+        transform: none;
+      }
+
+      .join-card:hover .join-image {
+        transform: scale(1.04);
+      }
+
+      .join-title {
+        font-size: 1.35rem;
+        line-height: 1.05;
+      }
+
+      .join-text {
+        font-size: 0.92rem;
+        line-height: 1.5;
+      }
+
+      .join-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 12px 16px;
+        box-shadow: 3px 3px 0 #111;
+      }
+
+      .footer {
+        padding: 24px 14px 30px;
+        font-size: 0.82rem;
+        line-height: 1.5;
+      }
+
+      .loading-state,
+      .empty-state,
+      .error-state {
+        font-size: 1.15rem;
+        padding: 24px 16px;
+        box-shadow: 4px 4px 0 rgba(0,0,0,1);
+      }
+
+      .modal {
+        padding: 10px;
+      }
+
+      .modal-content {
+        width: 100%;
+        max-height: calc(100vh - 20px);
+        border-width: 3px;
+        border-radius: 16px;
+        box-shadow: 8px 8px 0 rgba(0,0,0,0.7);
+      }
+
+      .modal-header {
+        padding: 18px 16px;
+      }
+
+      .modal-title {
+        font-size: 1.35rem;
+        line-height: 1.08;
+      }
+
+      .modal-body {
+        padding: 18px 16px;
+        font-size: 0.96rem;
+        line-height: 1.65;
+      }
+
+      .modal-link {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+      }
     }
-    @media (max-width: 900px) {
-  .page-wrap {
-    padding: 8px 12px 40px;
-  }
 
-  .archives-block,
-  .join-card,
-  .intro-block {
-    padding: 20px 16px;
-    box-shadow: 4px 4px 0 rgba(0,0,0,0.08);
-  }
-
-  .archives-block h3 {
-    font-size: 1.8rem;
-    line-height: 1.1;
-  }
-
-  .team-signature-intro {
-    font-size: 2.3rem;
-    line-height: 1;
-  }
-
-  .team-subtext {
-    font-size: 0.95rem;
-    line-height: 1.4;
-    padding: 6px 10px;
-  }
-
-  .team-members-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 22px 16px;
-    margin-top: 28px;
-  }
-
-  .team-member-card {
-    padding: 10px;
-    box-shadow: 4px 4px 0 rgba(0,0,0,1);
-  }
-
-  .team-member-card::after {
-    width: 38px;
-    height: 16px;
-    top: -10px;
-  }
-
-  .team-member-photo {
-    aspect-ratio: 1 / 1;
-    max-width: 100%;
-    height: auto;
-    margin-bottom: 8px;
-  }
-
-  .team-member-card h5 {
-    font-size: 0.95rem;
-  }
-
-  .team-member-info {
-    font-size: 0.75rem;
-    line-height: 1.3;
-  }
-
-  .join-title {
-    font-size: 1.5rem;
-    line-height: 1.1;
-  }
-
-  .join-text {
-    font-size: 0.95rem;
-  }
-
-  .join-image {
-    max-width: 160px;
-    width: 100%;
-  }
-}
-
-@media (max-width: 640px) {
-  body {
-    overflow-x: hidden;
-  }
-
-  .punk-header-wrapper {
-    padding: 36px 0 24px 0;
-  }
-
-  .punk-ribbon {
-    transform: none;
-    padding: 18px 12px;
-  }
-
-  .punk-ribbon-content {
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
-    text-align: center;
-  }
-
-  .punk-logo-zone {
-    margin-right: 0;
-  }
-
-  .logo-sud {
-    height: 76px;
-    transform: none;
-  }
-
-  .logo-sud:hover {
-    transform: scale(1.06);
-  }
-
-  .punk-title-area {
-    margin-left: 0;
-    align-items: center;
-  }
-
-  .site-title {
-    font-size: clamp(2.2rem, 14vw, 3.8rem);
-    line-height: 0.95;
-    letter-spacing: 1px;
-    transform: none;
-    text-align: center;
-  }
-
-  .site-subtitle-tag {
-    margin-left: 0;
-    margin-top: 10px;
-    font-size: 0.82rem;
-    line-height: 1.3;
-    padding: 6px 10px;
-    transform: none;
-    max-width: 100%;
-    white-space: normal;
-    text-align: center;
-  }
-
-  .ekg-track {
-    display: none;
-  }
-
-  .controls-band {
-    margin: 8px auto 22px;
-    padding: 0 12px;
-    justify-content: center;
-    gap: 10px;
-  }
-
-  .top-btn {
-    width: 100%;
-    max-width: 320px;
-    padding: 12px 16px;
-    font-size: 13px;
-    box-shadow: none;
-  }
-
-  .intro-block {
-    font-size: 0.95rem;
-    line-height: 1.6;
-    padding: 16px 14px;
-    margin-bottom: 20px;
-  }
-
-  .board {
-    grid-template-columns: 1fr !important;
-    grid-auto-rows: auto !important;
-    gap: 16px !important;
-    margin-bottom: 24px;
-  }
-
-  .bulletin-card-container {
-    grid-column: auto !important;
-    grid-row: auto !important;
-    min-height: auto;
-  }
-
-  .bulletin-card-tilt {
-    min-height: 250px;
-    border-radius: 18px;
-  }
-
-  .card-top {
-    padding: 16px 16px 0;
-  }
-
-  .card-body {
-    padding: 0 16px 16px;
-  }
-
-  .card-title {
-    font-size: 1.1rem;
-    line-height: 1.15;
-  }
-
-  .card-short {
-    font-size: 0.92rem;
-    line-height: 1.55;
-  }
-
-  .archives-block {
-    padding: 18px 14px;
-    margin-bottom: 20px;
-  }
-
-  .archives-block h3 {
-    font-size: 1.45rem;
-    line-height: 1.1;
-    margin-bottom: 8px;
-  }
-
-  .archives-block p {
-    font-size: 0.92rem;
-    line-height: 1.5;
-  }
-
-  .archive-controls {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .archive-select,
-  .archive-btn {
-    width: 100%;
-    min-height: 46px;
-  }
-
-  .archive-select {
-    padding: 0 14px;
-    font-size: 0.95rem;
-  }
-
-  .archive-btn {
-    font-size: 0.9rem;
-  }
-
-  .team-band {
-    margin: 34px 0 26px;
-    padding: 24px 14px;
-  }
-
-  .team-band::before {
-    inset: -4px -8px 6px -8px;
-    transform: rotate(-1deg) scaleX(1.01);
-  }
-
-  .team-band::after {
-    display: none;
-  }
-
-  .team-signature-intro {
-    font-size: 1.8rem;
-    margin-top: 0;
-    margin-bottom: 8px;
-    transform: none;
-    text-shadow: 1px 1px 0 #fff;
-  }
-
-  .team-subtext {
-    transform: none;
-    font-size: 0.82rem;
-    margin-bottom: 18px;
-    box-shadow: none;
-  }
-
-  .team-members-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 16px 12px;
-    margin-top: 18px;
-  }
-
-  .team-member-card,
-  .team-member-card:nth-child(even),
-  .team-member-card:nth-child(odd) {
-    transform: none;
-  }
-
-  .team-member-card:hover {
-    transform: translateY(-6px) scale(1.02) !important;
-    box-shadow: 6px 6px 0 var(--yellow-neon);
-  }
-
-  .team-member-photo {
-    width: 100%;
-    max-width: 100%;
-    aspect-ratio: 1 / 1;
-  }
-
-  .team-member-card h5 {
-    font-size: 0.88rem;
-    line-height: 1.2;
-  }
-
-  .team-member-info {
-    font-size: 0.72rem;
-    padding: 2px 4px;
-  }
-
-  .join-card {
-    flex-direction: column;
-    text-align: center;
-    gap: 18px;
-    padding: 18px 14px;
-  }
-
-  .join-image {
-    max-width: 140px;
-    transform: none;
-  }
-
-  .join-card:hover .join-image {
-    transform: scale(1.04);
-  }
-
-  .join-title {
-    font-size: 1.35rem;
-    line-height: 1.05;
-  }
-
-  .join-text {
-    font-size: 0.92rem;
-    line-height: 1.5;
-  }
-
-  .join-btn {
-    width: 100%;
-    justify-content: center;
-    padding: 12px 16px;
-    box-shadow: 3px 3px 0 #111;
-  }
-
-  .footer {
-    padding: 24px 14px 30px;
-    font-size: 0.82rem;
-    line-height: 1.5;
-  }
-
-  .modal {
-    padding: 10px;
-  }
-
-  .modal-content {
-    width: 100%;
-    max-height: calc(100vh - 20px);
-    border-width: 3px;
-    border-radius: 16px;
-    box-shadow: 8px 8px 0 rgba(0,0,0,0.7);
-  }
-
-  .modal-header {
-    padding: 18px 16px;
-  }
-
-  .modal-title {
-    font-size: 1.4rem;
-    line-height: 1.1;
-  }
-
-  .modal-body {
-    padding: 18px 16px;
-    font-size: 0.96rem;
-    line-height: 1.65;
-  }
-}
-
-@media (max-width: 420px) {
-  .team-members-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .site-title {
-    font-size: 2rem;
-  }
-
-  .site-subtitle-tag {
-    font-size: 0.76rem;
-  }
-}
+    @media (max-width: 420px) {
+      .team-members-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .site-title {
+        font-size: 2rem;
+      }
+
+      .site-subtitle-tag {
+        font-size: 0.76rem;
+      }
+
+      .archives-block h3 {
+        font-size: 1.25rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1272,7 +1321,7 @@
         </svg>
         <div class="ekg-line-end"></div>
       </div>
-<br><br>
+
       <div class="punk-title-area">
         <h1 class="site-title glitch-strong" id="siteTitle" data-text="FRÉQUENCE SUD">FRÉQUENCE SUD</h1>
         <div>
@@ -1318,38 +1367,38 @@
     <div class="team-members-grid">
       <article class="team-member-card">
         <img src="membres/rb.jpg" alt="Rudy" class="team-member-photo">
-        <h5>Rudy Bodart</h5><h5>06.26.15.61.40</h5>
-        <span class="team-member-info">EHS</span>
+        <h5>Rudy B.</h5>
+        <span class="team-member-info">06.26.15.61.40</span>
       </article>
 
       <article class="team-member-card">
         <img src="membres/sb.jpg" alt="Souad" class="team-member-photo">
-        <h5>Souad Belal</h5><h5></h5>06.23.91.45.95</h5>
-        <span class="team-member-info">Abeille</span>
+        <h5>Souad B.</h5>
+        <span class="team-member-info">06.23.91.45.95</span>
       </article>
 
       <article class="team-member-card">
         <img src="membres/bb.jpg" alt="Bouchra" class="team-member-photo">
-        <h5>Bouchra Bensaddik</h5><h5></h5>
-        <span class="team-member-info">Enedis</span>
+        <h5>Bouchra B.</h5>
+        <span class="team-member-info">Permanence Enedis</span>
       </article>
 
       <article class="team-member-card">
         <img src="membres/ld.jpg" alt="Latifa" class="team-member-photo">
-        <h5>Latifa Daussy</h5><h5></h5>
-        <span class="team-member-info">Enedis</span>
+        <h5>Latifa D.</h5>
+        <span class="team-member-info">Rep. terrain</span>
       </article>
 
       <article class="team-member-card">
         <img src="membres/jn.jpg" alt="Julien" class="team-member-photo">
-        <h5>Julien Nunne</h5><h5>06.17.97.31.42</h5>
-        <span class="team-member-info">AG2R</span>
+        <h5>Julien N.</h5>
+        <span class="team-member-info">06.17.97.31.42</span>
       </article>
     </div>
   </section>
 
   <section class="join-card">
-    <img src="img/SUD-FlyApp.png" alt="Application mobile" class="join-image">
+    <img src="assets/img/sud-app.png" alt="Application mobile" class="join-image">
     <div>
       <h4 class="join-title">REJOIGNEZ SUD</h4>
       <p class="join-text">
@@ -1543,7 +1592,7 @@
     DOM.siteSubtitle.textContent = `Bulletin d'information syndical // ${currentBulletin.period}`;
     DOM.footerTitle.textContent = currentBulletin.title.toUpperCase();
     DOM.footerPeriod.textContent = currentBulletin.period;
-    DOM.introText.textContent = `Retrouve dans cette édition les informations publiées par SUD pour les salariés : actualités, sujets suivis, ressources utiles et points de vigilance.`;
+    DOM.introText.textContent = "Retrouve dans cette édition les informations publiées par SUD pour les salariés : actualités, sujets suivis, ressources utiles et points de vigilance.";
 
     DOM.statesContainer.innerHTML = "";
     renderBoard(currentBulletin);
@@ -1601,6 +1650,7 @@
       `;
 
       containerWrap.addEventListener("mousemove", (e) => {
+        if (window.innerWidth <= 640) return;
         const rect = containerWrap.getBoundingClientRect();
         const xVal = ((e.clientX - rect.left) / rect.width) - 0.5;
         const yVal = ((e.clientY - rect.top) / rect.height) - 0.5;
